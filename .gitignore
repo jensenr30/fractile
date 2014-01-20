@@ -1,18 +1,16 @@
-# Object files
+bin/Debug/debug.txt
+bin/Debug/error.txt
+bin/Release/debug.txt
+bin/Release/error.txt
+*.layout
+*.depend
+bin/Debug/DataLogger.exe
+bin/Release/DataLogger.exe
 *.o
-*.ko
 
-# Libraries
-*.lib
-*.a
-
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
-
-# Executables
-*.exe
-*.out
-*.app
+*stderr.txt
+*stdout.txt
+*.orig
+*Thumbs.db
+*.orig
+*/*.orig

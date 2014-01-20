@@ -1,0 +1,4 @@
+git fetch origin --prune
+	This checks to see which remote branches no longer exist.
+	any remote brances that no longer exist are erased from your local repository's branch list.
+	:3 this cleans things up

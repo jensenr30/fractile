@@ -1,0 +1,14 @@
+<DataPlotter file type version>
+<Graph Title>
+<X Axis Title>
+<Y Axis Title>
+<bit (1/0) for plotting log scale>
+<bit (1/0) for printing axes>
+<6 hex bits for color of points>
+<int point size>
+<char for point connection style>
+<
+x_value, y_value
+x_value, y_value
+x_value, y_value
+>
