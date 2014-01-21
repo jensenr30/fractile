@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include "bool.h"
 #include "SDL/SDL.h"
+#include "bool.h"
 
 // this is a single data point
 struct pointData{
@@ -46,9 +46,9 @@ struct plotData{
 	// color of the background
 	Uint32 colorBack;
 	// the radius (in pixels) of the data points. 1=1 pixel (smallest) 
-	int pointSize;
+	float pointSize;
 	// what size line should be used?
-	int lineSize;
+	float lineSize;
 	// what line connection style should be used?
 	int lineStyle;
 	// this tells us how many other points any one point has connections to.

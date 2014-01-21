@@ -117,8 +117,10 @@ int main( int argc, char* argv[] )
 		//no more events to handle at the moment.
 		
 		
+		
 		plot(&myPlot, screen);						// display plot
-		//free(myPlot.dataPoints);					// free plot data point memory
+		
+        draw_circle(screen, 300.0, 300.0, 50, 0x00000000);
         
         //updates the screen
         SDL_Flip( screen );

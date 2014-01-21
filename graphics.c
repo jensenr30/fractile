@@ -1,5 +1,7 @@
 #include "graphics.h"
 #include "math.h"
+#include "plot.h"
+#include "globals.h"
 
 
 
@@ -248,7 +250,15 @@ void draw_line(SDL_Surface *theSurface, int x1, int y1, int x2, int y2, int thic
 		}
 		//this handles the special case the the line is a verticle line (slope infinity)
 		// this swaps the x and y values so that the function draws a line with a finite slope (zero)
-		draw_line(theSurface,y1,x1,y2,x2,thickness,lineColor);
+		SDL_Rect myRect;
+		myRect.w = thickness;
+		myRect.h = y1-y2;
+		myRect.x = x1 - ((int)0.5*thickness);
+		if(y1 < y2)
+			myRect.y = y1;
+		else
+			myRect.y = y2;
+		SDL_FillRect(theSurface, &myRect ,lineColor);
 		return;
 	}
 	
@@ -365,7 +375,7 @@ void draw_circle(SDL_Surface *dest, float x, float y, float radius, Uint32 color
 	for(i=(int)xLowBound; i<=(int)(xHighBound+1); i++){
 		for(j=(int)yLowBound; j<=(int)(yHighBound+1); j++){
 			dist = sqrtf((i-x)*(i-x) + (j-y)*(j-y) );
-			if(dist <= radius && i>=0 && j>=0)
+			if(dist <= radius && i>=0 && j>=0 && i<SCREEN_WIDTH && j<SCREEN_HEIGHT)
 				set_pixel(dest, i, j, color);
 		}
 	}
