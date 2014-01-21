@@ -1,11 +1,19 @@
-#include "headers_and_globals.h"
-
+#include "general_functions.h"
+#include "globals.h"
+#include "plot.h"
 
 
 
 int main( int argc, char* argv[] ) 
 {
+	
+	// initial screen sizes
+	SCREEN_WIDTH = DEFAULT_SCREEN_WIDTH;
+	SCREEN_HEIGHT = DEFAULT_SCREEN_HEIGHT;
+	
+	//----------------------------------------------------
 	//debugging the input arguments
+	//----------------------------------------------------
 	FILE *debugFile = fopen("debug.txt", "w");
 	if(debugFile == NULL) return 5;
 	fprintf(debugFile, "argc = %d\n",argc);
@@ -15,8 +23,12 @@ int main( int argc, char* argv[] )
 	}
 	fclose(debugFile);
 	
-	//get a random seed.
-	srand(time(NULL));
+	
+	FILE *dataFile = fopen("data.txt", "r");	// open file
+	if(dataFile == NULL) return 1;				// quit if plot file is null
+	plot_load(dataFile, &myPlot);				// load plot data
+	fclose(dataFile);							// close file
+	
 	
 	//----------------------------------------------------
 	// VARIABLES USED IN MAIN()
@@ -105,6 +117,8 @@ int main( int argc, char* argv[] )
 		//no more events to handle at the moment.
 		
 		
+		plot(&myPlot, screen);						// display plot
+		//free(myPlot.dataPoints);					// free plot data point memory
         
         //updates the screen
         SDL_Flip( screen );

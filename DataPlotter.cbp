@@ -44,12 +44,23 @@
 			<Add option="-lSDL_image" />
 			<Add option="-lSDL_ttf" />
 		</Linker>
+		<Unit filename="bool.h" />
+		<Unit filename="general_functions.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="general_functions.h" />
+		<Unit filename="globals.h" />
+		<Unit filename="graphics.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="graphics.h" />
-		<Unit filename="headers_and_globals.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="plot.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="plot.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />
