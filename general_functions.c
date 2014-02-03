@@ -76,7 +76,7 @@ void quit_game(Uint32 quitFlag){
  
  void set_window_size(int w, int h){
 	screen = SDL_SetVideoMode( w, h, SCREEN_BPP, SDL_SWSURFACE | SDL_RESIZABLE );
-	
+
 	//If there was an error setting up the screen
 	if(screen == NULL )
 	{
@@ -201,7 +201,7 @@ void clean_up(){
 	SDL_FreeSurface(screen);
 	
 	// de-allocate plot memory
-	free(myPlot.dataPoints);
+	//free(myPlot.dataPoints);
 	
 	//Quit SDL
 	SDL_Quit();

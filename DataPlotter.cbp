@@ -61,6 +61,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="plot.h" />
+		<Unit filename="weirdgraphics.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="weirdgraphics.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />

@@ -26,7 +26,7 @@ int main( int argc, char* argv[] )
 	
 	FILE *dataFile = fopen("data.txt", "r");	// open file
 	if(dataFile == NULL) return 1;				// quit if plot file is null
-	plot_load(dataFile, &myPlot);				// load plot data
+	//plot_load(dataFile, &myPlot);				// load plot data
 	fclose(dataFile);							// close file
 	
 	
@@ -118,12 +118,14 @@ int main( int argc, char* argv[] )
 		
 		
 		
-		plot(&myPlot, screen);						// display plot
+		//plot(&myPlot, screen);						// display plot
+		plot_weird_heat(screen);
 		
-        draw_circle(screen, 300.0, 300.0, 50, 0x00000000);
+        //draw_circle(screen, 300.0, 300.0, 50, 0x00000000);
         
         //updates the screen
         SDL_Flip( screen );
+        
         
         //----------------------------------------------------------------------
 		// FPS calculation and variable handling

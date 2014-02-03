@@ -1,4 +1,6 @@
 #include "SDL/SDL_ttf.h"
+//#include "plot.h"
+
 
 #define DEBUG 1 // general debug output.
 
@@ -25,4 +27,4 @@ SDL_Event event;
 TTF_Font *font22;
 TTF_Font *font16;
 
-struct plotData myPlot;
+//struct plotData myPlot;
