@@ -1,0 +1,9 @@
+*.layout
+*.depend
+
+*.exe
+*.o
+
+*stderr.txt
+*stdout.txt
+*.orig
