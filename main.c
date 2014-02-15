@@ -109,7 +109,8 @@ int main( int argc, char* argv[] )
 			
             if( event.type == SDL_KEYDOWN ){		///keyboard event
                 switch( event.key.keysym.sym ){
-				case SDLK_r: fractal_random(&myfractal, 5, 5); break;
+				case SDLK_F5: fractal_random(&myfractal, 5, 5); break;
+				case SDLK_e:  fractal_editor(NULL,&myfractal,x,y,ee_toggle); break;
 				default: break;
 				}
 			}
@@ -143,6 +144,7 @@ int main( int argc, char* argv[] )
         */
 		
         fractal_print(screen, &myfractal);
+        fractal_editor(screen, &myfractal, x, y, ee_print);
         SDL_Flip(screen);
         SDL_FillRect(screen, &screenRect, 0);
         

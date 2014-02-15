@@ -1,3 +1,4 @@
+#include "bool.h"
 
 struct vectorData{
 	// magnitude of each component
@@ -57,6 +58,33 @@ void fractal_iteration(SDL_Surface *dest, struct fractalData *f, double entryx, 
 void fractal_print(SDL_Surface *dest, struct fractalData *fractal);
 void fractal_random(struct fractalData *f, int maxVects, int maxIterations);
 
+
+
+// the editor is a sidbar on the left side of the window.
+#define EDITOR_DEFAULT_WIDTH 150
+#define EDITOR_COLOR_PRIMARY 0xff2f2f2f
+#define EDITOR_COLOR_SECONDARY 0xff3f3f3f
+#define EDITOR_COLOR_SCROLL_BAR 0xff5f5f5f
+#define EDITOR_COLOR_SCROLL_BAR_BACKGROUND EDITOR_COLOR_PRIMARY
+#define EDITOR_BUTTON_SIZE 32
+#define EDITOR_TITLE_BAR_HEIGHT 16
+#define EDITOR_SCROLL_BAR_WIDTH 16
+
+// these are enumerations for editor buttons.
+#define EDITOR_BUTTON_VECTOR 0
+#define EDITOR_BUTTON_OPTIONS 1
+// this is how many buttons there are.
+#define EDITOR_BUTTONS_NUMBER_OF 2
+
+/// these are enumerations of editor events
+#define ee_print 0	// just print the editor. the user isn't doing anything with it at this time.
+#define ee_toggle 1		// this will toggle if the editor is open or not.
+
+
+
+
+bool fractal_editor(SDL_Surface *dest, struct fractalData *f, int x, int y, int editorEvent);
+void init_fractal_editor();
 
 
 

@@ -151,3 +151,91 @@ void fractal_random(struct fractalData *f, int maxVects, int maxIterations){
     }
 }
 
+
+void init_fractal_editor(){
+	
+	
+}
+
+
+// f if the fractal that we will print the vectors for 
+/// returns true if the user's mouse click or event happened inside of the fractal editor.
+bool fractal_editor(SDL_Surface *dest, struct fractalData *f, int x, int y, int editorEvent){
+	
+	static SDL_Rect genRect;
+	static bool firstTime = true;
+	static SDL_Rect editor;
+	// this tells us if the editor window is open
+	static bool editorOpen=true;
+	// this tells us what button the editor is currently on.
+	static int editorButton=0;
+	// this is the current width of the editor
+	static int currentWidth;
+	
+	static SDL_Rect buttons[EDITOR_BUTTONS_NUMBER_OF];
+	int i;
+	
+	
+	// handle all first-time-through things
+	if(firstTime){
+		editor.x = 0;
+		editor.y = 0;
+		currentWidth = EDITOR_DEFAULT_WIDTH;
+		
+		for(i=0; i<EDITOR_BUTTONS_NUMBER_OF; i++){
+			buttons[i].w = buttons[i].h = EDITOR_BUTTON_SIZE;
+			buttons[i].y = i*EDITOR_BUTTON_SIZE;
+		}
+		firstTime = false;
+	}
+	
+	//check for toggling
+	if(editorEvent == ee_toggle) editorOpen^=1;
+	
+	
+	
+	// these things need to be evaluated every time through the loop.
+	for(i=0; i<EDITOR_BUTTONS_NUMBER_OF; i++){
+		buttons[i].x = (currentWidth+EDITOR_TITLE_BAR_HEIGHT)*editorOpen;
+	}
+	editor.h = SCREEN_HEIGHT;
+	editor.w = currentWidth*editorOpen;
+	
+	
+	// if the destination surface is null, don't bother printing anything
+	if(dest == NULL) return true;
+	
+	//-------------------------------------------------------------------------------
+	// printing stuff
+	//-------------------------------------------------------------------------------
+	// print buttons
+	for(i=0; i<EDITOR_BUTTONS_NUMBER_OF; i++){
+		SDL_FillRect(dest, &buttons[i], EDITOR_COLOR_PRIMARY*((i%2)^1) + EDITOR_COLOR_SECONDARY*(i%2) );
+	}
+	
+	if(editorOpen){
+		// print the background colors of the editor
+		SDL_FillRect(dest, &editor, EDITOR_COLOR_PRIMARY);
+		
+		genRect.x=editor.x+currentWidth;
+		genRect.y=editor.y;
+		genRect.w = EDITOR_SCROLL_BAR_WIDTH;
+		genRect.h = editor.h;
+		SDL_FillRect(dest, &genRect, EDITOR_COLOR_SCROLL_BAR_BACKGROUND);
+		
+		genRect.x = editor.x;
+		genRect.w = genRect.h = currentWidth;
+		for(i=0; i<f->numbVectors && i*currentWidth<SCREEN_HEIGHT; i++){
+			
+			// if i is an odd integer, print an secondary color background square
+			if(i%2){
+				genRect.y = editor.y + i*currentWidth + EDITOR_TITLE_BAR_HEIGHT;
+				SDL_FillRect(dest, &genRect, EDITOR_COLOR_SECONDARY);
+			}
+			
+		}
+	}
+	// the user did not interact with the editor.
+	return false;
+}
+
