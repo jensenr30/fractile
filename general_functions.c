@@ -5,7 +5,6 @@
 #include "Windows.h"
 #include "bool.h"
 #include "general_functions.h"
-#include "plot.h"
 #include "globals.h"
 
 /*

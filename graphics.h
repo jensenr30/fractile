@@ -12,6 +12,6 @@ void apply_outline(SDL_Surface *dest, SDL_Rect *box, unsigned short thickness, U
 #define grad_linear 0
 #define grad_radial 1
 void gradient(SDL_Surface *datsurface, SDL_Rect *gradClip, int x1, int y1, int x2, int y2, Uint32 color1, Uint32 color2, unsigned int gradientType);
-void draw_line(SDL_Surface *theSurface, int x1, int y1, int x2, int y2, int thickness, int lineColor);
+void draw_line(SDL_Surface *dest, float x1, float y1, float x2, float y2, float thickness, unsigned int lineColor);
 void draw_circle(SDL_Surface *dest, float x, float y, float radius, Uint32 color);
 

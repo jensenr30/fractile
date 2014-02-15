@@ -1,8 +1,8 @@
 #include "graphics.h"
 #include "math.h"
-#include "plot.h"
+#include "math_custom.h"
 #include "globals.h"
-
+#include "bool.h"
 
 
 /// this returns the pixel data of a pixel at a certain point on a surface (color and alpha in an Uint32)
@@ -227,7 +227,7 @@ void gradient(SDL_Surface *datsurface, SDL_Rect *gradClip, int x1, int y1, int x
 	}
 }
 
-
+/*
 
 //this draws a line on the screen from point (x1,y1) to point (x2,y2)
 // this draws the line (mathematically) from the centers of the two pixels.
@@ -272,27 +272,6 @@ void draw_line(SDL_Surface *theSurface, int x1, int y1, int x2, int y2, int thic
 	
 	// if the absolute value of the slope is less than 1, index through the x values
 	if(absval_slope < 1){
-		/* OLD CODE FOR GRADUAL SLOPE LINES
-		// swap the points around if x1 > x2
-		if(x1 > x2){
-			
-			int tempval=x1;	// store x1
-			x1 = x2;		// put x2 into x1
-			x2 = tempval;	// put the value that used to be in x1 into x2.
-			tempval = y1;	// store y1
-			y1 = y2;		// put y2 into y1
-			y2 = tempval;	// put the value that used to be in y1 into y2.
-		}
-		
-		for(x=x1+0.5,myPixel.x=x1; x<x2; x+=1.0,myPixel.x++){
-			line_value = slope*x +y1;
-			myPixel.y = line_value; // integer assignment. truncate decimal places
-			// if the line_value has decimal place value greater than or equal to 0.5, then round up.
-			if(line_value-(int)line_value >= 0.5) myPixel.y++;
-				
-			SDL_FillRect(theSurface, &myPixel, lineColor);
-		}
-		*/
 		//all of this assumes that x1 <= x2
 		float pixel_offset = 0.5;
 		//x2 is greater than x1
@@ -321,19 +300,6 @@ void draw_line(SDL_Surface *theSurface, int x1, int y1, int x2, int y2, int thic
 	}
 	// otherwise, the absolute value of the slope is greater to or equal to one, so index through the y values
 	else{
-		/*
-		// swap the points around if y1 > y2
-		if(x1 > x2){
-			int tempval=x1;	// store x1
-			x1 = x2;		// put x2 into x1
-			x2 = tempval;	// put the value that used to be in x1 into x2.
-			tempval = y1;	// store y1
-			y1 = y2;		// put y2 into y1
-			y2 = tempval;	// put the value that used to be in y1 into y2.
-		}
-		*/
-		
-		
 		//all of this assumes that y1 <= y2
 		float pixel_offset = 0.5;
 		//y2 is greater than y1
@@ -360,6 +326,212 @@ void draw_line(SDL_Surface *theSurface, int x1, int y1, int x2, int y2, int thic
 			SDL_FillRect(theSurface, &myPixel, lineColor);
 		}
 	}
+}
+
+*/
+
+
+void draw_line(SDL_Surface *dest, float x1, float y1, float x2, float y2, float thickness, unsigned int lineColor){
+	
+	//-------------------------------------------------------------------------------
+	// setting up variables
+	//-------------------------------------------------------------------------------
+	// these are the differences in x and y.
+	float xdiff = x2-x1;
+	float ydiff = y2-y1;
+	
+	// these are the slopes of x and y. This describes how fast they change with respect to a unit step in the line parameter, t.
+	float xslope;
+	float yslope;
+	
+	// this is the maximum difference (either the difference in y or the difference in y, depending on which is bigger.)
+	float bigdiff;
+	
+	if(fabs(ydiff) > abs(xdiff)){			// the difference in y is greater than the difference in x
+		bigdiff = ydiff;
+		xslope = xdiff/bigdiff;
+		yslope = 1.0;
+	}
+	else{						// the difference in x is greater than the difference in y
+		bigdiff = xdiff;
+		xslope = 1;
+		yslope = ydiff/bigdiff;
+	}
+	if(xslope == 0){				// make sure xslope is not zero. we need to divide by that!
+		xslope = 1/VERTICAL;		// make xslope insanely tiny (so that y can change a lot and x will change change a VERY small amount.
+	}
+	//-------------------------------------------------------------------------------
+	// check to see if BOTH points are out of bounds
+	//-------------------------------------------------------------------------------
+	if(!within_screen(x1,y1) && !within_screen(x2,y2)){
+		
+		// a temporary solution (this doesn't allow lines that have points outside the screen to be drawn THROUGH the screen)
+		return;															
+			
+		// used to collect the resulting intersection points with the screen.
+		float xr, yr, xr1=-1, yr1=-1, xr2=-1, yr2=-1;
+		bool foundOne = false;
+		
+		// check top screen bound intersection
+		if( intersect_p(x1,y1,yslope/xslope, 0,0,HORIZONTAL, &xr,&yr)==1){
+			if(within_screen(xr,yr)){
+				if(foundOne==false){
+					xr1=xr;
+					yr1=yr;
+				}
+				else{
+					xr2=xr;
+					yr2=yr;
+				}
+				foundOne = true;
+			}
+		}
+		// check bottom screen bound intersection
+		if( intersect_p(x1,y1,yslope/xslope, 0,SCREEN_HEIGHT-1,HORIZONTAL, &xr,&yr)==1){
+			if(within_screen(xr,yr)){
+				if(foundOne==false){
+					xr1=xr;
+					yr1=yr;
+				}
+				else{
+					xr2=xr;
+					yr2=yr;
+				}
+				foundOne = true;
+			}
+		}
+		// check left screen bound intersection
+		if( intersect_p(x1,y1,yslope/xslope, 0,0,VERTICAL, &xr,&yr)==1){
+			if(within_screen(xr,yr)){
+				if(foundOne==false){
+					xr1=xr;
+					yr1=yr;
+				}
+				else{
+					xr2=xr;
+					yr2=yr;
+				}
+				foundOne = true;
+			}
+		}
+		// check right bound intersection
+		if( intersect_p(x1,y1,yslope/xslope, SCREEN_WIDTH-1,0,VERTICAL, &xr,&yr)==1){
+			if(within_screen(xr,yr)){
+				if(foundOne==false){
+					xr1=xr;
+					yr1=yr;
+				}
+				else{
+					xr2=xr;
+					yr2=yr;
+				}
+				foundOne = true;
+			}
+		}
+		// if you found two spots where the line intersects (an entry and exit point)
+		if(xr2 != -1 && yr2 != -1){
+			// draw a line between those points (now, no part of the line is outside the screen)
+			draw_line(dest, xr1, yr1, xr2, yr2, thickness, lineColor);
+			return;
+		}
+	}
+	//-------------------------------------------------------------------------------
+	// check to see if ONE of the points is out of bounds
+	//-------------------------------------------------------------------------------
+	else if(!within_screen(x1,y1) || !within_screen(x2,y2)){
+		
+		// used to collect the resulting intersection points with the screen.
+		float xr, yr, xr1=-1, yr1=-1;
+		
+		bool foundOne = false;
+		
+		float xin, yin; // these are the coordinates of the inside point
+		float xout, yout; // these are the coordinates of the outside point
+		// store the inside points in xin and yin floating point variables.
+		if(within_screen(x1,y1)){
+			xin = x1;
+			yin = y1;
+			xout = x2;
+			yout = y2;
+		}
+		else{
+			xin = x2;
+			yin = y2;
+			xout = x1;
+			yout = y1;
+		}
+		
+		// this records the direction that x travels when going from inside the screen to outside it. (1 or -1)
+		//float xSignChange = (xin-xout);
+		
+		
+		
+		// check top screen bound intersection
+		if( !foundOne && intersect_p(x1,y1,yslope/xslope, 0,0,HORIZONTAL, &xr,&yr)==1){
+			if(within_screen(xr,yr)){
+				if((yin-yr)*(yin-yout) >=0){
+					xr1=xr;
+					yr1=yr;
+					foundOne = true;
+				}
+			}
+		}
+		// check bottom screen bound intersection
+		if( !foundOne && intersect_p(x1,y1,yslope/xslope, 0,SCREEN_HEIGHT-1,HORIZONTAL, &xr,&yr)==1){
+			if(within_screen(xr,yr)){
+				if((yin-yr)*(yin-yout) >=0){
+					xr1=xr;
+					yr1=yr;
+					foundOne = true;
+				}
+			}
+		}
+		// check left screen bound intersection
+		if( !foundOne && intersect_p(x1,y1,yslope/xslope, 0,0,VERTICAL, &xr,&yr)==1){
+			if(within_screen(xr,yr)){
+				if((xin-xr)*(xin-xout) >=0){
+					xr1=xr;
+					yr1=yr;
+					foundOne = true;
+				}
+			}
+		}
+		// check right bound intersection
+		if( !foundOne && intersect_p(x1,y1,yslope/xslope, SCREEN_WIDTH-1,0,VERTICAL, &xr,&yr)==1){
+			if(within_screen(xr,yr)){
+				if((xin-xr)*(xin-xout) >=0){
+					xr1=xr;
+					yr1=yr;
+					foundOne = true;
+				}
+			}
+		}
+		// if you found the exit point of the line,
+		if(foundOne){
+			// draw a line between that exit point and the one valid point inside the screen. now no part of the line is outside the screen.
+			if(within_screen(x1,y1))
+				draw_line(dest, x1, y1, xr1, yr1, thickness, lineColor);
+			else
+				draw_line(dest, x2, y2, xr1, yr1, thickness, lineColor);
+		}
+		return;
+	}
+	//-------------------------------------------------------------------------------
+	// drawing valid in-bounds line
+	//-------------------------------------------------------------------------------
+	// this is the arbitrary parameter than will step through the line's pixels
+	
+	//swap the x's if necessary to correct the sign of bigdiff.
+	if(bigdiff<0){
+		bigdiff*=-1.0;
+		x1=x2;
+		y1=y2;
+	}
+	float t;
+	for(t=0; t<=bigdiff; t=t+1.0){
+		set_pixel(dest, (int)(x1 + xslope*t), (int)(y1 + yslope*t), lineColor);
+	}
+	
 }
 
 // this draws a circle with radius and color at point (x,y)

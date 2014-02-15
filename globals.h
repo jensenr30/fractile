@@ -10,6 +10,7 @@
 unsigned int SCREEN_WIDTH;
 unsigned int SCREEN_HEIGHT;
 
+#define within_screen(x,y) (x>=0 && x<SCREEN_WIDTH && y>=0 && y<SCREEN_HEIGHT)
 
 #define SCREEN_BPP 32
 
@@ -17,7 +18,7 @@ unsigned int SCREEN_HEIGHT;
 int FPS; // arbitrary initial value
 
 // The surfaces that will be used
-SDL_Surface *screen;;	// this is the surface the player sees.
+SDL_Surface *screen;	// this is the surface the player sees.
 // The event structure that will be used
 SDL_Event event;
 

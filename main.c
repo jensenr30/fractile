@@ -1,16 +1,22 @@
 #include "general_functions.h"
+#include "graphics.h"
 #include "globals.h"
-#include "plot.h"
-
-
+#include "math_custom.h"
+#include "math.h"
+#include "fractile.h"
+#include <stdlib.h>
+#include <time.h>
 
 int main( int argc, char* argv[] ) 
 {
+	//random seed
+	srand(time(NULL));
 	
 	// initial screen sizes
 	SCREEN_WIDTH = DEFAULT_SCREEN_WIDTH;
 	SCREEN_HEIGHT = DEFAULT_SCREEN_HEIGHT;
 	
+<<<<<<< Updated upstream
 	//----------------------------------------------------
 	//debugging the input arguments
 	//----------------------------------------------------
@@ -29,6 +35,8 @@ int main( int argc, char* argv[] )
 	plot_load(dataFile, &myPlot);				// load plot data
 	fclose(dataFile);							// close file
 	
+=======
+>>>>>>> Stashed changes
 	
 	//----------------------------------------------------
 	// VARIABLES USED IN MAIN()
@@ -42,13 +50,29 @@ int main( int argc, char* argv[] )
 	int cumulativeFrames = 0;					// this counts how many Frames there have been since the last
 	int currentTicks = 0;						// this is how many 
 	int quit = false;							//make sure the program waits for a quit
-	
+	float lines=2*PI;
 	//----------------------------------------------------
 	// initialize lots of stuff
 	//----------------------------------------------------
     if( init() == false ) return 1;				// make sure you can boot up the necessary libraries
     if( load_files() == false ) return 2;		// make sure all files are loaded corre
     
+    SDL_Rect screenRect;
+    screenRect.x = 0;
+    screenRect.y = 0;
+    screenRect.w = SCREEN_WIDTH;
+    screenRect.h = SCREEN_HEIGHT;
+    
+    
+    //----------------------------------------------------
+	// testing fractal utilities
+	//----------------------------------------------------
+    struct fractalData myfractal;
+    myfractal.scale = 0.5;
+    myfractal.iterations = 3;
+    myfractal.thickness = 5;
+    myfractal.color1 = 0xff00ff00;
+    fractal_random(&myfractal, 15, 5);
     
     
     //----------------------------------------------------
@@ -99,10 +123,13 @@ int main( int argc, char* argv[] )
 				SCREEN_WIDTH = event.resize.w;
 				SCREEN_HEIGHT = event.resize.h;
 				set_window_size(event.resize.w, event.resize.h);		// set window to correct dimensions
+				screenRect.w = event.resize.w;
+				screenRect.h = event.resize.h;
 			}
 			
             if( event.type == SDL_KEYDOWN ){		///keyboard event
                 switch( event.key.keysym.sym ){
+				case SDLK_r: fractal_random(&myfractal, 7, 7); break;
 				default: break;
 				}
 			}
@@ -116,15 +143,38 @@ int main( int argc, char* argv[] )
     	} // end while(event)
 		//no more events to handle at the moment.
 		
+<<<<<<< Updated upstream
 		
 		
 		plot(&myPlot, screen);						// display plot
 		
         draw_circle(screen, 300.0, 300.0, 50, 0x00000000);
+=======
+		//draw_line(screen, -200,10,200,50,1,0xffff0000);
+		//draw_line(screen, (int)(y*0.9),(int)(x*0.9),x,y,1,0xffff0000);
+		//draw_line(screen, 1200,200,x,y,1,0xffff0000);
+        //draw_circle(screen, 300.0, 300.0, 50, 0x00000000);
+>>>>>>> Stashed changes
         
+        //draw_line(screen, 200, 1200, 200,-200,1,0xffff0000);
+        
+        /*
+        float theta;
+        lines += 1;
+        for(theta=0; theta<2*PI; theta = theta + 2*PI/lines){
+			draw_line(screen,SCREEN_WIDTH/2,SCREEN_HEIGHT/2,SCREEN_WIDTH*cos(theta)+SCREEN_WIDTH/2, SCREEN_WIDTH*sin(theta)+SCREEN_HEIGHT/2, 1, 0xff0000ff);
+        }
+        SDL_Delay(50);
         //updates the screen
-        SDL_Flip( screen );
+        */
         
+<<<<<<< Updated upstream
+=======
+        fractal_print(screen, &myfractal, 400, 100);
+        SDL_Flip( screen );
+        SDL_FillRect(screen, &screenRect, 0);
+        
+>>>>>>> Stashed changes
         //----------------------------------------------------------------------
 		// FPS calculation and variable handling
 		//----------------------------------------------------------------------

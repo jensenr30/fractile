@@ -1,4 +1,4 @@
-DataPlotter
+Fractile
 ===========
 
-This program uses SDL to graph data in a simple and lightweight manor. 
+This program uses SDL to generate custom fractals in a simple and (hopefully) lightweight manor. 
