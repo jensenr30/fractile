@@ -149,7 +149,7 @@ int init(){
 	}
 	
 	//Set the window caption
-	SDL_WM_SetCaption( "GridVenture 1.0", NULL );
+	SDL_WM_SetCaption( "Fractile 0.1", NULL );
 	
 	
 	
@@ -199,8 +199,6 @@ int load_files(){
 void clean_up(){
 	SDL_FreeSurface(screen);
 	
-	// de-allocate plot memory
-	free(myPlot.dataPoints);
 	
 	//Quit SDL
 	SDL_Quit();

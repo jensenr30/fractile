@@ -28,7 +28,7 @@ void fractal_iteration(SDL_Surface *dest, struct fractalData *f, double entryx, 
 // dest is the SDL_Surface to which everything will be printed
 // f is a pointer to the fractal structure that contains all the information about the fractal that will be printed.
 // entryx and entryy are the <x,y> coordinates of the first entry point of this iteration of the fractal
-void fractal_print(SDL_Surface *dest, struct fractalData *f, double x, double y){
+void fractal_print(SDL_Surface *dest, struct fractalData *f){
 	
 	// make sure the fractal and the destination surface are valid
 	if(f == NULL || dest == NULL) return;
@@ -80,6 +80,12 @@ void fractal_print(SDL_Surface *dest, struct fractalData *f, double x, double y)
 		ymin += (yvmin+yemin)*scale;
 	}
 	
+	// the maximum/minimum cannot pass over the origin because the maximum/minimum is at LEAST the origin.
+	if(xmin>0)xmin = 0.0f;
+	if(ymin>0)ymin = 0.0f;
+	if(xmax<0)xmax = 0.0f;
+	if(ymax<0)ymax = 0.0f;
+	
 	double xdiff = xmax - xmin;
 	double ydiff = ymax - ymin;
 	
@@ -96,7 +102,7 @@ void fractal_print(SDL_Surface *dest, struct fractalData *f, double x, double y)
 	
 	
 	// begin drawing the fractal
-	fractal_iteration(dest, f, -xmin*scale, -ymin*scale, scale/f->scale, 1);
+	fractal_iteration(dest, f, -((xmax+xmin)*scale)/2 + SCREEN_WIDTH/2, -((ymax+ymin)*scale)/2 + SCREEN_HEIGHT/2, scale/f->scale, 1);
 }
 
 

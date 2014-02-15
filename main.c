@@ -1,11 +1,12 @@
+#include <stdlib.h>
+#include <time.h>
 #include "general_functions.h"
 #include "graphics.h"
 #include "globals.h"
 #include "math_custom.h"
 #include "math.h"
 #include "fractile.h"
-#include <stdlib.h>
-#include <time.h>
+
 
 int main( int argc, char* argv[] ) 
 {
@@ -16,27 +17,6 @@ int main( int argc, char* argv[] )
 	SCREEN_WIDTH = DEFAULT_SCREEN_WIDTH;
 	SCREEN_HEIGHT = DEFAULT_SCREEN_HEIGHT;
 	
-<<<<<<< Updated upstream
-	//----------------------------------------------------
-	//debugging the input arguments
-	//----------------------------------------------------
-	FILE *debugFile = fopen("debug.txt", "w");
-	if(debugFile == NULL) return 5;
-	fprintf(debugFile, "argc = %d\n",argc);
-	int i;
-	for(i=0; i<argc; i++){
-		fprintf(debugFile, "%2d. %s\n",i,argv[i]);
-	}
-	fclose(debugFile);
-	
-	
-	FILE *dataFile = fopen("data.txt", "r");	// open file
-	if(dataFile == NULL) return 1;				// quit if plot file is null
-	plot_load(dataFile, &myPlot);				// load plot data
-	fclose(dataFile);							// close file
-	
-=======
->>>>>>> Stashed changes
 	
 	//----------------------------------------------------
 	// VARIABLES USED IN MAIN()
@@ -72,7 +52,7 @@ int main( int argc, char* argv[] )
     myfractal.iterations = 3;
     myfractal.thickness = 5;
     myfractal.color1 = 0xff00ff00;
-    fractal_random(&myfractal, 15, 5);
+    fractal_random(&myfractal, 10, 5);
     
     
     //----------------------------------------------------
@@ -129,7 +109,7 @@ int main( int argc, char* argv[] )
 			
             if( event.type == SDL_KEYDOWN ){		///keyboard event
                 switch( event.key.keysym.sym ){
-				case SDLK_r: fractal_random(&myfractal, 7, 7); break;
+				case SDLK_r: fractal_random(&myfractal, 5, 5); break;
 				default: break;
 				}
 			}
@@ -143,18 +123,12 @@ int main( int argc, char* argv[] )
     	} // end while(event)
 		//no more events to handle at the moment.
 		
-<<<<<<< Updated upstream
 		
-		
-		plot(&myPlot, screen);						// display plot
-		
-        draw_circle(screen, 300.0, 300.0, 50, 0x00000000);
-=======
 		//draw_line(screen, -200,10,200,50,1,0xffff0000);
 		//draw_line(screen, (int)(y*0.9),(int)(x*0.9),x,y,1,0xffff0000);
 		//draw_line(screen, 1200,200,x,y,1,0xffff0000);
         //draw_circle(screen, 300.0, 300.0, 50, 0x00000000);
->>>>>>> Stashed changes
+
         
         //draw_line(screen, 200, 1200, 200,-200,1,0xffff0000);
         
@@ -167,14 +141,11 @@ int main( int argc, char* argv[] )
         SDL_Delay(50);
         //updates the screen
         */
-        
-<<<<<<< Updated upstream
-=======
-        fractal_print(screen, &myfractal, 400, 100);
-        SDL_Flip( screen );
+		
+        fractal_print(screen, &myfractal);
+        SDL_Flip(screen);
         SDL_FillRect(screen, &screenRect, 0);
         
->>>>>>> Stashed changes
         //----------------------------------------------------------------------
 		// FPS calculation and variable handling
 		//----------------------------------------------------------------------
