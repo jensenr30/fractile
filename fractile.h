@@ -15,9 +15,11 @@ struct pointData{
 // this is the maximum number of individual fractals that can be added to the base iteration.
 // when the program DRAWS a fractal, it will end up drawing a LOT MORE than this number.
 // this number just describes how many different vectors there can be on the base vector (the starting one)
-#define MAX_VECTORS_PER_FRACTAL 100
+#define MAX_VECTORS_PER_FRACTAL 50
 // this defines how many exit points the fractal can have. and exit point is where the current level fractal will spawn the next level fractal.
-#define MAX_EXITS_PER_FRACTAL 100
+#define MAX_EXITS_PER_FRACTAL 50
+
+#define MAX_ITERATIONS_PER_FRACTAL 20
 
 struct fractalData{
 	

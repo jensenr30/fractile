@@ -30,18 +30,21 @@ void fractal_iteration(SDL_Surface *dest, struct fractalData *f, double entryx, 
 			if(r == 0)
 				theta = 0.0f;
 			else if(f->vects[i].x == 0)
-				theta = PI/2*(f->vects[i].y/fabs(f->vects[i].y));
+				theta = PI/2;
 			else
-				theta = atan(f->vects[i].y/f->vects[i].x)*(f->vects[i].x/fabs(f->vects[i].x));
+				theta = atan(f->vects[i].y/f->vects[i].x);
+			if(f->vects[0].x<0) ;//theta+=PI;
+			
 			// calculate magnitude of the beginning of the vector
 			r0 = sqrt(f->vects[i].x0*f->vects[i].x0 + f->vects[i].y0*f->vects[i].y0);
 			// calculate the angle of the beginning of the vector with respect to the entry point
 			if(r0 == 0)
 				theta0 = 0;
 			else if(f->vects[i].x0 == 0)
-				theta = (PI/2.0)*(f->vects[i].y0/fabs(f->vects[i].y0));
+				theta0 = (PI/2.0);
 			else
-				theta0 = atan((f->vects[i].y0-entryy)/(f->vects[i].x0-entryx))*(f->vects[i].x0/fabs(f->vects[i].x0));
+				theta0 = atan((f->vects[i].y0-entryy)/(f->vects[i].x0-entryx));
+			if(f->vects[0].x0<0) theta0+=PI;
 			// draw the line between the transformed coordinates
 			draw_line(dest, entryx+(r0*cos(theta0+twist))*scale, entryy+(r0*sin(theta0+twist))*scale, entryx+(r0*cos(theta0+twist)+r*cos(theta+twist))*scale, entryy+(r0*sin(theta0+twist)+r*sin(theta+twist))*scale, f->thickness*scale, f->color1);
 		}
@@ -62,10 +65,10 @@ void fractal_iteration(SDL_Surface *dest, struct fractalData *f, double entryx, 
 				if(r == 0)
 					theta = 0.0f;
 				else if(f->exits[i].x == 0)
-					theta = (PI/2.0)*((f->exits[i].y-entryy)/fabs(f->exits[i].y-entryy));
+					theta = (PI/2.0);
 				else
-					theta = atan((f->exits[i].y-entryy)/(f->exits[i].x-entryx))*((f->exits[i].x-entryx)/fabs(f->exits[i].x-entryx));
-				
+					theta = atan((f->exits[i].y-entryy)/(f->exits[i].x-entryx));
+				if(f->vects[0].x0<0) theta+=PI;
 				fractal_iteration(dest, f, entryx+f->exits[i].x*scale, entryy+f->exits[i].y*scale, scale*f->scale, twist+f->twist, iter+1);
 			}
 		}
@@ -77,6 +80,8 @@ void fractal_iteration(SDL_Surface *dest, struct fractalData *f, double entryx, 
 // f is a pointer to the fractal structure that contains all the information about the fractal that will be printed.
 // entryx and entryy are the <x,y> coordinates of the first entry point of this iteration of the fractal
 void fractal_print(SDL_Surface *dest, struct fractalData *f){
+	
+	int borderSize = 10;
 	
 	// make sure the fractal and the destination surface are valid
 	if(f == NULL || dest == NULL) return;
@@ -137,8 +142,8 @@ void fractal_print(SDL_Surface *dest, struct fractalData *f){
 	double xdiff = xmax - xmin;
 	double ydiff = ymax - ymin;
 	
-	double xscale = SCREEN_WIDTH/(xdiff);
-	double yscale = SCREEN_HEIGHT/(ydiff);
+	double xscale = (SCREEN_WIDTH-borderSize*2)/(xdiff);
+	double yscale = (SCREEN_HEIGHT-borderSize*2)/(ydiff);
 	
 	if(xscale < yscale){
 		scale = xscale;
@@ -188,7 +193,7 @@ void fractal_random(struct fractalData *f, int maxVects, int maxIterations){
     */
     f->iterations = maxIterations;
     int i;
-    f->twist = PI/6;//f->twist = (((rand()%20001)-10000)*PI)/10000;
+    f->twist = PI/100;//f->twist = (((rand()%20001)-10000)*PI)/10000;
     f->numbVectors = f->numbExits = rand()%(maxVects-2)+ 2;
     for(i=0; i<f->numbVectors; i++){
 		f->vects[i].x0 = 0;//rand()%400 + 20;
