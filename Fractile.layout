@@ -8,12 +8,12 @@
 	</File>
 	<File name="fractile.c" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="7444" topLine="187" />
+			<Cursor1 position="2763" topLine="24" />
 		</Cursor>
 	</File>
-	<File name="fractile.h" open="1" top="1" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="fractile.h" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1992" topLine="35" />
+			<Cursor1 position="1866" topLine="33" />
 		</Cursor>
 	</File>
 	<File name="general_functions.c" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -33,7 +33,7 @@
 	</File>
 	<File name="graphics.c" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="15144" topLine="314" />
+			<Cursor1 position="2693" topLine="62" />
 		</Cursor>
 	</File>
 	<File name="graphics.h" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -41,9 +41,9 @@
 			<Cursor1 position="906" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="main.c" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="main.c" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="5279" topLine="120" />
+			<Cursor1 position="3407" topLine="72" />
 		</Cursor>
 	</File>
 	<File name="math_custom.c" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
