@@ -1,0 +1,14 @@
+Left Click
+	Select vector from the editor sidebar
+	
+Rick Click and Drag
+	Resize vectors
+
+F5
+	generate a random fractal
+
+Scroll Up/Down
+	increase/decrease iterations of the fraactal to print
+	
+E
+	show/hide (toggle) the editor sidebar
