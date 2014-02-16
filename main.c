@@ -73,23 +73,35 @@ int main( int argc, char* argv[] )
 				x = event.motion.x;
 				y = event.motion.y;
                 if( event.button.button == SDL_BUTTON_LEFT ){
-                    mouseLeft[0] = 1;
+                    mouseLeft[0] = true;
+                    fractal_editor(NULL, &myfractal, x, y, ee_left_click_down);
                 }
                 else if( event.button.button == SDL_BUTTON_RIGHT ){
-                    mouseRight[0] = 1;
+                    mouseRight[0] = true;
+					fractal_editor(NULL, &myfractal, x, y, ee_right_click_down);
                 }
                 
                 else if( event.button.button == SDL_BUTTON_WHEELUP ){
-					// zoom in
+					// more iterations
+					myfractal.iterations++;
                 }
 				else if( event.button.button == SDL_BUTTON_WHEELDOWN ){
-					// zoom out
+					// less iterations
+					myfractal.iterations--;
+					if(myfractal.iterations <1) myfractal.iterations = 1;
 				}
 				
             }
             else if(event.type == SDL_MOUSEBUTTONUP){						/// mouse up
 				x = event.motion.x;
 				y = event.motion.y;
+				if(event.button.button == SDL_BUTTON_LEFT){
+					mouseLeft[0] = false;
+				}
+				else if(event.button.button == SDL_BUTTON_RIGHT){
+					fractal_editor(NULL, &myfractal, x, y, ee_right_click_up);
+					mouseRight[0] = false;
+				}
             }
             else if( event.type == SDL_MOUSEMOTION ){						/// mouse motion
 				x = event.motion.x;
@@ -109,7 +121,7 @@ int main( int argc, char* argv[] )
 			
             if( event.type == SDL_KEYDOWN ){		///keyboard event
                 switch( event.key.keysym.sym ){
-				case SDLK_F5: fractal_random(&myfractal, 5, 5); break;
+				case SDLK_F5: fractal_random(&myfractal, 6, 5); break;
 				case SDLK_e:  fractal_editor(NULL,&myfractal,x,y,ee_toggle); break;
 				default: break;
 				}

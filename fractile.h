@@ -50,11 +50,15 @@ struct fractalData{
 	int numbExits;
 	// this is how many vectors there currently are in the fractal
 	int numbVectors;
+	
+	// this is how much the fractal will twist on each iteration
+	// measured in radians
+	double twist;
 };
 
 
 
-void fractal_iteration(SDL_Surface *dest, struct fractalData *f, double entryx, double entryy, double scale, int iter);
+void fractal_iteration(SDL_Surface *dest, struct fractalData *f, double entryx, double entryy, double scale, double twist, int iter);
 void fractal_print(SDL_Surface *dest, struct fractalData *fractal);
 void fractal_random(struct fractalData *f, int maxVects, int maxIterations);
 
@@ -66,6 +70,7 @@ void fractal_random(struct fractalData *f, int maxVects, int maxIterations);
 #define EDITOR_COLOR_SECONDARY 0xff3f3f3f
 #define EDITOR_COLOR_SCROLL_BAR 0xff5f5f5f
 #define EDITOR_COLOR_SCROLL_BAR_BACKGROUND EDITOR_COLOR_PRIMARY
+#define EDITOR_CURRENT_VECTOR_OUTLINE_COLOR 0xffff0000
 #define EDITOR_BUTTON_SIZE 32
 #define EDITOR_TITLE_BAR_HEIGHT 16
 #define EDITOR_SCROLL_BAR_WIDTH 16
@@ -77,10 +82,12 @@ void fractal_random(struct fractalData *f, int maxVects, int maxIterations);
 #define EDITOR_BUTTONS_NUMBER_OF 2
 
 /// these are enumerations of editor events
-#define ee_print 0	// just print the editor. the user isn't doing anything with it at this time.
-#define ee_toggle 1		// this will toggle if the editor is open or not.
-
-
+#define ee_print 0			// just print the editor. the user isn't doing anything with it at this time.
+#define ee_toggle 1			// this will toggle if the editor is open or not.
+#define ee_left_click_down 2	// this is when the user presses  the left mouse button
+#define ee_left_click_up 3		// this is when the user releases the left mouse button
+#define ee_right_click_down 4	// this is when the user presses  the right mouse button
+#define ee_right_click_up 5		// this is when the user releases the right mouse button
 
 
 bool fractal_editor(SDL_Surface *dest, struct fractalData *f, int x, int y, int editorEvent);
