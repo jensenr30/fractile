@@ -121,7 +121,7 @@ int main( int argc, char* argv[] )
 			
             if( event.type == SDL_KEYDOWN ){		///keyboard event
                 switch( event.key.keysym.sym ){
-				case SDLK_F5: fractal_random(&myfractal, 5, 5); break;
+				case SDLK_F5: fractal_random(&myfractal, 6, 5); break;
 				case SDLK_e:  fractal_editor(NULL,&myfractal,x,y,ee_toggle); break;
 				default: break;
 				}

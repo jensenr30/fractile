@@ -13,62 +13,16 @@ void fractal_iteration(SDL_Surface *dest, struct fractalData *f, double entryx, 
 	
 	int i;
 	
-	if(twist == 0){		// if there is no twist angle
-		// print all the vectors
-		for(i=0; i<f->numbVectors; i++){
-			draw_line(dest, entryx+(f->vects[i].x0)*scale, entryy+(f->vects[i].y0)*scale, entryx+(f->vects[i].x0+f->vects[i].x)*scale, entryy+(f->vects[i].y0+f->vects[i].y)*scale, f->thickness*scale, f->color1);
-		}
-	}
-	else{				// if there is some twist
-		double r, r0;
-		double theta, theta0;
-		// print all the vectors
-		for(i=0; i<f->numbVectors; i++){
-			// calculate magnitude of the components vector
-			r = sqrt(f->vects[i].x*f->vects[i].x + f->vects[i].y*f->vects[i].y);
-			// calculate the angle of the of the components vector with respect to the beginning of the vector
-			if(r == 0)
-				theta = 0.0f;
-			else if(f->vects[i].x == 0)
-				theta = PI/2*(f->vects[i].y/fabs(f->vects[i].y));
-			else
-				theta = atan(f->vects[i].y/f->vects[i].x)*(f->vects[i].x/fabs(f->vects[i].x));
-			// calculate magnitude of the beginning of the vector
-			r0 = sqrt(f->vects[i].x0*f->vects[i].x0 + f->vects[i].y0*f->vects[i].y0);
-			// calculate the angle of the beginning of the vector with respect to the entry point
-			if(r0 == 0)
-				theta0 = 0;
-			else if(f->vects[i].x0 == 0)
-				theta = (PI/2.0)*(f->vects[i].y0/fabs(f->vects[i].y0));
-			else
-				theta0 = atan((f->vects[i].y0-entryy)/(f->vects[i].x0-entryx))*(f->vects[i].x0/fabs(f->vects[i].x0));
-			// draw the line between the transformed coordinates
-			draw_line(dest, entryx+(r0*cos(theta0+twist))*scale, entryy+(r0*sin(theta0+twist))*scale, entryx+(r0*cos(theta0+twist)+r*cos(theta+twist))*scale, entryy+(r0*sin(theta0+twist)+r*sin(theta+twist))*scale, f->thickness*scale, f->color1);
-		}
+	// print all the vectors
+	for(i=0; i<f->numbVectors; i++){
+		draw_line(dest, entryx+(f->vects[i].x0)*scale, entryy+(f->vects[i].y0)*scale, entryx+(f->vects[i].x0+f->vects[i].x)*scale, entryy+(f->vects[i].y0+f->vects[i].y)*scale, f->thickness*scale, f->color1);
 	}
 	// return if you are done with all iterations of the fractal
 	if(iter == f->iterations) return;
 	
 	// recursively call more fractal iteration functions at the exit points of this iteration.
 	for(i=0; i<f->numbExits; i++){
-		if(twist == 0){
-			fractal_iteration(dest, f, entryx+f->exits[i].x*scale, entryy+f->exits[i].y*scale, scale*f->scale, twist+f->twist, iter+1);
-		}
-		else{
-			double r, theta;
-			// print all the vectors
-			for(i=0; i<f->numbVectors; i++){
-				r = sqrt(f->exits[i].x*f->exits[i].x + f->exits[i].y*f->exits[i].y);
-				if(r == 0)
-					theta = 0.0f;
-				else if(f->exits[i].x == 0)
-					theta = (PI/2.0)*((f->exits[i].y-entryy)/fabs(f->exits[i].y-entryy));
-				else
-					theta = atan((f->exits[i].y-entryy)/(f->exits[i].x-entryx))*((f->exits[i].x-entryx)/fabs(f->exits[i].x-entryx));
-				
-				fractal_iteration(dest, f, entryx+f->exits[i].x*scale, entryy+f->exits[i].y*scale, scale*f->scale, twist+f->twist, iter+1);
-			}
-		}
+		fractal_iteration(dest, f, entryx+f->exits[i].x*scale, entryy+f->exits[i].y*scale, scale*f->scale, twist+f->twist, iter+1);
 	}
 }
 
@@ -189,7 +143,7 @@ void fractal_random(struct fractalData *f, int maxVects, int maxIterations){
     f->iterations = maxIterations;
     int i;
     f->twist = PI/6;//f->twist = (((rand()%20001)-10000)*PI)/10000;
-    f->numbVectors = f->numbExits = rand()%(maxVects-2)+ 2;
+    f->numbVectors = f->numbExits = rand()%(maxVects-1)+ 2;
     for(i=0; i<f->numbVectors; i++){
 		f->vects[i].x0 = 0;//rand()%400 + 20;
 		f->vects[i].y0 = 0;//rand()%400 + 20;
