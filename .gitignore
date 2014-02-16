@@ -1,5 +1,7 @@
 *.layout
 *.depend
+Fractile.layout
+Fractile.depend
 
 *.exe
 *.o

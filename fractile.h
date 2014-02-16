@@ -54,6 +54,7 @@ struct fractalData{
 	// this is how much the fractal will twist on each iteration
 	// measured in radians
 	double twist;
+	
 };
 
 
