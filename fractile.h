@@ -1,15 +1,36 @@
 #include "bool.h"
 
+
+// this keeps track of what vector is selected
+int currentVector;
+
 struct vectorData{
+	//----------------------------------------------
+	// normal parameters
+	//----------------------------------------------
 	// magnitude of each component
 	double x, y;
 	// offsets from the origin
 	double x0, y0;
+	//----------------------------------------------
+	// wobble parameters
+	//----------------------------------------------
+	// these are the original x and y magnitudes just before wobble was started.
+	double xorig, yorig;
+	// these two variables describe (relative to xorig and yorig) the radius of the circle that the wobble orbits on around <xorig,yorig>
+	double xWobble, yWobble;
+	// this is when (in milliseconds) the wobble started (giving us a reference
+	int wobbleStartTime;
+	// this is how long it takes for the vector to wobble full circle. (milliseconds)
+	// if period == 0, then we are NOT WOBBLING
+	// any other positive integer, and this vector is wobbling.
+	int period;
 	
 };
 
+
 struct pointData{
-	int x, y;
+	double x, y;
 };
 
 // this is the maximum number of individual fractals that can be added to the base iteration.
@@ -64,6 +85,17 @@ void fractal_print(SDL_Surface *dest, struct fractalData *fractal);
 void fractal_random(struct fractalData *f, int maxVects, int maxIterations);
 
 
+/// vector wobble (vw_)
+#define vw_evaluate	0
+#define vw_toggle	1
+
+// this is the period of one full circle wobble (in milliseconds)
+#define WOBBLE_DEFAULT_PERIOD 1400
+// this is the radius of the circle that the wobble will orbit (expressed in terms of the original vector's magnitude) 
+#define WOBBLE_PERCENTAGE_OF_MAGNITUDE 0.10f
+
+void fractal_wobble(struct fractalData *f, int wobbleEvent);
+
 
 // the editor is a sidbar on the left side of the window.
 #define EDITOR_DEFAULT_WIDTH 150
@@ -72,6 +104,8 @@ void fractal_random(struct fractalData *f, int maxVects, int maxIterations);
 #define EDITOR_COLOR_SCROLL_BAR 0xff5f5f5f
 #define EDITOR_COLOR_SCROLL_BAR_BACKGROUND EDITOR_COLOR_PRIMARY
 #define EDITOR_CURRENT_VECTOR_OUTLINE_COLOR 0xffff0000
+#define EDITOR_WOBBLE_OUTLINE_COLOR 0xff0000ff
+#define EDITOR_OUTLINE_THICKNESS 2
 #define EDITOR_BUTTON_SIZE 32
 #define EDITOR_TITLE_BAR_HEIGHT 16
 #define EDITOR_SCROLL_BAR_WIDTH 16
@@ -94,5 +128,10 @@ void fractal_random(struct fractalData *f, int maxVects, int maxIterations);
 bool fractal_editor(SDL_Surface *dest, struct fractalData *f, int x, int y, int editorEvent);
 void init_fractal_editor();
 
+#define MAX_FRACTILE_PATH 256
+int fractal_save(struct fractalData *f, char *filename);
+int fractal_load(struct fractalData *f, char *filename);
+int fractal_save_windows(struct fractalData *f);
+int fractal_load_windows(struct fractalData *f);
 
 

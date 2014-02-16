@@ -4,6 +4,7 @@
 #include "globals.h"
 #include "math.h"
 #include "math_custom.h"
+#include "Windows.h"
 
 
 
@@ -108,6 +109,40 @@ void fractal_print(SDL_Surface *dest, struct fractalData *f){
 }
 
 
+void fractal_wobble(struct fractalData *f, int wobbleEvent){
+	int i;
+	
+	if(wobbleEvent==vw_evaluate){
+		double wobbleAngle;
+		for(i=0; i<f->numbVectors; i++){
+			if(f->vects[i].period > 0){
+				wobbleAngle = (2*PI*(SDL_GetTicks() - f->vects[i].wobbleStartTime))/f->vects[i].period;
+				f->exits[i].x = f->vects[i].x = f->vects[i].xorig*(1.0 + f->vects[i].xWobble*cos(wobbleAngle));
+				f->exits[i].y = f->vects[i].y = f->vects[i].yorig*(1.0 + f->vects[i].yWobble*sin(wobbleAngle));
+			}
+		}
+	}
+	
+	
+	if(wobbleEvent==vw_toggle){
+		if(f->vects[currentVector].period == 0){
+			f->vects[currentVector].wobbleStartTime = SDL_GetTicks();
+			f->vects[currentVector].period = WOBBLE_DEFAULT_PERIOD;
+			f->vects[currentVector].xorig = f->vects[currentVector].x;
+			f->vects[currentVector].yorig = f->vects[currentVector].y;
+			f->vects[currentVector].xWobble = WOBBLE_PERCENTAGE_OF_MAGNITUDE;
+			f->vects[currentVector].yWobble = WOBBLE_PERCENTAGE_OF_MAGNITUDE;
+		}
+		else
+			f->vects[currentVector].period = 0;
+			f->exits[currentVector].x = f->vects[currentVector].x = f->vects[currentVector].xorig;
+			f->exits[currentVector].y = f->vects[currentVector].y = f->vects[currentVector].yorig;
+			
+	}
+}
+
+
+
 void fractal_random(struct fractalData *f, int maxVects, int maxIterations){
 	/*
     f->vects[0].x0= 0;
@@ -151,6 +186,8 @@ void fractal_random(struct fractalData *f, int maxVects, int maxIterations){
 		f->vects[i].y = (rand()%400 + 20)*(rand()%2-0.5)*2;
 		f->exits[i].x = f->vects[i].x0 + f->vects[i].x;
 		f->exits[i].y = f->vects[i].y0 + f->vects[i].y;
+		f->vects[i].period = 0; // not wobbling
+		f->vects[i].wobbleStartTime = 0;
     }
 }
 
@@ -166,10 +203,12 @@ void init_fractal_editor(){
 bool fractal_editor(SDL_Surface *dest, struct fractalData *f, int x, int y, int editorEvent){
 	
 	//these keep track of where the mouse was last time this function was called.
-	static int xlast;
-	static int ylast;
+	//static int xlast;
+	//static int ylast;
 	// this is a general purpose rectangle.
 	static SDL_Rect genRect;
+	// a secondary general purpose rectangle
+	static SDL_Rect genRect2;
 	// this keeps track of whether or not this is the first time running through this function.
 	static bool firstTime = true;
 	// this is a rectangle than describes the position <x,y> and size <w,h> of the editor virtual window.
@@ -180,8 +219,6 @@ bool fractal_editor(SDL_Surface *dest, struct fractalData *f, int x, int y, int 
 	static int editorButton=0;
 	// this is the current width of the editor
 	static int currentWidth = EDITOR_DEFAULT_WIDTH;
-	// this is for keeping track of which vector is currently selected
-	static int currentVector=0;
 	// this is the scale at which the vectors in the editor window are printed to the screen (pixels/vector-size)
 	static double scale;
 	// this keeps track of what state the right mouse button was/is in.
@@ -304,8 +341,13 @@ bool fractal_editor(SDL_Surface *dest, struct fractalData *f, int x, int y, int 
 		//-------------------------------------------------------------------------------
 		// print the sidebar
 		//-------------------------------------------------------------------------------
+		// genRect is for the selected vector outlines and the even/odd vector background coloring
 		genRect.x = editor.x;
 		genRect.w = genRect.h = currentWidth;
+		// genRect2 is for the wobble outlines
+		genRect2.x = editor.x + editor.w/4;
+		genRect2.w = editor.w/2;
+		genRect2.h = genRect.h/2;
 		for(i=0; i<f->numbVectors && i*currentWidth<SCREEN_HEIGHT; i++){
 			
 			// if i is an odd integer, print an secondary color background square
@@ -313,9 +355,15 @@ bool fractal_editor(SDL_Surface *dest, struct fractalData *f, int x, int y, int 
 				genRect.y = editor.y + i*currentWidth + EDITOR_TITLE_BAR_HEIGHT;
 				SDL_FillRect(dest, &genRect, EDITOR_COLOR_SECONDARY);
 			}
+			// if the vector is wobbling, print a box around it
+			if(f->vects[i].period > 0){
+				genRect2.y = genRect.h*(0.25 + i) + EDITOR_TITLE_BAR_HEIGHT;
+				apply_outline(dest, &genRect2, EDITOR_OUTLINE_THICKNESS, EDITOR_WOBBLE_OUTLINE_COLOR);
+			}
+			// print the vector
 			if(i==currentVector){
 				genRect.y = editor.y + i*currentWidth + EDITOR_TITLE_BAR_HEIGHT;
-				apply_outline(dest, &genRect, 2, EDITOR_CURRENT_VECTOR_OUTLINE_COLOR);
+				apply_outline(dest, &genRect, EDITOR_OUTLINE_THICKNESS, EDITOR_CURRENT_VECTOR_OUTLINE_COLOR);
 			}
 			
 			draw_line(dest, currentWidth/2, currentWidth*(i+0.5) + EDITOR_TITLE_BAR_HEIGHT, currentWidth/2 + f->vects[i].x*scale, currentWidth*(i+0.5) + EDITOR_TITLE_BAR_HEIGHT + f->vects[i].y*scale, f->thickness, f->color1);
@@ -324,4 +372,128 @@ bool fractal_editor(SDL_Surface *dest, struct fractalData *f, int x, int y, int 
 	// the user did not interact with the editor.
 	return false;
 }
+
+int fractal_save(struct fractalData *f, char *filename){
+	if(f == NULL || filename == NULL) return false;
+	FILE *savefile = fopen(filename, "w");
+	if(savefile == NULL)return false;
+	
+	fprintf(savefile,"version = %f\n",programVersion);
+	fprintf(savefile,"color1 = 0x%lx\n",f->color1);
+	fprintf(savefile,"color2 = 0x%lx\n",f->color2);
+	fprintf(savefile,"colorScaler = %lf\n",f->colorScaler);
+	fprintf(savefile,"iterations = %d\n",f->iterations);
+	fprintf(savefile,"scale = %lf\n",f->scale);
+	fprintf(savefile,"twist = %lf\n",f->twist);
+	fprintf(savefile,"numbVectors = %d\n", f->numbVectors);
+	fprintf(savefile,"numbExits = %d\n", f->numbExits);
+	int i;
+	for(i=0; i<f->numbVectors; i++){
+		fprintf(savefile,"x = %lf\n",f->vects[i].x);
+		fprintf(savefile,"y = %lf\n",f->vects[i].y);
+		fprintf(savefile,"x0 = %lf\n",f->vects[i].x0);
+		fprintf(savefile,"y0 = %lf\n",f->vects[i].y0);
+		fprintf(savefile,"xorig = %lf\n",f->vects[i].xorig);
+		fprintf(savefile,"yorig = %lf\n",f->vects[i].yorig);
+		fprintf(savefile,"xWobble = %lf\n",f->vects[i].xWobble);
+		fprintf(savefile,"yWobble = %lf\n",f->vects[i].yWobble);
+		fprintf(savefile,"period = %d\n",f->vects[i].period);
+		fprintf(savefile,"wobbleStartTime = %d\n",f->vects[i].wobbleStartTime%f->vects[i].period);
+	}
+	for(i=0; i<f->numbExits; i++){
+		fprintf(savefile,"x = %lf\n",f->exits[i].x);
+		fprintf(savefile,"y = %lf\n",f->exits[i].y);
+	}
+	fclose(savefile);
+	return true;
+}
+int fractal_load(struct fractalData *f, char *filename){
+	if(f == NULL || filename == NULL) return false;
+	FILE *savefile = fopen(filename, "r");
+	if(savefile == NULL)return false;
+	
+	float loadedVersion=0.0;
+	
+	fscanf(savefile,"version = %f\n",&loadedVersion);
+	fscanf(savefile,"color1 = 0x%lx\n",&f->color1);
+	fscanf(savefile,"color2 = 0x%lx\n",&f->color2);
+	fscanf(savefile,"colorScaler = %lf\n",&f->colorScaler);
+	fscanf(savefile,"iterations = %d\n",&f->iterations);
+	fscanf(savefile,"scale = %lf\n",&f->scale);
+	fscanf(savefile,"twist = %lf\n",&f->twist);
+	fscanf(savefile,"numbVectors = %d\n", &f->numbVectors);
+	fscanf(savefile,"numbExits = %d\n", &f->numbExits);
+	int i;
+	for(i=0; i<f->numbVectors; i++){
+		fscanf(savefile,"x = %lf\n",&f->vects[i].x);
+		fscanf(savefile,"y = %lf\n",&f->vects[i].y);
+		fscanf(savefile,"x0 = %lf\n",&f->vects[i].x0);
+		fscanf(savefile,"y0 = %lf\n",&f->vects[i].y0);
+		fscanf(savefile,"xorig = %lf\n",&f->vects[i].xorig);
+		fscanf(savefile,"yorig = %lf\n",&f->vects[i].yorig);
+		fscanf(savefile,"xWobble = %lf\n",&f->vects[i].xWobble);
+		fscanf(savefile,"yWobble = %lf\n",&f->vects[i].yWobble);
+		fscanf(savefile,"period = %d\n",&f->vects[i].period);
+		fscanf(savefile,"wobbleStartTime = %d\n",&f->vects[i].wobbleStartTime);
+		if(f->vects[i].period > 0) f->vects[i].wobbleStartTime %= f->vects[i].period;
+	}
+	for(i=0; i<f->numbExits; i++){
+		fscanf(savefile,"x = %lf\n",&f->exits[i].x);
+		fscanf(savefile,"y = %lf\n",&f->exits[i].y);
+	}
+	fclose(savefile);
+	return true;
+}
+
+
+int fractal_save_windows(struct fractalData *f){
+	OPENFILENAME ofn;
+	char szFileName[MAX_FRACTILE_PATH] = "";
+	
+	ZeroMemory(&ofn, sizeof(ofn));
+	
+	ofn.lStructSize = sizeof(ofn);
+	ofn.lpstrFilter = "Fractal Files (*.fractal)\0*.fractal\0All Files (*.*)\0*.*\0";
+	ofn.lpstrFile = szFileName;
+	ofn.nMaxFile = MAX_FRACTILE_PATH;
+	ofn.lpstrDefExt = "fractal";
+	ofn.lpstrInitialDir = "saves\\";
+	ofn.Flags = OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR | OFN_FILEMUSTEXIST;
+	
+	if(GetSaveFileName(&ofn))
+	{
+	    return fractal_save(f, szFileName);
+	}
+	return false;
+}
+
+int fractal_load_windows(struct fractalData *f){
+	OPENFILENAME ofn;
+	char szFileName[MAX_FRACTILE_PATH] = "";
+	
+	ZeroMemory(&ofn, sizeof(ofn));
+	
+	ofn.lStructSize = sizeof(ofn);
+	ofn.lpstrFilter = "Fractal Files (*.fractal)\0*.fractal\0All Files (*.*)\0*.*\0";
+	ofn.lpstrFile = szFileName;
+	ofn.nMaxFile = MAX_FRACTILE_PATH;
+	ofn.lpstrDefExt = "fractal";
+	ofn.lpstrInitialDir = "saves\\";
+	ofn.Flags = OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR | OFN_FILEMUSTEXIST;
+	
+	if(GetOpenFileName(&ofn))
+	{
+		return fractal_load(f, szFileName);
+	}
+	return false;
+}
+
+
+
+
+
+
+
+
+
 

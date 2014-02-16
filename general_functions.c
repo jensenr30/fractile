@@ -149,7 +149,8 @@ int init(){
 	}
 	
 	//Set the window caption
-	SDL_WM_SetCaption( "Fractile 0.1", NULL );
+	SDL_WM_SetCaption( "Fractile 0.3", NULL );
+	programVersion = 0.3;
 	
 	
 	
@@ -177,6 +178,7 @@ int load_files(){
         MessageBox(NULL, "Error in initializing TTF (True Type Font) library", "TTF Error", MB_OK);
         return false;
     }
+    
     
     //open font file
     font22 = TTF_OpenFont( "resources\\fonts\\FreeMonoBold.ttf", 22 );

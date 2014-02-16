@@ -1,0 +1,6 @@
+Fractile 0.3
+2014-2-16
+Ryan Jensen
+
+fixed the wobble glitch.
+	wobble would be very rigid when loading saved fractals.

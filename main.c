@@ -30,7 +30,7 @@ int main( int argc, char* argv[] )
 	int cumulativeFrames = 0;					// this counts how many Frames there have been since the last
 	int currentTicks = 0;						// this is how many 
 	int quit = false;							//make sure the program waits for a quit
-	float lines=2*PI;
+	//float lines=2*PI;
 	//----------------------------------------------------
 	// initialize lots of stuff
 	//----------------------------------------------------
@@ -53,6 +53,9 @@ int main( int argc, char* argv[] )
     myfractal.thickness = 5;
     myfractal.color1 = 0xff00ff00;
     fractal_random(&myfractal, 10, 5);
+    bool ctrl;
+    //bool shift;
+    //bool alt;
     
     
     //----------------------------------------------------
@@ -121,13 +124,20 @@ int main( int argc, char* argv[] )
 			
             if( event.type == SDL_KEYDOWN ){		///keyboard event
                 switch( event.key.keysym.sym ){
-				case SDLK_F5: fractal_random(&myfractal, 6, 5); break;
-				case SDLK_e:  fractal_editor(NULL,&myfractal,x,y,ee_toggle); break;
+				case SDLK_F5:	fractal_random(&myfractal, 6, 5); break;
+				case SDLK_e: 	fractal_editor(NULL,&myfractal,x,y,ee_toggle); break;
+				case SDLK_w:	fractal_wobble(&myfractal, vw_toggle); break;
+				case SDLK_RCTRL:
+				case SDLK_LCTRL: ctrl = true; break;
+				case SDLK_s: if(ctrl)fractal_save_windows(&myfractal); break;
+				case SDLK_l: if(ctrl)fractal_load_windows(&myfractal); break;
 				default: break;
 				}
 			}
 			if( event.type == SDL_KEYUP ){								///keyboard event
                 switch( event.key.keysym.sym ){
+				case SDLK_RCTRL:
+				case SDLK_LCTRL: ctrl = false; break;
 				default: break;
 				}
 			}
@@ -154,7 +164,7 @@ int main( int argc, char* argv[] )
         SDL_Delay(50);
         //updates the screen
         */
-		
+		fractal_wobble(&myfractal, vw_evaluate);
         fractal_print(screen, &myfractal);
         fractal_editor(screen, &myfractal, x, y, ee_print);
         SDL_Flip(screen);

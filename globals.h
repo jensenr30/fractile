@@ -25,3 +25,5 @@ SDL_Event event;
 // the fint that will be used
 TTF_Font *font22;
 TTF_Font *font16;
+
+float programVersion;
