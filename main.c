@@ -10,6 +10,8 @@
 
 int main( int argc, char* argv[] ) 
 {
+	colorWhite.r = 0xff;
+	colorWhite.g = colorWhite.b = 0;
 	//random seed
 	srand(time(NULL));
 	
@@ -53,7 +55,7 @@ int main( int argc, char* argv[] )
     myfractal.thickness = 5;
     myfractal.color1 = 0xff00ff00;
     fractal_random(&myfractal, 10, 5);
-    bool ctrl;
+    bool ctrl=false;
     //bool shift;
     //bool alt;
     

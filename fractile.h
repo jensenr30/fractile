@@ -80,7 +80,7 @@ struct fractalData{
 
 
 
-void fractal_iteration(SDL_Surface *dest, struct fractalData *f, double entryx, double entryy, double scale, double twist, int iter);
+void fractal_iteration(SDL_Surface *dest, struct fractalData **f, double entryx, double entryy, int iter);
 void fractal_print(SDL_Surface *dest, struct fractalData *fractal);
 void fractal_random(struct fractalData *f, int maxVects, int maxIterations);
 

@@ -10,20 +10,22 @@
 
 
 // this is the recursive function that will draw the fractal.
-void fractal_iteration(SDL_Surface *dest, struct fractalData *f, double entryx, double entryy, double scale, double twist, int iter){
+// iter (iterations) starts at 0!!
+// **f is a pointer to an array of fractals
+void fractal_iteration(SDL_Surface *dest, struct fractalData **f, double entryx, double entryy, int iter){
 	
 	int i;
 	
 	// print all the vectors
-	for(i=0; i<f->numbVectors; i++){
-		draw_line(dest, entryx+(f->vects[i].x0)*scale, entryy+(f->vects[i].y0)*scale, entryx+(f->vects[i].x0+f->vects[i].x)*scale, entryy+(f->vects[i].y0+f->vects[i].y)*scale, f->thickness*scale, f->color1);
+	for(i=0; i<f[iter]->numbVectors; i++){
+		draw_line(dest, entryx+(f[iter]->vects[i].x0)*f[iter]->scale, entryy+(f[iter]->vects[i].y0)*f[iter]->scale, entryx+(f[iter]->vects[i].x0+f[iter]->vects[i].x)*f[iter]->scale, entryy+(f[iter]->vects[i].y0+f[iter]->vects[i].y)*f[iter]->scale, f[iter]->thickness*f[iter]->scale, f[iter]->color1);
 	}
 	// return if you are done with all iterations of the fractal
-	if(iter == f->iterations) return;
+	if(iter == f[iter]->iterations) return;
 	
 	// recursively call more fractal iteration functions at the exit points of this iteration.
-	for(i=0; i<f->numbExits; i++){
-		fractal_iteration(dest, f, entryx+f->exits[i].x*scale, entryy+f->exits[i].y*scale, scale*f->scale, twist+f->twist, iter+1);
+	for(i=0; i<f[iter]->numbExits; i++){
+		fractal_iteration(dest, f, entryx+f[iter]->exits[i].x*f[iter]->scale, entryy + f[iter]->exits[i].y*f[iter]->scale, iter+1);
 	}
 }
 
@@ -32,7 +34,7 @@ void fractal_iteration(SDL_Surface *dest, struct fractalData *f, double entryx, 
 // f is a pointer to the fractal structure that contains all the information about the fractal that will be printed.
 // entryx and entryy are the <x,y> coordinates of the first entry point of this iteration of the fractal
 void fractal_print(SDL_Surface *dest, struct fractalData *f){
-	
+	int j;
 	// make sure the fractal and the destination surface are valid
 	if(f == NULL || dest == NULL) return;
 	
@@ -102,10 +104,62 @@ void fractal_print(SDL_Surface *dest, struct fractalData *f){
 		scale = yscale;
 	}
 	
+	// allocate space for calculating the fractals at every iteration size
+	struct fractalData **fa = malloc(f->iterations * sizeof(struct fractalData));
 	
-	
-	// begin drawing the fractal
-	fractal_iteration(dest, f, -((xmax+xmin)*scale)/2 + SCREEN_WIDTH/2, -((ymax+ymin)*scale)/2 + SCREEN_HEIGHT/2, scale/f->scale, 0, 1);
+	if(fa == NULL){
+		apply_text(dest, SCREEN_WIDTH/2 - 110,SCREEN_HEIGHT/2,font16,"malloc returned NULL", colorWhite);
+		return;
+	}
+	else{
+		// initial starting values for the first fractal iteration
+		fa[0]->scale = f->scale;
+		fa[0]->thickness = f->thickness;
+		// calculate all the fractals at each level
+		for(i=0; i<f->iterations; i++){
+			fa[i]->color1 = f->color1;
+			fa[i]->color2 = f->color2;
+			fa[i]->colorScaler = f->colorScaler;
+			fa[i]->iterations = f->iterations;
+			fa[i]->numbVectors = f->numbVectors;
+			fa[i]->numbExits = f->numbExits;
+			fa[i]->twist = f->twist;
+			if(i>0){
+				fa[i]->scale = fa[i-1]->scale*f->scale;
+				fa[i]->thickness = fa[i-1]->thickness*f->scale;
+			}
+			
+			//rotate and scale the vectors
+			for(j=0; j<f->numbVectors; j++){
+				fa[i]->vects[j].period = f->vects[j].period;
+				fa[i]->vects[j].wobbleStartTime = f->vects[j].wobbleStartTime;
+				
+				rotate_point(fa[i]->vects[j].x + fa[i]->vects[j].x0, fa[i]->vects[j].y + fa[i]->vects[j].y0, &fa[i]->vects[j].x, &fa[i]->vects[j].y, f->twist*i);
+				rotate_point(fa[i]->vects[j].x0, fa[i]->vects[j].y0, &fa[i]->vects[j].x0, &fa[i]->vects[j].y0, f->twist*i);
+				rotate_point(fa[i]->vects[j].xorig, fa[i]->vects[j].yorig, &fa[i]->vects[j].xorig, &fa[i]->vects[j].yorig, f->twist*i);
+				rotate_point(fa[i]->vects[j].xWobble, fa[i]->vects[j].yWobble, &fa[i]->vects[j].xWobble, &fa[i]->vects[j].yWobble, f->twist*i);
+				fa[i]->vects[j].x *=			fa[i]->scale;
+				fa[i]->vects[j].y *=			fa[i]->scale;
+				fa[i]->vects[j].x0 *=			fa[i]->scale;
+				fa[i]->vects[j].y0 *=			fa[i]->scale;
+				fa[i]->vects[j].xorig *=		fa[i]->scale;
+				fa[i]->vects[j].yorig *=		fa[i]->scale;
+				fa[i]->vects[j].xWobble *=		fa[i]->scale;
+				fa[i]->vects[j].yWobble *=		fa[i]->scale;
+			}
+			// rotate and scale the exits
+			for(j=0; j<f->numbExits; j++){
+				rotate_point(fa[i]->exits[j].x, fa[i]->exits[j].y, &fa[i]->exits[j].x, &fa[i]->exits[j].y, f->twist*i);
+				fa[i]->exits[j].x *= fa[i]->scale;
+				fa[i]->exits[j].y *= fa[i]->scale;
+			}
+		}
+		fractal_iteration(dest, fa, -((xmax+xmin)*scale)/2 + SCREEN_WIDTH/2, -((ymax+ymin)*scale)/2 + SCREEN_HEIGHT/2, 0);
+		
+		for(i=0; i<f->iterations; i++){
+			free(fa[i]);
+		}
+	}
 }
 
 

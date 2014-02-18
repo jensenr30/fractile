@@ -1,5 +1,36 @@
+#include <stdio.h>
 #include "math_custom.h"
+#include <math.h>
 
+/// this will rotate the point <x,y> about the point <0,0> an angle of theta (radians) and return the new <xn,yn> coordinates
+void rotate_point(double x, double y, double *xn, double *yn, double theta){
+	// calculate magnitude
+	double r = sqrt(x*x + y*y);
+	double newAngle;
+	// if both components are zero, there is no rotation. The point stays the same (such is the nature of the so-called "zero vector").
+	if(x == 0 && y == 0){
+		*xn = x;
+		*yn = y;
+		return;
+	}
+	// if y is larger than x, calculate the original angle with arc sine
+	if(y > x){
+		newAngle = asin(r/y) + theta;
+	}
+	// if x is larger than y, calculate the original angle with arc cosine.
+	else{
+		newAngle = acos(r/x) + theta;
+	}
+	
+	// calculate the new x
+	if(xn != NULL){
+		*xn = r*cos(newAngle);
+	}
+	// calculate the new y
+	if(yn != NULL){
+		*yn = r*sin(newAngle);
+	}
+}
 
 
 /// intersect_p is for when you know some point on each line <x,y> and the slopes of each line.

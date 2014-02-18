@@ -1,0 +1,2 @@
+wobble boxes get shifted when they are cut off by the bottom of the window!
+Thanks, JP.

@@ -63,7 +63,6 @@ int apply_text(SDL_Surface *datsurface, int x, int y, TTF_Font *theFont, char *t
 	if(strcmp(theString, " ") != 0)
 		theSurface = TTF_RenderText_Blended(theFont, theString, theColor); // attempt rendering text
 	if(theSurface == NULL){
-		SDL_FreeSurface(theSurface); // clean the surface
 		return 0; // rendering text didn't work. return 0
 	}
 	apply_surface(x, y, theSurface, datsurface); // apply surface at x, y

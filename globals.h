@@ -27,3 +27,4 @@ TTF_Font *font22;
 TTF_Font *font16;
 
 float programVersion;
+SDL_Color colorWhite;
