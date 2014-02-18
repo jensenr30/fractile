@@ -9,8 +9,8 @@ void rotate_point(double x, double y, double *xn, double *yn, double theta){
 	double newAngle;
 	// if both components are zero, there is no rotation. The point stays the same (such is the nature of the so-called "zero vector").
 	if(x == 0 && y == 0){
-		*xn = x;
-		*yn = y;
+		if(xn != NULL)*xn = x;
+		if(yn != NULL)*yn = y;
 		return;
 	}
 	// if y is larger than x, calculate the original angle with arc sine

@@ -20,13 +20,19 @@ void fractal_iteration(SDL_Surface *dest, struct fractalData **f, double entryx,
 	for(i=0; i<f[iter]->numbVectors; i++){
 		draw_line(dest, entryx+(f[iter]->vects[i].x0)*f[iter]->scale, entryy+(f[iter]->vects[i].y0)*f[iter]->scale, entryx+(f[iter]->vects[i].x0+f[iter]->vects[i].x)*f[iter]->scale, entryy+(f[iter]->vects[i].y0+f[iter]->vects[i].y)*f[iter]->scale, f[iter]->thickness*f[iter]->scale, f[iter]->color1);
 	}
+	
+	
 	// return if you are done with all iterations of the fractal
-	if(iter == f[iter]->iterations) return;
+	if(iter >= f[iter]->iterations-1){
+		return;
+	}
+	
 	
 	// recursively call more fractal iteration functions at the exit points of this iteration.
 	for(i=0; i<f[iter]->numbExits; i++){
 		fractal_iteration(dest, f, entryx+f[iter]->exits[i].x*f[iter]->scale, entryy + f[iter]->exits[i].y*f[iter]->scale, iter+1);
 	}
+	
 }
 
 
@@ -105,61 +111,73 @@ void fractal_print(SDL_Surface *dest, struct fractalData *f){
 	}
 	
 	// allocate space for calculating the fractals at every iteration size
-	struct fractalData **fa = malloc(f->iterations * sizeof(struct fractalData));
+	// I forgot why I called it fa. fractal "adjusted"? fractal "after rotation"? "all done"? I don't know... I'm beginning to doubt there ever was a reason...
+	struct fractalData *fa = malloc(f->iterations * sizeof(struct fractalData));
+	// declare an array of fractal pointers of the correct length
+	struct fractalData **fp = malloc(sizeof(struct fractalData*)*f->iterations);
 	
-	if(fa == NULL){
-		apply_text(dest, SCREEN_WIDTH/2 - 110,SCREEN_HEIGHT/2,font16,"malloc returned NULL", colorWhite);
+	if(fa == NULL || fp == NULL){
+		apply_text(dest, SCREEN_WIDTH/2 - 150,SCREEN_HEIGHT/2,font16,"malloc returned NULL for either *fa or **fp", colorWhite);
 		return;
 	}
 	else{
+		
 		// initial starting values for the first fractal iteration
-		fa[0]->scale = f->scale;
-		fa[0]->thickness = f->thickness;
+		fa[0].scale = f->scale;
+		fa[0].thickness = f->thickness;
+		
 		// calculate all the fractals at each level
 		for(i=0; i<f->iterations; i++){
-			fa[i]->color1 = f->color1;
-			fa[i]->color2 = f->color2;
-			fa[i]->colorScaler = f->colorScaler;
-			fa[i]->iterations = f->iterations;
-			fa[i]->numbVectors = f->numbVectors;
-			fa[i]->numbExits = f->numbExits;
-			fa[i]->twist = f->twist;
+			
+			fa[i].color1 = f->color1;
+			fa[i].color2 = f->color2;
+			fa[i].colorScaler = f->colorScaler;
+			fa[i].iterations = f->iterations;
+			fa[i].numbVectors = f->numbVectors;
+			fa[i].numbExits = f->numbExits;
+			fa[i].twist = f->twist;
 			if(i>0){
-				fa[i]->scale = fa[i-1]->scale*f->scale;
-				fa[i]->thickness = fa[i-1]->thickness*f->scale;
+				fa[i].scale = fa[i-1].scale*f->scale;
+				fa[i].thickness = fa[i-1].thickness*f->scale;
 			}
 			
 			//rotate and scale the vectors
 			for(j=0; j<f->numbVectors; j++){
-				fa[i]->vects[j].period = f->vects[j].period;
-				fa[i]->vects[j].wobbleStartTime = f->vects[j].wobbleStartTime;
+				fa[i].vects[j].period = f->vects[j].period;
+				fa[i].vects[j].wobbleStartTime = f->vects[j].wobbleStartTime;
 				
-				rotate_point(fa[i]->vects[j].x + fa[i]->vects[j].x0, fa[i]->vects[j].y + fa[i]->vects[j].y0, &fa[i]->vects[j].x, &fa[i]->vects[j].y, f->twist*i);
-				rotate_point(fa[i]->vects[j].x0, fa[i]->vects[j].y0, &fa[i]->vects[j].x0, &fa[i]->vects[j].y0, f->twist*i);
-				rotate_point(fa[i]->vects[j].xorig, fa[i]->vects[j].yorig, &fa[i]->vects[j].xorig, &fa[i]->vects[j].yorig, f->twist*i);
-				rotate_point(fa[i]->vects[j].xWobble, fa[i]->vects[j].yWobble, &fa[i]->vects[j].xWobble, &fa[i]->vects[j].yWobble, f->twist*i);
-				fa[i]->vects[j].x *=			fa[i]->scale;
-				fa[i]->vects[j].y *=			fa[i]->scale;
-				fa[i]->vects[j].x0 *=			fa[i]->scale;
-				fa[i]->vects[j].y0 *=			fa[i]->scale;
-				fa[i]->vects[j].xorig *=		fa[i]->scale;
-				fa[i]->vects[j].yorig *=		fa[i]->scale;
-				fa[i]->vects[j].xWobble *=		fa[i]->scale;
-				fa[i]->vects[j].yWobble *=		fa[i]->scale;
+				rotate_point(f->vects[j].x + 		f->vects[j].x0,			fa[i].vects[j].y +			fa[i].vects[j].y0,			&fa[i].vects[j].x, &fa[i].vects[j].y, f->twist*i);
+				rotate_point(f->vects[j].x0, 		f->vects[j].y0,			&fa[i].vects[j].x0,			&fa[i].vects[j].y0,			f->twist*i);
+				rotate_point(f->vects[j].xorig, 	f->vects[j].yorig,		&fa[i].vects[j].xorig,		&fa[i].vects[j].yorig,		f->twist*i);
+				rotate_point(f->vects[j].xWobble,	f->vects[j].yWobble,	&fa[i].vects[j].xWobble,	&fa[i].vects[j].yWobble,	f->twist*i);
+				fa[i].vects[j].x *=			fa[i].scale;
+				fa[i].vects[j].y *=			fa[i].scale;
+				fa[i].vects[j].x0 *=		fa[i].scale;
+				fa[i].vects[j].y0 *=		fa[i].scale;
+				fa[i].vects[j].xorig *=		fa[i].scale;
+				fa[i].vects[j].yorig *=		fa[i].scale;
+				fa[i].vects[j].xWobble *=	fa[i].scale;
+				fa[i].vects[j].yWobble *=	fa[i].scale;
 			}
+			
 			// rotate and scale the exits
 			for(j=0; j<f->numbExits; j++){
-				rotate_point(fa[i]->exits[j].x, fa[i]->exits[j].y, &fa[i]->exits[j].x, &fa[i]->exits[j].y, f->twist*i);
-				fa[i]->exits[j].x *= fa[i]->scale;
-				fa[i]->exits[j].y *= fa[i]->scale;
+				
+				rotate_point(f->exits[j].x, f->exits[j].y, &fa[i].exits[j].x, &fa[i].exits[j].y, f->twist*i);
+				fa[i].exits[j].x *= fa[i].scale;
+				fa[i].exits[j].y *= fa[i].scale;
+			}
+			
+			
+			for(i=0; i<f->iterations; i++){
+				fp[i] = &fa[i];
 			}
 		}
-		fractal_iteration(dest, fa, -((xmax+xmin)*scale)/2 + SCREEN_WIDTH/2, -((ymax+ymin)*scale)/2 + SCREEN_HEIGHT/2, 0);
-		
-		for(i=0; i<f->iterations; i++){
-			free(fa[i]);
-		}
+		fractal_iteration(dest, fp, -((xmax+xmin)*scale)/2 + SCREEN_WIDTH/2, -((ymax+ymin)*scale)/2 + SCREEN_HEIGHT/2, 0);
+		free(fp);
+		free(fa);
 	}
+	
 }
 
 
