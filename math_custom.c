@@ -13,13 +13,13 @@ void rotate_point(double x, double y, double *xn, double *yn, double theta){
 		if(yn != NULL)*yn = y;
 		return;
 	}
-	// if y is larger than x, calculate the original angle with arc sine
-	if(y > x){
-		newAngle = asin(r/y) + theta;
+	// if the magnitude of y is larger than the magnitude of x, calculate the original angle with arc sine
+	if( 1/*abs(y) > abs(x)*/ ){
+		newAngle = (asin(y/r)+PI/2)*(1-2*(x<0)) - PI/2 + theta;
 	}
 	// if x is larger than y, calculate the original angle with arc cosine.
 	else{
-		newAngle = acos(r/x) + theta;
+		newAngle = acos(x/r)*(1-2*(y<0)) + theta;
 	}
 	
 	// calculate the new x

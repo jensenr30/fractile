@@ -10,8 +10,8 @@
 
 int main( int argc, char* argv[] ) 
 {
-	colorWhite.r = 0xff;
-	colorWhite.g = colorWhite.b = 0;
+	colorRed.r = 0xff;
+	colorRed.g = colorRed.b = 0;
 	//random seed
 	srand(time(NULL));
 	
@@ -19,6 +19,11 @@ int main( int argc, char* argv[] )
 	SCREEN_WIDTH = DEFAULT_SCREEN_WIDTH;
 	SCREEN_HEIGHT = DEFAULT_SCREEN_HEIGHT;
 	
+	//----------------------------------------------------
+	// DEBUG THE ROTATE_POINT() function
+	//----------------------------------------------------
+	//double xtest=5, ytest=5, xresult, yresult, angle=-5*PI/2;
+	//rotate_point(xtest,ytest,&xresult,&yresult,angle);
 	
 	//----------------------------------------------------
 	// VARIABLES USED IN MAIN()
