@@ -254,7 +254,7 @@ void fractal_random(struct fractalData *f, int maxVects, int maxIterations){
     */
     f->iterations = maxIterations;
     int i;
-    f->twist = PI/6;//f->twist = (((rand()%20001)-10000)*PI)/10000;
+    f->twist = 0;//PI/6;//f->twist = (((rand()%20001)-10000)*PI)/10000;
     f->numbVectors = f->numbExits = rand()%(maxVects-1)+ 2;
     for(i=0; i<f->numbVectors; i++){
 		f->vects[i].x0 = 0;//rand()%400 + 20;
