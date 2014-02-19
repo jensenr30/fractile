@@ -164,7 +164,7 @@
 	"globals.h"
 	"bool.h"
 
-1392778698 source:a:\programming\fractile\main.c
+1392780670 source:a:\programming\fractile\main.c
 	<stdlib.h>
 	<time.h>
 	"general_functions.h"

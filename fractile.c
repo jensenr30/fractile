@@ -475,7 +475,10 @@ int fractal_save(struct fractalData *f, char *filename){
 		fprintf(savefile,"xWobble = %lf\n",f->vects[i].xWobble);
 		fprintf(savefile,"yWobble = %lf\n",f->vects[i].yWobble);
 		fprintf(savefile,"period = %d\n",f->vects[i].period);
-		fprintf(savefile,"wobbleStartTime = %d\n",f->vects[i].wobbleStartTime%f->vects[i].period);
+		if(f->vects[i].period > 0)
+			fprintf(savefile,"wobbleStartTime = %d\n",f->vects[i].wobbleStartTime%f->vects[i].period);
+		else
+			fprintf(savefile,"wobbleStartTime = 0\n");
 	}
 	for(i=0; i<f->numbExits; i++){
 		fprintf(savefile,"x = %lf\n",f->exits[i].x);

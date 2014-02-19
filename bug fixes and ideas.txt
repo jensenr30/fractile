@@ -1,0 +1,43 @@
+wobble boxes get shifted when they are cut off by the bottom of the window!
+Thanks, JP.
+
+
+
+
+
+when you switch to a new fractal, the scale of the vectors in the editor window is not properly adjusted.
+I also need to add options to enter in values numerically
+Thanks, Corbin.
+
+
+
+
+
+The window does not currently auto-fit the fractal properly.
+What I need to do is calculate:
+	xmax, xmin, ymax, ymin
+for every iteration of the fractal. (This takes in to account the twisting of each iteration)
+It seems logical to simply sum them up after that, but that is not quite right.
+what you need to do is this:
+	
+	// at this point, the xmax[], xmin[], ymax[], and ymin[] terms have been calculated at each iteration.
+	
+	double xmaxglobal = xmax[0]	// this is the xmax at iteration 0
+	double xminglobal = xmin[0]	// this is the xmin at iteration 0
+	double ymaxglobal = ymax[0]	// this is the ymax at iteration 0
+	double yminglobal = ymin[0]	// this is the ymin at iteration 0
+	
+	for(i=0; i<iterations; i++){
+		if(xmaxglobal + xmax[i] > xmaxglobal){	// calculate the right-most any line will ever be.
+			xmaxglobal += xmax[i];
+		}
+		if(xminglobal + xmin[i] < xminglobal){	// calculate the left-most any line will ever be.
+			xminglobal += xmin[i];
+		}
+		if(ymaxglobal + ymax[i] > ymaxglobal){	// calculate the lowest any line will ever be.
+			ymaxglobal += ymax[i];
+		}
+		if(yminglobal + ymin[i] < yminglobal){	// calculate the highest any line will ever be.
+			yminglobal += ymin[i];
+		}
+	}
