@@ -36,8 +36,12 @@ int main( int argc, char* argv[] )
 	int ticksSinceLastFPSUpdate=0;				// time since last FPS update (ideally, goes from 0 to 1000 milliseconds and then resets)
 	int cumulativeFrames = 0;					// this counts how many Frames there have been since the last
 	int currentTicks = 0;						// this is how many 
-	int quit = false;							//make sure the program waits for a quit
-	//float lines=2*PI;
+	int quit = false;							// make sure the program waits for a quit
+	int xtwist=0, ytwist=0;						// these store the user's coordinates when the user started twisting myfractal
+	bool twisting=false;						// this keeps track of whether or not the user is twisting the fractal.
+	double twistInitial=0;						// this is what the twist was for myfractal when the user started changing it.
+	double twistRadiansPerPixel = (2*PI)/SCREEN_WIDTH;	// this is how fast the twist of a fractal is changed
+	unsigned long int twistColor = 0xffff0000;	// the color of the twisting line
 	//----------------------------------------------------
 	// initialize lots of stuff
 	//----------------------------------------------------
@@ -116,6 +120,8 @@ int main( int argc, char* argv[] )
             else if( event.type == SDL_MOUSEMOTION ){						/// mouse motion
 				x = event.motion.x;
 				y = event.motion.y;
+				// update twist
+				
             }
             else if(event.type == SDL_VIDEORESIZE){							/// window resize
 				
@@ -127,6 +133,7 @@ int main( int argc, char* argv[] )
 				set_window_size(event.resize.w, event.resize.h);		// set window to correct dimensions
 				screenRect.w = event.resize.w;
 				screenRect.h = event.resize.h;
+				twistRadiansPerPixel = (2*PI)/SCREEN_WIDTH;	// recalculate the twist per pixels scaler
 			}
 			
             if( event.type == SDL_KEYDOWN ){		///keyboard event
@@ -138,6 +145,12 @@ int main( int argc, char* argv[] )
 				case SDLK_LCTRL: ctrl = true; break;
 				case SDLK_s: if(ctrl)fractal_save_windows(&myfractal); break;
 				case SDLK_l: if(ctrl)fractal_load_windows(&myfractal); break;
+				case SDLK_t:
+					xtwist = x;
+					ytwist = y;
+					twistInitial = myfractal.twist;
+					twisting = true;
+					break;
 				default: break;
 				}
 			}
@@ -145,6 +158,10 @@ int main( int argc, char* argv[] )
                 switch( event.key.keysym.sym ){
 				case SDLK_RCTRL:
 				case SDLK_LCTRL: ctrl = false; break;
+				case SDLK_t:
+					myfractal.twist = twistInitial + (y-ytwist)*twistRadiansPerPixel;
+					twisting = false;
+					break;
 				default: break;
 				}
 			}
@@ -174,6 +191,37 @@ int main( int argc, char* argv[] )
 		fractal_wobble(&myfractal, vw_evaluate);
         fractal_print(screen, &myfractal);
         fractal_editor(screen, &myfractal, x, y, ee_print);
+        // print the twisting line
+        if(twisting){
+			
+			myfractal.twist = twistInitial + (y-ytwist)*twistRadiansPerPixel;
+			draw_line(screen, x, ytwist, x, y, 1, twistColor);
+			while(myfractal.twist<0) myfractal.twist += 2*PI;
+			while(myfractal.twist>2*PI) myfractal.twist -= 2*PI;
+			
+			char degStr[] = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+			double degrees = 180*myfractal.twist/PI;
+			int n; // this is how many whole number digits there are in degrees.
+			
+			itoa(((int)degrees), degStr, 10);
+			if(degrees < 10){
+				n = 1;
+			}
+			else if(degrees < 100){
+				n = 2;
+			}
+			else {
+				n = 3;
+			}
+			
+			degStr[n] = '.';
+			
+			degStr[n+1] = (degrees*10) - ((int)degrees)*10 + 48;
+			
+			strcat(&degStr[n+2], " degrees");
+			
+			apply_text(screen, x, (y+ytwist)/2, font16, degStr, colorRed);
+        }
         SDL_Flip(screen);
         SDL_FillRect(screen, &screenRect, 0);
         

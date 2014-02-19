@@ -1,6 +1,8 @@
-Fractile 0.3
-2014-2-16
+Fractile 0.4
+2014-2-18
 Ryan Jensen
 
-fixed the wobble glitch.
-	wobble would be very rigid when loading saved fractals.
+§ Added twisting.
+	You can now adjust how much each iteration of the fractal twists relative to the original fractal.
+	This opens up "an entirely new dimension of fractals", as it were.
+	press and hold T to twist

@@ -16,6 +16,10 @@ E
 W
 	toggle wobble for a vector
 	
+T (press and hold)
+	twist the fractal by pressing and holding T, and dragging the mouse up/down.
+	The degrees that the fractal is being twisted on each iteration is displayed
+	
 Ctrl+S
 	save the fractal
 	
