@@ -10,6 +10,15 @@ I also need to add options to enter in values numerically
 Thanks, Corbin.
 
 
+Corbin suggested a feature that locks vectors in equal magnitude but opposite direction.
+I think this is a great idea, but I'll do it one better:
+have the ability to specify a vector based on a different vector in general.
+have the ability to "reference" a vector to another vector.
+Be able to change this reference manually.
+The reference variables will be comprised two variables:
+1. a scaling factor (that describes what percentage of the original vector this new vector will be
+2. a twist (shown to the user in degrees, stored in memory as radians) that describes the angle from the referenced vector to the current one.
+
 
 
 

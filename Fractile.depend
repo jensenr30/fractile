@@ -115,7 +115,7 @@
 	"graphics.h"
 	"globals.h"
 
-1392775832 source:a:\programming\fractile\fractile.c
+1392849441 source:a:\programming\fractile\fractile.c
 	<SDL\SDL.h>
 	"fractile.h"
 	"graphics.h"
@@ -141,7 +141,7 @@
 
 1392775832 a:\programming\fractile\math_custom.h
 
-1392775832 source:a:\programming\fractile\general_functions.c
+1392876005 source:a:\programming\fractile\general_functions.c
 	<stdio.h>
 	"SDL/SDL.h"
 	"SDL/SDL_image.h"
@@ -164,7 +164,7 @@
 	"globals.h"
 	"bool.h"
 
-1392780670 source:a:\programming\fractile\main.c
+1392875843 source:a:\programming\fractile\main.c
 	<stdlib.h>
 	<time.h>
 	"general_functions.h"

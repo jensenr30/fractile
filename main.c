@@ -63,7 +63,7 @@ int main( int argc, char* argv[] )
     myfractal.iterations = 3;
     myfractal.thickness = 5;
     myfractal.color1 = 0xff00ff00;
-    fractal_random(&myfractal, 10, 5);
+    fractal_random(&myfractal, 6, 5);
     bool ctrl=false;
     //bool shift;
     //bool alt;
