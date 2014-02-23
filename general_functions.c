@@ -149,8 +149,8 @@ int init(){
 	}
 	
 	//Set the window caption
-	SDL_WM_SetCaption( "Fractile v0.4", NULL );
-	programVersion = 0.4;
+	SDL_WM_SetCaption( "Fractile v0.5", NULL );
+	programVersion = 0.5;
 	
 	
 	

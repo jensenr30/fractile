@@ -19,6 +19,9 @@ W
 T (press and hold)
 	twist the fractal by pressing and holding T, and dragging the mouse up/down.
 	The degrees that the fractal is being twisted on each iteration is displayed
+
+S (press and hold)
+	move the mouse up and down to control the scaling of the fractal at each iteration.
 	
 Ctrl+S
 	save the fractal
