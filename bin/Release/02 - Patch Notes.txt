@@ -1,8 +1,7 @@
-Fractile v0.4
-2014-2-20
+Fractile v0.5
+xxxx-xx-xx
 Ryan Jensen
 
-§ Added twisting.
-	You can now adjust how much each iteration of the fractal twists relative to the original fractal.
-	This opens up "an entirely new dimension of fractals", as it were.
-	press and hold T to twist
+Added Scaling
+	you can now control the scale of the fractal at each iteration.
+	the scale is essentially how big the next fractal iteration will be relative to the current one.

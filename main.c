@@ -42,6 +42,11 @@ int main( int argc, char* argv[] )
 	double twistInitial=0;						// this is what the twist was for myfractal when the user started changing it.
 	double twistRadiansPerPixel = (2*PI)/SCREEN_WIDTH;	// this is how fast the twist of a fractal is changed
 	unsigned long int twistColor = 0xffff0000;	// the color of the twisting line
+	
+	int xscale=0, yscale=0;								// initial coordinates of the mouse when the user starts scaling
+	bool scaling=false;									// this is true/false corresponding to if the user is currently scaling the fractal
+	double scaleInitial = 0.5;							// this is the initial scale value when the user began scaling
+	double scaleMultiplierPerPixel = 1.5/((float)SCREEN_WIDTH);	// this is how much the scale changes with the mouse pixel movement
 	//----------------------------------------------------
 	// initialize lots of stuff
 	//----------------------------------------------------
@@ -143,7 +148,17 @@ int main( int argc, char* argv[] )
 				case SDLK_w:	fractal_wobble(&myfractal, vw_toggle); break;
 				case SDLK_RCTRL:
 				case SDLK_LCTRL: ctrl = true; break;
-				case SDLK_s: if(ctrl)fractal_save_windows(&myfractal); break;
+				case SDLK_s:
+					if(ctrl){
+						fractal_save_windows(&myfractal);
+					}
+					else{
+						xscale = x;
+						yscale = y;
+						scaleInitial = myfractal.scale;
+						scaling = true;
+					}
+					break;
 				case SDLK_l: if(ctrl)fractal_load_windows(&myfractal); break;
 				case SDLK_t:
 					xtwist = x;
@@ -161,6 +176,10 @@ int main( int argc, char* argv[] )
 				case SDLK_t:
 					myfractal.twist = twistInitial + (y-ytwist)*twistRadiansPerPixel;
 					twisting = false;
+					break;
+				case SDLK_s:
+					myfractal.scale = scaleInitial*(1 - (yscale-y)*scaleMultiplierPerPixel);
+					scaling = false;
 					break;
 				default: break;
 				}
@@ -221,6 +240,9 @@ int main( int argc, char* argv[] )
 			strcat(&degStr[n+2], " degrees");
 			
 			apply_text(screen, x, (y+ytwist)/2, font16, degStr, colorRed);
+        }
+        if(scaling){
+			myfractal.scale = scaleInitial*(1 - (yscale-y)*scaleMultiplierPerPixel);
         }
         SDL_Flip(screen);
         SDL_FillRect(screen, &screenRect, 0);
