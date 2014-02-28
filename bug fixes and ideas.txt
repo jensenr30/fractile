@@ -50,3 +50,21 @@ what you need to do is this:
 			yminglobal += ymin[i];
 		}
 	}
+
+
+
+I need to add an opiton for a secondary color.
+The color should shift from one to another as you move from the first iteration onwards.
+ 
+
+you should be able to specify which iterations are displayed. (i.e. boxes with check marks for each iteration)
+
+
+I need an editor window for adjusting just the entry and exit points of the fractal. blue = entry, red = exit.
+
+
+make a scroll bar for the space in which you reserved a scroll bar (for vectors and exit points)
+
+
+add a button to increase/decrease the number of vectors (maybe up/down)
+add a similar button to increase/decrease the number of exit points (maybe left/right)
