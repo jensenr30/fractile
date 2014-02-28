@@ -67,7 +67,7 @@ int main( int argc, char* argv[] )
     myfractal.scale = 0.5;
     myfractal.iterations = 3;
     myfractal.thickness = 5;
-    myfractal.color1 = 0xff00ff00;
+    myfractal.color1 = 0xffffffff;
     fractal_random(&myfractal, 6, 5);
     bool ctrl=false;
     //bool shift;
@@ -245,7 +245,7 @@ int main( int argc, char* argv[] )
 			myfractal.scale = scaleInitial*(1 - (yscale-y)*scaleMultiplierPerPixel);
         }
         SDL_Flip(screen);
-        SDL_FillRect(screen, &screenRect, 0);
+        SDL_FillRect(screen, &screenRect, 0xff000000);
         
         //----------------------------------------------------------------------
 		// FPS calculation and variable handling
