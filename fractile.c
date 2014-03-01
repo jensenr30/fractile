@@ -293,7 +293,7 @@ bool fractal_editor(SDL_Surface *dest, struct fractalData *f, int x, int y, int 
 	// this tells us if the editor window is open
 	static bool editorOpen=true;
 	// this tells us what button the editor is currently on.
-	static int editorButton=0;
+	static int editorButton=EDITOR_BUTTONS_VECTORS;
 	// this is the current width of the editor
 	static int currentWidth = EDITOR_DEFAULT_WIDTH;
 	// this is the scale at which the vectors in the editor window are printed to the screen (pixels/vector-size)
@@ -311,7 +311,7 @@ bool fractal_editor(SDL_Surface *dest, struct fractalData *f, int x, int y, int 
 	bool calculateVectorScale=false;
 	
 	static SDL_Rect buttons[EDITOR_BUTTONS_NUMBER_OF];
-	int i;
+	int i,b,v;
 	
 	
 	// handle all first-time-through things
@@ -325,76 +325,95 @@ bool fractal_editor(SDL_Surface *dest, struct fractalData *f, int x, int y, int 
 		}
 		firstTime = false;
 	}
-	
+	//-------------------------------------------------------------------------------
+	// adjust the position of the editor buttons
+	//-------------------------------------------------------------------------------
+	for(i=0; i<EDITOR_BUTTONS_NUMBER_OF; i++){
+		buttons[i].x = (currentWidth+EDITOR_TITLE_BAR_HEIGHT)*editorOpen;
+	}
 	//-------------------------------------------------------------------------------
 	// check for user input
 	//-------------------------------------------------------------------------------
 	//check for toggling
 	if(editorEvent == ee_toggle) editorOpen^=1;
-	//check for selecting a vector
-	if(editorOpen && x<currentWidth && y>=EDITOR_TITLE_BAR_HEIGHT && editorEvent == ee_left_click_down){
-		currentVector = ((y-EDITOR_TITLE_BAR_HEIGHT)/currentWidth)%f->numbVectors;
-	}
-	//check for left clicking (clicking and dragging)
+	//check for right click down
 	if(editorEvent == ee_right_click_down){
 		rightMouseButton = true;
 		xRightMouseInitial = x;
 		yRightMouseInitial = y;
-		xVectInit = f->vects[currentVector].x;
-		yVectInit = f->vects[currentVector].y;
+		if(editorButton == EDITOR_BUTTONS_VECTORS){
+			xVectInit = f->vects[currentVector].x;
+			yVectInit = f->vects[currentVector].y;
+		}
 	}
-	if(editorEvent == ee_right_click_up){
+	//check for right mouse button up
+	else if(editorEvent == ee_right_click_up){
 		rightMouseButton = false;
-		f->exits[currentVector].x = f->vects[currentVector].x = xVectInit + ((x-xRightMouseInitial)*dragSpeed)/scale;
-		f->exits[currentVector].y = f->vects[currentVector].y = yVectInit + ((y-yRightMouseInitial)*dragSpeed)/scale;
-		calculateVectorScale=true;
-	}
-	
-	
-	//-------------------------------------------------------------------------------
-	// check to see if we need to calculate the scaling factor for printing the editor window vectors
-	//-------------------------------------------------------------------------------
-	if(calculateVectorScale){
-		//-------------------------------------------------------------------------------
-		//determine the longest magnitude vector in this vector
-		//-------------------------------------------------------------------------------
-		double yMaxMag=0.0f;
-		double xMaxMag=0.0f;
-		for(i=0; i<f->numbVectors; i++){
-			if(fabs(f->vects[i].x)>xMaxMag) xMaxMag = fabs(f->vects[i].x);
-			if(fabs(f->vects[i].y)>yMaxMag) yMaxMag = fabs(f->vects[i].y);
-		}
-		//-------------------------------------------------------------------------------
-		// set the scale of the vectors in the editor sidebar
-		//-------------------------------------------------------------------------------
-		// this is the scale at which the vectors of the fractal will be printed in the editor
-		// scale is in units of (pixels/vector-size) so that it can be multiplied by a vector's size and the units work out to be pixels.
-		if(xMaxMag > yMaxMag){
-			scale = currentWidth/(xMaxMag*2);
-		}
-		else{
-			scale = currentWidth/(yMaxMag*2);
+		if(editorButton == EDITOR_BUTTONS_VECTORS){
+			f->exits[currentVector].x = f->vects[currentVector].x = xVectInit + ((x-xRightMouseInitial)*dragSpeed)/scale;
+			f->exits[currentVector].y = f->vects[currentVector].y = yVectInit + ((y-yRightMouseInitial)*dragSpeed)/scale;
+			calculateVectorScale=true;
 		}
 	}
+	// check for left click down
+	else if(editorEvent == ee_left_click_down){
+		//check for selecting a vector
+		if(editorOpen && x<currentWidth && y>=EDITOR_TITLE_BAR_HEIGHT){
+			currentVector = ((y-EDITOR_TITLE_BAR_HEIGHT)/currentWidth)%f->numbVectors;
+		}
+		for(b=0; b<EDITOR_BUTTONS_NUMBER_OF; b++){
+			if(within_rect(&buttons[b],x,y)){
+				editorButton = b;
+			}
+		}
+	}
+	
+	if(editorButton == EDITOR_BUTTONS_VECTORS || editorButton == EDITOR_BUTTONS_EXITPOINTS){
+		//-------------------------------------------------------------------------------
+		// check to see if we need to calculate the scaling factor for printing the editor window vectors
+		//-------------------------------------------------------------------------------
+		if(calculateVectorScale){
+			//-------------------------------------------------------------------------------
+			//determine the longest magnitude vector in this vector
+			//-------------------------------------------------------------------------------
+			double yMaxMag=0.0f;
+			double xMaxMag=0.0f;
+			for(i=0; i<f->numbVectors; i++){
+				if(fabs(f->vects[i].x)>xMaxMag) xMaxMag = fabs(f->vects[i].x);
+				if(fabs(f->vects[i].y)>yMaxMag) yMaxMag = fabs(f->vects[i].y);
+			}
+			//-------------------------------------------------------------------------------
+			// set the scale of the vectors in the editor sidebar
+			//-------------------------------------------------------------------------------
+			// this is the scale at which the vectors of the fractal will be printed in the editor
+			// scale is in units of (pixels/vector-size) so that it can be multiplied by a vector's size and the units work out to be pixels.
+			if(xMaxMag > yMaxMag){
+				scale = currentWidth/(xMaxMag*2);
+			}
+			else{
+				scale = currentWidth/(yMaxMag*2);
+			}
+		}
+	}
+	
 	
 	//-------------------------------------------------------------------------------
 	// check for scaling of the current vector
 	//-------------------------------------------------------------------------------
 	if(rightMouseButton){
-		f->exits[currentVector].x = f->vects[currentVector].x = xVectInit + ((x-xRightMouseInitial)*dragSpeed)/scale;
-		f->exits[currentVector].y = f->vects[currentVector].y = yVectInit + ((y-yRightMouseInitial)*dragSpeed)/scale;
+		if(editorButton == EDITOR_BUTTONS_VECTORS){
+			f->exits[currentVector].x = f->vects[currentVector].x = xVectInit + ((x-xRightMouseInitial)*dragSpeed)/scale;
+			f->exits[currentVector].y = f->vects[currentVector].y = yVectInit + ((y-yRightMouseInitial)*dragSpeed)/scale;
+		}
 	}
-	
-	// these things need to be evaluated every time through the loop.
-	for(i=0; i<EDITOR_BUTTONS_NUMBER_OF; i++){
-		buttons[i].x = (currentWidth+EDITOR_TITLE_BAR_HEIGHT)*editorOpen;
-	}
-	editor.h = SCREEN_HEIGHT;
-	editor.w = currentWidth*editorOpen;
 	
 	
 	// if the destination surface is null, don't bother printing anything
 	if(dest == NULL) return true;
+	
+	//update the size of the editor window
+	editor.h = SCREEN_HEIGHT-editor.y;		// the editor window goes as far down as possible without going outside the window
+	editor.w = currentWidth*editorOpen;		// the width of the editor is the currentWidth if the editor is open, and 0 if the editor is closed.
 	
 	//-------------------------------------------------------------------------------
 	// printing stuff
@@ -402,7 +421,18 @@ bool fractal_editor(SDL_Surface *dest, struct fractalData *f, int x, int y, int 
 	// print buttons
 	for(i=0; i<EDITOR_BUTTONS_NUMBER_OF; i++){
 		SDL_FillRect(dest, &buttons[i], EDITOR_COLOR_PRIMARY*((i%2)^1) + EDITOR_COLOR_SECONDARY*(i%2) );
+		// apply the red outline to the current
+		if(i==editorButton)
+			apply_outline(dest, &buttons[i], EDITOR_OUTLINE_THICKNESS, EDITOR_CURRENT_BUTTON_OUTLINE_COLOR);
+		// print the vectors on the button
+		if(i == EDITOR_BUTTONS_VECTORS){
+			for(v=0; v<f->numbVectors; v++){
+				// draw each line in the EDITOR_BUTTONS_VECTOR button for an artistic effect
+				draw_line_diff(dest, editor.x + editor.w + EDITOR_SCROLL_BAR_WIDTH + buttons[i].w/2.0, editor.y + EDITOR_BUTTON_SIZE*(i+0.5), (f->vects[v].x*scale*buttons[i].w)/((float)currentWidth), (f->vects[v].y*scale*buttons[i].h)/((float)currentWidth), f->thickness, f->color1);
+			}
+		}
 	}
+	
 	
 	if(editorOpen){
 		// print the background colors of the editor
@@ -442,7 +472,7 @@ bool fractal_editor(SDL_Surface *dest, struct fractalData *f, int x, int y, int 
 				genRect.y = editor.y + i*currentWidth + EDITOR_TITLE_BAR_HEIGHT;
 				apply_outline(dest, &genRect, EDITOR_OUTLINE_THICKNESS, EDITOR_CURRENT_VECTOR_OUTLINE_COLOR);
 			}
-			
+			// draw each line in each box
 			draw_line(dest, currentWidth/2, currentWidth*(i+0.5) + EDITOR_TITLE_BAR_HEIGHT, currentWidth/2 + f->vects[i].x*scale, currentWidth*(i+0.5) + EDITOR_TITLE_BAR_HEIGHT + f->vects[i].y*scale, f->thickness, f->color1);
 		}
 	}

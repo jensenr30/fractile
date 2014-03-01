@@ -104,15 +104,16 @@ void fractal_wobble(struct fractalData *f, int wobbleEvent);
 #define EDITOR_COLOR_SCROLL_BAR 0xff5f5f5f
 #define EDITOR_COLOR_SCROLL_BAR_BACKGROUND EDITOR_COLOR_PRIMARY
 #define EDITOR_CURRENT_VECTOR_OUTLINE_COLOR 0xffff0000
+#define EDITOR_CURRENT_BUTTON_OUTLINE_COLOR 0xffff0000
 #define EDITOR_WOBBLE_OUTLINE_COLOR 0xff0000ff
 #define EDITOR_OUTLINE_THICKNESS 2
 #define EDITOR_BUTTON_SIZE 32
 #define EDITOR_TITLE_BAR_HEIGHT 16
 #define EDITOR_SCROLL_BAR_WIDTH 16
 
-// these are enumerations for editor buttons.
-#define EDITOR_BUTTON_VECTOR 0
-#define EDITOR_BUTTON_OPTIONS 1
+// these are enumerations for editor buttons. list starts at zero so it can easily be plugged into an array.
+#define EDITOR_BUTTONS_VECTORS 0
+#define EDITOR_BUTTONS_EXITPOINTS 1
 // this is how many buttons there are.
 #define EDITOR_BUTTONS_NUMBER_OF 2
 

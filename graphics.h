@@ -13,5 +13,7 @@ void apply_outline(SDL_Surface *dest, SDL_Rect *box, unsigned short thickness, U
 #define grad_radial 1
 void gradient(SDL_Surface *datsurface, SDL_Rect *gradClip, int x1, int y1, int x2, int y2, Uint32 color1, Uint32 color2, unsigned int gradientType);
 void draw_line(SDL_Surface *dest, float x1, float y1, float x2, float y2, float thickness, unsigned int lineColor);
+// this will draw the line from point (x0,y0) to point (x0+x,y0+y).
+#define draw_line_diff(dest, x0, y0, x, y, thickness, lineColor) draw_line(dest, x0, y0, x0+x, y0+y, thickness, lineColor)
 void draw_circle(SDL_Surface *dest, float x, float y, float radius, Uint32 color);
 
