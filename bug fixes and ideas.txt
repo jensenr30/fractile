@@ -68,3 +68,9 @@ make a scroll bar for the space in which you reserved a scroll bar (for vectors 
 
 add a button to increase/decrease the number of vectors (maybe up/down)
 add a similar button to increase/decrease the number of exit points (maybe left/right)
+
+
+add an option to lock exit points to their vectors. This will be a toggle feature.
+locked exit points will appear yellow.
+unlocked exit points will appear red.
+the entry point of the vector will be blue.

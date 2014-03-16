@@ -1,7 +1,8 @@
 Fractile v0.5
-xxxx-xx-xx
+2014-03-16
 Ryan Jensen
 
 Added Scaling
 	you can now control the scale of the fractal at each iteration.
 	the scale is essentially how big the next fractal iteration will be relative to the current one.
+	you can change the scale by pressing and holding the 's' key and dragging the mouse up or down
