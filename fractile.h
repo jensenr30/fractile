@@ -16,8 +16,8 @@ struct vectorData{
 	// wobble parameters
 	//----------------------------------------------
 	// these are the original x and y magnitudes just before wobble was started.
-	double xorig, yorig;
-	// these two variables describe (relative to xorig and yorig) the radius of the circle that the wobble orbits on around <xorig,yorig>
+	double xOrig, yOrig;
+	// these two variables describe (relative to xOrig and yOrig) the radius of the circle that the wobble orbits on around <xOrig,yOrig>
 	double xWobble, yWobble;
 	// this is when (in milliseconds) the wobble started (giving us a reference
 	int wobbleStartTime;
@@ -32,6 +32,8 @@ struct vectorData{
 struct pointData{
 	double x, y;
 };
+
+void vector_copy(struct vectorData *source, struct vectorData *dest);
 
 // this is the maximum number of individual fractals that can be added to the base iteration.
 // when the program DRAWS a fractal, it will end up drawing a LOT MORE than this number.
@@ -126,8 +128,9 @@ void fractal_wobble(struct fractalData *f, int wobbleEvent);
 #define ee_right_click_up 5		// this is when the user releases the right mouse button
 
 
-bool fractal_editor(SDL_Surface *dest, struct fractalData *f, int x, int y, int editorEvent);
-void init_fractal_editor();
+//bool fractal_editor(SDL_Surface *dest, struct fractalData *f, int x, int y, int editorEvent);
+bool fractal_editor2(SDL_Surface *dest, struct fractalData *f, int x, int y, int editorEvent);
+//void init_fractal_editor();
 
 #define MAX_FRACTILE_PATH 256
 int fractal_save(struct fractalData *f, char *filename);

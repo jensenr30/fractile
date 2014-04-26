@@ -28,7 +28,7 @@ int main( int argc, char* argv[] )
 	//----------------------------------------------------
 	// VARIABLES USED IN MAIN()
 	//----------------------------------------------------
-    int x, y;									// this is the location of the player's mouse
+    int x=0, y=0;								// this is the location of the player's mouse
     
     int mouseLeft[2] = {0,0};					// this keeps track of the user's left  mouse button state. [0]=current, [1]=previous
     int mouseRight[2] = {0,0};					// this keeps track of the user's right mouse button state. [0]=current, [1]=previous
@@ -93,11 +93,11 @@ int main( int argc, char* argv[] )
 				y = event.motion.y;
                 if( event.button.button == SDL_BUTTON_LEFT ){
                     mouseLeft[0] = true;
-                    fractal_editor(NULL, &myfractal, x, y, ee_left_click_down);
+                    fractal_editor2(NULL, &myfractal, x, y, ee_left_click_down);
                 }
                 else if( event.button.button == SDL_BUTTON_RIGHT ){
                     mouseRight[0] = true;
-					fractal_editor(NULL, &myfractal, x, y, ee_right_click_down);
+					fractal_editor2(NULL, &myfractal, x, y, ee_right_click_down);
                 }
                 
                 else if( event.button.button == SDL_BUTTON_WHEELUP ){
@@ -115,10 +115,11 @@ int main( int argc, char* argv[] )
 				x = event.motion.x;
 				y = event.motion.y;
 				if(event.button.button == SDL_BUTTON_LEFT){
+					fractal_editor2(NULL, &myfractal, x, y, ee_left_click_up);
 					mouseLeft[0] = false;
 				}
 				else if(event.button.button == SDL_BUTTON_RIGHT){
-					fractal_editor(NULL, &myfractal, x, y, ee_right_click_up);
+					fractal_editor2(NULL, &myfractal, x, y, ee_right_click_up);
 					mouseRight[0] = false;
 				}
             }
@@ -144,7 +145,7 @@ int main( int argc, char* argv[] )
             if( event.type == SDL_KEYDOWN ){		///keyboard event
                 switch( event.key.keysym.sym ){
 				case SDLK_F5:	fractal_random(&myfractal, 6, 5); break;
-				case SDLK_e: 	fractal_editor(NULL,&myfractal,x,y,ee_toggle); break;
+				case SDLK_e: 	fractal_editor2(NULL,&myfractal,x,y,ee_toggle); break;
 				case SDLK_w:	fractal_wobble(&myfractal, vw_toggle); break;
 				case SDLK_RCTRL:
 				case SDLK_LCTRL: ctrl = true; break;
@@ -209,7 +210,7 @@ int main( int argc, char* argv[] )
         */
 		fractal_wobble(&myfractal, vw_evaluate);
         fractal_print(screen, &myfractal);
-        fractal_editor(screen, &myfractal, x, y, ee_print);
+        fractal_editor2(screen, &myfractal, x, y, ee_print);
         // print the twisting line
         if(twisting){
 			

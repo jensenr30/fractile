@@ -7,6 +7,22 @@
 #include "Windows.h"
 
 
+void vector_copy(struct vectorData *source, struct vectorData *dest){
+	
+	dest->x=				source->x;
+	dest->y=				source->y;
+	dest->x0=				source->x0;
+	dest->y0=				source->y0;
+	
+	dest->xOrig=			source->xOrig;
+	dest->yOrig=			source->yOrig;
+	dest->xWobble=			source->xWobble;
+	dest->yWobble=			source->yWobble;
+	dest->wobbleStartTime=	source->wobbleStartTime;
+	dest->period=			source->period;
+	
+}
+
 
 
 // this is the recursive function that will draw the fractal.
@@ -148,7 +164,7 @@ void fractal_print(SDL_Surface *dest, struct fractalData *f){
 				
 				rotate_point(f->vects[j].x + f->vects[j].x0, f->vects[j].y + f->vects[j].y0, &fa[i].vects[j].x, &fa[i].vects[j].y, f->twist*i);
 				rotate_point(f->vects[j].x0, 		f->vects[j].y0,			&fa[i].vects[j].x0,			&fa[i].vects[j].y0,			f->twist*i);
-				rotate_point(f->vects[j].xorig, 	f->vects[j].yorig,		&fa[i].vects[j].xorig,		&fa[i].vects[j].yorig,		f->twist*i);
+				rotate_point(f->vects[j].xOrig, 	f->vects[j].yOrig,		&fa[i].vects[j].xOrig,		&fa[i].vects[j].yOrig,		f->twist*i);
 				rotate_point(f->vects[j].xWobble,	f->vects[j].yWobble,	&fa[i].vects[j].xWobble,	&fa[i].vects[j].yWobble,	f->twist*i);
 				fa[i].vects[j].x -= fa[i].vects[j].x0;
 				fa[i].vects[j].y -= fa[i].vects[j].y0;
@@ -156,8 +172,8 @@ void fractal_print(SDL_Surface *dest, struct fractalData *f){
 				fa[i].vects[j].y *=			fa[i].scale;
 				fa[i].vects[j].x0 *=		fa[i].scale;
 				fa[i].vects[j].y0 *=		fa[i].scale;
-				fa[i].vects[j].xorig *=		fa[i].scale;
-				fa[i].vects[j].yorig *=		fa[i].scale;
+				fa[i].vects[j].xOrig *=		fa[i].scale;
+				fa[i].vects[j].yOrig *=		fa[i].scale;
 				fa[i].vects[j].xWobble *=	fa[i].scale;
 				fa[i].vects[j].yWobble *=	fa[i].scale;
 			}
@@ -194,8 +210,8 @@ void fractal_wobble(struct fractalData *f, int wobbleEvent){
 		for(i=0; i<f->numbVectors; i++){
 			if(f->vects[i].period > 0){
 				wobbleAngle = (2*PI*(SDL_GetTicks() - f->vects[i].wobbleStartTime))/f->vects[i].period;
-				f->exits[i].x = f->vects[i].x = f->vects[i].xorig*(1.0 + f->vects[i].xWobble*cos(wobbleAngle));
-				f->exits[i].y = f->vects[i].y = f->vects[i].yorig*(1.0 + f->vects[i].yWobble*sin(wobbleAngle));
+				f->exits[i].x = f->vects[i].x = f->vects[i].xOrig*(1.0 + f->vects[i].xWobble*cos(wobbleAngle));
+				f->exits[i].y = f->vects[i].y = f->vects[i].yOrig*(1.0 + f->vects[i].yWobble*sin(wobbleAngle));
 			}
 		}
 	}
@@ -205,15 +221,15 @@ void fractal_wobble(struct fractalData *f, int wobbleEvent){
 		if(f->vects[currentVector].period == 0){
 			f->vects[currentVector].wobbleStartTime = SDL_GetTicks();
 			f->vects[currentVector].period = WOBBLE_DEFAULT_PERIOD;
-			f->vects[currentVector].xorig = f->vects[currentVector].x;
-			f->vects[currentVector].yorig = f->vects[currentVector].y;
+			f->vects[currentVector].xOrig = f->vects[currentVector].x;
+			f->vects[currentVector].yOrig = f->vects[currentVector].y;
 			f->vects[currentVector].xWobble = WOBBLE_PERCENTAGE_OF_MAGNITUDE;
 			f->vects[currentVector].yWobble = WOBBLE_PERCENTAGE_OF_MAGNITUDE;
 		}
 		else
 			f->vects[currentVector].period = 0;
-			f->exits[currentVector].x = f->vects[currentVector].x = f->vects[currentVector].xorig;
-			f->exits[currentVector].y = f->vects[currentVector].y = f->vects[currentVector].yorig;
+			f->exits[currentVector].x = f->vects[currentVector].x = f->vects[currentVector].xOrig;
+			f->exits[currentVector].y = f->vects[currentVector].y = f->vects[currentVector].yOrig;
 			
 	}
 }
@@ -268,13 +284,13 @@ void fractal_random(struct fractalData *f, int maxVects, int maxIterations){
     }
 }
 
-
+/*
 void init_fractal_editor(){
 	
 	
 }
-
-
+*/
+/*
 // f if the fractal that we will print the vectors for 
 /// returns true if the user's mouse click or event happened inside of the fractal editor.
 bool fractal_editor(SDL_Surface *dest, struct fractalData *f, int x, int y, int editorEvent){
@@ -480,6 +496,47 @@ bool fractal_editor(SDL_Surface *dest, struct fractalData *f, int x, int y, int 
 	return false;
 }
 
+*/
+
+bool fractal_editor2(SDL_Surface *dest, struct fractalData *f, int x, int y, int editorEvent){
+	
+	static int xClickLeft=0, yClickLeft=0;		// this keeps track of where the mouse buttons were when the user left clicked
+	static struct vectorData vectOrig;		// this keeps track of the original state of the vector when the user first clicked on it.
+	static bool leftMouse = false;					// this keeps track of whether the user is holding down the left click button or not.
+	static int vectSelect=-1;					// this keeps track of which vector is selected dragged (-1 = none.)
+	
+	
+	if(editorEvent == ee_left_click_down){
+		leftMouse = true;
+		xClickLeft = x;							// store the values of x and y when the user presses the left mouse button
+		yClickLeft = y;
+		vectSelect = 0;							// set selected vector to the first vector (debugging purposes)
+		vector_copy(&f->vects[vectSelect], &vectOrig);	// copy the vector being changed into the original vector.
+	}
+	
+	if(editorEvent == ee_left_click_up){
+		leftMouse = false;
+		f->vects[vectSelect].x =  vectOrig.x  + x - xClickLeft;
+		f->vects[vectSelect].y =  vectOrig.y  + y - yClickLeft;
+		f->vects[vectSelect].x0 = vectOrig.x0 + x - xClickLeft;
+		f->vects[vectSelect].y0 = vectOrig.y0 + y - yClickLeft;
+		vectSelect = -1;
+	}
+	
+	if(vectSelect != -1){ // if there is a valid vector selected
+		
+		if(leftMouse){
+			f->vects[vectSelect].x =  vectOrig.x  + x - xClickLeft;
+			f->vects[vectSelect].y =  vectOrig.y  + y - yClickLeft;
+			f->vects[vectSelect].x0 = vectOrig.x0 + x - xClickLeft;
+			f->vects[vectSelect].y0 = vectOrig.y0 + y - yClickLeft;
+		}
+	}
+	
+}
+
+
+
 int fractal_save(struct fractalData *f, char *filename){
 	if(f == NULL || filename == NULL) return false;
 	FILE *savefile = fopen(filename, "w");
@@ -500,8 +557,8 @@ int fractal_save(struct fractalData *f, char *filename){
 		fprintf(savefile,"y = %lf\n",f->vects[i].y);
 		fprintf(savefile,"x0 = %lf\n",f->vects[i].x0);
 		fprintf(savefile,"y0 = %lf\n",f->vects[i].y0);
-		fprintf(savefile,"xorig = %lf\n",f->vects[i].xorig);
-		fprintf(savefile,"yorig = %lf\n",f->vects[i].yorig);
+		fprintf(savefile,"xOrig = %lf\n",f->vects[i].xOrig);
+		fprintf(savefile,"yOrig = %lf\n",f->vects[i].yOrig);
 		fprintf(savefile,"xWobble = %lf\n",f->vects[i].xWobble);
 		fprintf(savefile,"yWobble = %lf\n",f->vects[i].yWobble);
 		fprintf(savefile,"period = %d\n",f->vects[i].period);
@@ -539,8 +596,8 @@ int fractal_load(struct fractalData *f, char *filename){
 		fscanf(savefile,"y = %lf\n",&f->vects[i].y);
 		fscanf(savefile,"x0 = %lf\n",&f->vects[i].x0);
 		fscanf(savefile,"y0 = %lf\n",&f->vects[i].y0);
-		fscanf(savefile,"xorig = %lf\n",&f->vects[i].xorig);
-		fscanf(savefile,"yorig = %lf\n",&f->vects[i].yorig);
+		fscanf(savefile,"xOrig = %lf\n",&f->vects[i].xOrig);
+		fscanf(savefile,"yOrig = %lf\n",&f->vects[i].yOrig);
 		fscanf(savefile,"xWobble = %lf\n",&f->vects[i].xWobble);
 		fscanf(savefile,"yWobble = %lf\n",&f->vects[i].yWobble);
 		fscanf(savefile,"period = %d\n",&f->vects[i].period);
