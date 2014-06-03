@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include "SDL/SDL.h"
-#include "SDL/SDL_image.h"
-#include "SDL/SDL_ttf.h"
+#include "SDL.h"
+#include "SDL_image.h"
+#include "SDL_ttf.h"
 #include "Windows.h"
 #include "bool.h"
 #include "general_functions.h"
@@ -11,7 +11,7 @@
 /// this handles an error.
 void handle_error(int type, char *msg){
 	char fullMsg[256];
-	
+
 	switch(type){
 	case e_loadfile:
 		strcpy(fullMsg, "Error loading:   ");
@@ -38,11 +38,11 @@ void handle_error(int type, char *msg){
 bool is_empty_file(char *relativeFilePath){
 	FILE *datFile = fopen(relativeFilePath,"r");	// attempt to open the file
 	if(datFile == NULL) return true;				// if there is no file, then the file is empty.
-	
+
 	#if(DEBUG_IS_EMPTY_FILE)
 	fprintf(debugFile,"\n\nchecking if %s is empty:\n\t",relativeFilePath);
 	#endif
-	
+
 	// check to see if the first character is an end of File character
 	char c;
 	while(1){
@@ -71,32 +71,37 @@ void quit_game(Uint32 quitFlag){
 	exit(quitFlag);
 }
 
+// this is a temporary work-around because the compiler is not finding the proper definition of SDL_RESIZABLE
+// I feel dirty putting this definition here.
+// This is not a good way to solve this problem.
+// fix this
+#define SDL_RESIZABLE 0x00000010
 
- 
+
  void set_window_size(int w, int h){
 	screen = SDL_SetVideoMode( w, h, SCREEN_BPP, SDL_SWSURFACE | SDL_RESIZABLE );
-	
+
 	//If there was an error setting up the screen
 	if(screen == NULL )
 	{
 		exit(111);
 	}
 }
- 
- 
- 
- 
+
+
+
+
 SDL_Surface *load_image(char* filename){
     //Temporary storage for the image that is loaded
     SDL_Surface* loadedImage = NULL;
-    
+
     //The optimized image that will be used
     SDL_Surface* optimizedImage = NULL;
-    
+
     //Load the image with either SDL_image or LoadBMP. comment-out the one you are not using
     loadedImage = IMG_Load( filename );
     //loadedImage = SDL_LoadBMP( filename );
-    
+
     //If the image was loaded correctly
     if( loadedImage != NULL ){
         // Create an optimized image
@@ -110,7 +115,7 @@ SDL_Surface *load_image(char* filename){
     else{
 		//handle_error(e_loadfile, filename);
     }
-    
+
     //Return the optimized image
     return optimizedImage;
 }
@@ -118,16 +123,16 @@ SDL_Surface *load_image(char* filename){
 
 //this returns a pointer to an SDL_Surface
 SDL_Surface *create_surface(int width, int height){
-	
+
 	// try to create surface
-	SDL_Surface *retSurf = SDL_CreateRGBSurface(SDL_HWSURFACE, width, height, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xff000000);
-	
+	SDL_Surface *retSurf = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xff000000);
+
 	// check to see if the surface creation went well
 	if(retSurf == NULL){
 		quit_game(9);
 		return NULL;
 	}
-	
+
 	SDL_Surface *retSurfAlpha = SDL_DisplayFormatAlpha(retSurf);
 	// delete old surface
 	SDL_FreeSurface(retSurf);
@@ -139,21 +144,21 @@ int init(){
 	if( SDL_Init( SDL_INIT_EVERYTHING ) == -1 ){
 		return false;
 	}
-	
+
 	//Set up the screen
 	set_window_size(SCREEN_WIDTH, SCREEN_HEIGHT);
-	
+
 	//If there was an error setting up the screen
 	if(screen == NULL ){
 		return false;
 	}
-	
+
 	//Set the window caption
 	SDL_WM_SetCaption( "Fractile v0.5", NULL );
 	programVersion = 0.5;
-	
-	
-	
+
+
+
 	//If everything initialized fine
 	return true;
 }
@@ -162,34 +167,34 @@ int load_files(){
 	/*
 	//Load the image
 	image = load_image( "box.png" );
-	
+
 	//if there was an error in loading the image
 	if( image == NULL )
 	{
 		return false;
 	}
 	*/
-	
-	
-	
+
+
+
 	//Initialize SDL_ttf
     if( TTF_Init() == -1 )
     {
         MessageBox(NULL, "Error in initializing TTF (True Type Font) library", "TTF Error", MB_OK);
         return false;
     }
-    
-    
+
+
     //open font file
     font22 = TTF_OpenFont( "resources\\fonts\\FreeMonoBold.ttf", 22 );
     font16 = TTF_OpenFont( "resources\\fonts\\FreeMonoBold.ttf", 16);
-    
+
     if (font22 == NULL || font16 == NULL)
     {
         MessageBox(NULL, "Could not load FreeMonoBold.ttf", "Error loading font", MB_OK);
     }
-	
-	
+
+
 	//If everthing loaded fine
 	return true;
 }
@@ -200,8 +205,8 @@ int load_files(){
 
 void clean_up(){
 	SDL_FreeSurface(screen);
-	
-	
+
+
 	//Quit SDL
 	SDL_Quit();
 	TTF_Quit();
@@ -214,12 +219,12 @@ void clean_up(){
 //#define get_rand(lowBound, highBound) (rand()%((highBound) - (lowBound) + 1) + (lowBound))
 
 int get_rand(int lowBound, int highBound){
-	
+
 	// if the lowBound is higher than the highBound, then flip them around and return that.
 	if(highBound < lowBound){
 		return get_rand(highBound, lowBound);
 	}
-	
+
 	return ( rand() % (highBound-lowBound+1) ) + lowBound;
 }
 

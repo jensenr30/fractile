@@ -1,5 +1,5 @@
 #include "bool.h"
-#include "SDL/SDL.h"
+#include "SDL.h"
 
 
 // these are different error types

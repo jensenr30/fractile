@@ -1,11 +1,11 @@
-#include <SDL\SDL.h>
+#include <SDL.h>
 #include "fractile.h"
 #include "graphics.h"
 #include "globals.h"
 #include "math.h"
 #include "math_custom.h"
 #include "Windows.h"
-
+#include <stdio.h>
 
 
 
@@ -13,26 +13,26 @@
 // iter (iterations) starts at 0!!
 // **f is a pointer to an array of fractals
 void fractal_iteration(SDL_Surface *dest, struct fractalData **f, double entryx, double entryy, int iter){
-	
+
 	int i;
-	
+
 	// print all the vectors
 	for(i=0; i<f[iter]->numbVectors; i++){
 		draw_line(dest, entryx+(f[iter]->vects[i].x0), entryy+(f[iter]->vects[i].y0), entryx+(f[iter]->vects[i].x0+f[iter]->vects[i].x), entryy+(f[iter]->vects[i].y0+f[iter]->vects[i].y), f[iter]->thickness, f[iter]->color1);
 	}
-	
-	
+
+
 	// return if you are done with all iterations of the fractal
 	if(iter >= f[0]->iterations-1){
 		return;
 	}
-	
-	
+
+
 	// recursively call more fractal iteration functions at the exit points of this iteration.
 	for(i=0; i<f[iter]->numbExits; i++){
 		fractal_iteration(dest, f, entryx+f[iter]->exits[i].x, entryy + f[iter]->exits[i].y, iter+1);
 	}
-	
+
 }
 
 
@@ -43,12 +43,12 @@ void fractal_print(SDL_Surface *dest, struct fractalData *f){
 	int j;
 	// make sure the fractal and the destination surface are valid
 	if(f == NULL || dest == NULL) return;
-	
+
 	// make sure numbVectors isn't larger than the cap
 	if(f->numbVectors >= MAX_VECTORS_PER_FRACTAL) f->numbVectors = MAX_VECTORS_PER_FRACTAL-1;
 	// make sure numbExits   isn't larger than the cap
 	if(f->numbExits >= MAX_EXITS_PER_FRACTAL) f->numbExits = MAX_EXITS_PER_FRACTAL-1;
-	
+
 	//-------------------------------------------------------------------------------
 	// fit the fractal to the screen
 	//-------------------------------------------------------------------------------
@@ -56,17 +56,17 @@ void fractal_print(SDL_Surface *dest, struct fractalData *f){
 	double xvmin=0; // largest single vector movement in the -x direction
 	double yvmax=0; // largest single vector movement in the +y direction
 	double yvmin=0; // largest single vector movement in the -y direction
-	
+
 	double xemax=0; // largest single exit movement in the +x direction
 	double xemin=0; // largest single exit movement in the -x direction
 	double yemax=0; // largest single exit movement in the +y direction
 	double yemin=0; // largest single exit movement in the -y direction
-	
+
 	double xmax=0; // total movement in the +x direction
 	double xmin=0; // total movement in the -x direction
 	double ymax=0; // total movement in the +y direction
 	double ymin=0; // total movement in the -y direction
-	
+
 	int i;
 	for(i=0; i<f->numbVectors; i++){
 		if(f->vects[i].x+f->vects[i].x0 > xvmax) xvmax = f->vects[i].x+f->vects[i].x0;
@@ -74,15 +74,15 @@ void fractal_print(SDL_Surface *dest, struct fractalData *f){
 		if(f->vects[i].x+f->vects[i].x0 < xvmin) xvmin = f->vects[i].x+f->vects[i].x0;
 		if(f->vects[i].y+f->vects[i].y0 < yvmin) yvmin = f->vects[i].y+f->vects[i].y0;
 	}
-	
+
 	for(i=0; i<f->numbExits; i++){
 		if(f->exits[i].x > xemax) xemax = f->exits[i].x;
 		if(f->exits[i].y > yemax) yemax = f->exits[i].y;
 		if(f->exits[i].x < xemin) xemin = f->exits[i].x;
 		if(f->exits[i].y < yemin) yemin = f->exits[i].y;
 	}
-	
-	
+
+
 	double scale;
 	for(i=1, scale=1; i<=f->iterations; i++, scale*=f->scale){
 		xmax += (xvmax+xemax)*scale;
@@ -90,45 +90,45 @@ void fractal_print(SDL_Surface *dest, struct fractalData *f){
 		xmin += (xvmin+xemin)*scale;
 		ymin += (yvmin+yemin)*scale;
 	}
-	
+
 	// the maximum/minimum cannot pass over the origin because the maximum/minimum is at LEAST the origin.
 	if(xmin>0)xmin = 0.0f;
 	if(ymin>0)ymin = 0.0f;
 	if(xmax<0)xmax = 0.0f;
 	if(ymax<0)ymax = 0.0f;
-	
+
 	double xdiff = xmax - xmin;
 	double ydiff = ymax - ymin;
-	
+
 	double xscale = SCREEN_WIDTH/(xdiff);
 	double yscale = SCREEN_HEIGHT/(ydiff);
-	
+
 	if(xscale < yscale){
 		scale = xscale;
 	}
 	else{
 		scale = yscale;
 	}
-	
+
 	// allocate space for calculating the fractals at every iteration size
 	// I forgot why I called it fa. fractal "adjusted"? fractal "after rotation"? "all done"? I don't know... I'm beginning to doubt there ever was a reason...
 	struct fractalData *fa = malloc(f->iterations * sizeof(struct fractalData));
 	// declare an array of fractal pointers of the correct length
 	struct fractalData **fp = malloc(sizeof(struct fractalData*)*f->iterations);
-	
+
 	if(fa == NULL || fp == NULL){
 		apply_text(dest, SCREEN_WIDTH/2 - 150,SCREEN_HEIGHT/2,font16,"malloc returned NULL for either *fa or **fp", colorRed);
 		return;
 	}
 	else{
-		
+
 		// initial starting values for the first fractal iteration
 		fa[0].scale = f->scale;
 		fa[0].thickness = f->thickness;
-		
+
 		// calculate all the fractals at each level
 		for(i=0; i<f->iterations; i++){
-			
+
 			fa[i].color1 = f->color1;
 			fa[i].color2 = f->color2;
 			fa[i].colorScaler = f->colorScaler;
@@ -140,12 +140,12 @@ void fractal_print(SDL_Surface *dest, struct fractalData *f){
 				fa[i].scale = fa[i-1].scale*f->scale;
 				fa[i].thickness = fa[i-1].thickness*f->scale;
 			}
-			
+
 			//rotate and scale the vectors
 			for(j=0; j<f->numbVectors; j++){
 				fa[i].vects[j].period = f->vects[j].period;
 				fa[i].vects[j].wobbleStartTime = f->vects[j].wobbleStartTime;
-				
+
 				rotate_point(f->vects[j].x + f->vects[j].x0, f->vects[j].y + f->vects[j].y0, &fa[i].vects[j].x, &fa[i].vects[j].y, f->twist*i);
 				rotate_point(f->vects[j].x0, 		f->vects[j].y0,			&fa[i].vects[j].x0,			&fa[i].vects[j].y0,			f->twist*i);
 				rotate_point(f->vects[j].xorig, 	f->vects[j].yorig,		&fa[i].vects[j].xorig,		&fa[i].vects[j].yorig,		f->twist*i);
@@ -161,16 +161,16 @@ void fractal_print(SDL_Surface *dest, struct fractalData *f){
 				fa[i].vects[j].xWobble *=	fa[i].scale;
 				fa[i].vects[j].yWobble *=	fa[i].scale;
 			}
-			
+
 			// rotate and scale the exits
 			for(j=0; j<f->numbExits; j++){
-				
+
 				rotate_point(f->exits[j].x, f->exits[j].y, &fa[i].exits[j].x, &fa[i].exits[j].y, f->twist*i);
 				fa[i].exits[j].x *= fa[i].scale;
 				fa[i].exits[j].y *= fa[i].scale;
 			}
-			
-			
+
+
 			for(j=0; j<f->iterations; j++){
 				fp[j] = &fa[j];
 			}
@@ -182,13 +182,13 @@ void fractal_print(SDL_Surface *dest, struct fractalData *f){
 		free(fp);
 		free(fa);
 	}
-	
+
 }
 
 
 void fractal_wobble(struct fractalData *f, int wobbleEvent){
 	int i;
-	
+
 	if(wobbleEvent==vw_evaluate){
 		double wobbleAngle;
 		for(i=0; i<f->numbVectors; i++){
@@ -199,8 +199,8 @@ void fractal_wobble(struct fractalData *f, int wobbleEvent){
 			}
 		}
 	}
-	
-	
+
+
 	if(wobbleEvent==vw_toggle){
 		if(f->vects[currentVector].period == 0){
 			f->vects[currentVector].wobbleStartTime = SDL_GetTicks();
@@ -214,7 +214,7 @@ void fractal_wobble(struct fractalData *f, int wobbleEvent){
 			f->vects[currentVector].period = 0;
 			f->exits[currentVector].x = f->vects[currentVector].x = f->vects[currentVector].xorig;
 			f->exits[currentVector].y = f->vects[currentVector].y = f->vects[currentVector].yorig;
-			
+
 	}
 }
 
@@ -238,9 +238,9 @@ void fractal_random(struct fractalData *f, int maxVects, int maxIterations){
     f->vects[3].y0= 0;
     f->vects[3].x=  -200;
     f->vects[3].y=  200;
-    
+
     f->numbVectors = 4;
-    
+
     f->exits[0].x = 200;
     f->exits[0].y = 200;
     f->exits[1].x = 200;
@@ -249,7 +249,7 @@ void fractal_random(struct fractalData *f, int maxVects, int maxIterations){
     f->exits[2].y = 200;
     f->exits[3].x = -200;
     f->exits[3].y = 200;
-    
+
     f->numbExits = 4;
     */
     f->iterations = maxIterations;
@@ -270,15 +270,15 @@ void fractal_random(struct fractalData *f, int maxVects, int maxIterations){
 
 
 void init_fractal_editor(){
-	
-	
+
+
 }
 
 
-// f if the fractal that we will print the vectors for 
+// f if the fractal that we will print the vectors for
 /// returns true if the user's mouse click or event happened inside of the fractal editor.
 bool fractal_editor(SDL_Surface *dest, struct fractalData *f, int x, int y, int editorEvent){
-	
+
 	//these keep track of where the mouse was last time this function was called.
 	//static int xlast;
 	//static int ylast;
@@ -306,14 +306,14 @@ bool fractal_editor(SDL_Surface *dest, struct fractalData *f, int x, int y, int 
 	static double xVectInit;
 	static double yVectInit;
 	static double dragSpeed = 0.1f;
-	
+
 	// this keeps track of whether or not we need to calculate the vector-to-pixel scaling factor
 	bool calculateVectorScale=false;
-	
+
 	static SDL_Rect buttons[EDITOR_BUTTONS_NUMBER_OF];
 	int i,b,v;
-	
-	
+
+
 	// handle all first-time-through things
 	if(firstTime){
 		editor.x = 0;
@@ -367,7 +367,7 @@ bool fractal_editor(SDL_Surface *dest, struct fractalData *f, int x, int y, int 
 			}
 		}
 	}
-	
+
 	if(editorButton == EDITOR_BUTTONS_VECTORS || editorButton == EDITOR_BUTTONS_EXITPOINTS){
 		//-------------------------------------------------------------------------------
 		// check to see if we need to calculate the scaling factor for printing the editor window vectors
@@ -395,8 +395,8 @@ bool fractal_editor(SDL_Surface *dest, struct fractalData *f, int x, int y, int 
 			}
 		}
 	}
-	
-	
+
+
 	//-------------------------------------------------------------------------------
 	// check for scaling of the current vector
 	//-------------------------------------------------------------------------------
@@ -406,15 +406,15 @@ bool fractal_editor(SDL_Surface *dest, struct fractalData *f, int x, int y, int 
 			f->exits[currentVector].y = f->vects[currentVector].y = yVectInit + ((y-yRightMouseInitial)*dragSpeed)/scale;
 		}
 	}
-	
-	
+
+
 	// if the destination surface is null, don't bother printing anything
 	if(dest == NULL) return true;
-	
+
 	//update the size of the editor window
 	editor.h = SCREEN_HEIGHT-editor.y;		// the editor window goes as far down as possible without going outside the window
 	editor.w = currentWidth*editorOpen;		// the width of the editor is the currentWidth if the editor is open, and 0 if the editor is closed.
-	
+
 	//-------------------------------------------------------------------------------
 	// printing stuff
 	//-------------------------------------------------------------------------------
@@ -432,19 +432,19 @@ bool fractal_editor(SDL_Surface *dest, struct fractalData *f, int x, int y, int 
 			}
 		}
 	}
-	
-	
+
+
 	if(editorOpen){
 		// print the background colors of the editor
 		SDL_FillRect(dest, &editor, EDITOR_COLOR_PRIMARY);
-		
+
 		genRect.x=editor.x+currentWidth;
 		genRect.y=editor.y;
 		genRect.w = EDITOR_SCROLL_BAR_WIDTH;
 		genRect.h = editor.h;
 		SDL_FillRect(dest, &genRect, EDITOR_COLOR_SCROLL_BAR_BACKGROUND);
-		
-		
+
+
 		//-------------------------------------------------------------------------------
 		// print the sidebar
 		//-------------------------------------------------------------------------------
@@ -456,7 +456,7 @@ bool fractal_editor(SDL_Surface *dest, struct fractalData *f, int x, int y, int 
 		genRect2.w = editor.w/2;
 		genRect2.h = genRect.h/2;
 		for(i=0; i<f->numbVectors && i*currentWidth<SCREEN_HEIGHT; i++){
-			
+
 			// if i is an odd integer, print an secondary color background square
 			if(i%2){
 				genRect.y = editor.y + i*currentWidth + EDITOR_TITLE_BAR_HEIGHT;
@@ -484,7 +484,7 @@ int fractal_save(struct fractalData *f, char *filename){
 	if(f == NULL || filename == NULL) return false;
 	FILE *savefile = fopen(filename, "w");
 	if(savefile == NULL)return false;
-	
+
 	fprintf(savefile,"version = %f\n",programVersion);
 	fprintf(savefile,"color1 = 0x%lx\n",f->color1);
 	fprintf(savefile,"color2 = 0x%lx\n",f->color2);
@@ -521,9 +521,9 @@ int fractal_load(struct fractalData *f, char *filename){
 	if(f == NULL || filename == NULL) return false;
 	FILE *savefile = fopen(filename, "r");
 	if(savefile == NULL)return false;
-	
+
 	float loadedVersion=0.0;
-	
+
 	fscanf(savefile,"version = %f\n",&loadedVersion);
 	fscanf(savefile,"color1 = 0x%lx\n",&f->color1);
 	fscanf(savefile,"color2 = 0x%lx\n",&f->color2);
@@ -559,9 +559,9 @@ int fractal_load(struct fractalData *f, char *filename){
 int fractal_save_windows(struct fractalData *f){
 	OPENFILENAME ofn;
 	char szFileName[MAX_FRACTILE_PATH] = "";
-	
+
 	ZeroMemory(&ofn, sizeof(ofn));
-	
+
 	ofn.lStructSize = sizeof(ofn);
 	ofn.lpstrFilter = "Fractal Files (*.fractal)\0*.fractal\0All Files (*.*)\0*.*\0";
 	ofn.lpstrFile = szFileName;
@@ -569,7 +569,7 @@ int fractal_save_windows(struct fractalData *f){
 	ofn.lpstrDefExt = "fractal";
 	ofn.lpstrInitialDir = "saves\\";
 	ofn.Flags = OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR | OFN_FILEMUSTEXIST;
-	
+
 	if(GetSaveFileName(&ofn))
 	{
 	    return fractal_save(f, szFileName);
@@ -580,9 +580,9 @@ int fractal_save_windows(struct fractalData *f){
 int fractal_load_windows(struct fractalData *f){
 	OPENFILENAME ofn;
 	char szFileName[MAX_FRACTILE_PATH] = "";
-	
+
 	ZeroMemory(&ofn, sizeof(ofn));
-	
+
 	ofn.lStructSize = sizeof(ofn);
 	ofn.lpstrFilter = "Fractal Files (*.fractal)\0*.fractal\0All Files (*.*)\0*.*\0";
 	ofn.lpstrFile = szFileName;
@@ -590,7 +590,7 @@ int fractal_load_windows(struct fractalData *f){
 	ofn.lpstrDefExt = "fractal";
 	ofn.lpstrInitialDir = "saves\\";
 	ofn.Flags = OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR | OFN_FILEMUSTEXIST;
-	
+
 	if(GetOpenFileName(&ofn))
 	{
 		return fractal_load(f, szFileName);

@@ -1,4 +1,4 @@
-#include "SDL/SDL_ttf.h"
+#include "SDL_ttf.h"
 
 #define DEBUG 1 // general debug output.
 
