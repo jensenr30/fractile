@@ -99,17 +99,10 @@ int main( int argc, char* argv[] )
                     mouseRight[0] = true;
 					fractal_editor(NULL, &myfractal, x, y, ee_right_click_down);
                 }
-
-                else if( event.button.button == SDL_BUTTON_ ){
-					// more iterations
-					myfractal.iterations++;
-                }
-				else if( event.button.button == SDL_BUTTON_WHEELDOWN ){
-					// less iterations
-					myfractal.iterations--;
-					if(myfractal.iterations <1) myfractal.iterations = 1;
-				}
-
+            }
+            else if(event.type == SDL_MOUSEWHEEL){
+				// adjust the iterations of the fractal based on how many turns the user's mouse wheel has gone.
+                myfractal.iterations += event.wheel.y;
             }
             else if(event.type == SDL_MOUSEBUTTONUP){						/// mouse up
 				x = event.motion.x;
@@ -128,7 +121,7 @@ int main( int argc, char* argv[] )
 				// update twist
 
             }
-            else if(event.type == SDL_VIDEORESIZE){							/// window resize
+            /*else if(event.type == SDL_WINDOWEVENT_RESIZE){					/// window resize
 
 //				float new_cell_size = CELL_SIZE * event.resize.h/((float)SCREEN_HEIGHT); // adjust the pixel size.
 //				if(new_cell_size - ((int)new_cell_size) >= 0.5f) CELL_SIZE = new_cell_size + 1;
@@ -139,7 +132,7 @@ int main( int argc, char* argv[] )
 				screenRect.w = event.resize.w;
 				screenRect.h = event.resize.h;
 				twistRadiansPerPixel = (2*PI)/SCREEN_WIDTH;	// recalculate the twist per pixels scaler
-			}
+			}*/
 
             if( event.type == SDL_KEYDOWN ){		///keyboard event
                 switch( event.key.keysym.sym ){

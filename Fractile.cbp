@@ -39,10 +39,9 @@
 		<Linker>
 			<Add option="-lcomdlg32" />
 			<Add option="-lmingw32" />
-			<Add option="-lSDLmain" />
-			<Add option="-lSDL" />
-			<Add option="-lSDL_image" />
-			<Add option="-lSDL_ttf" />
+			<Add option="-lSDL2" />
+			<Add option="-lSDL2_image" />
+			<Add option="-lSDL2_ttf" />
 		</Linker>
 		<Unit filename="bool.h" />
 		<Unit filename="fractile.c">
