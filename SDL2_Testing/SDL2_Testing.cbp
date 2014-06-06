@@ -33,9 +33,18 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="globals.h" />
+		<Unit filename="graphics.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="graphics.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="utilities.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="utilities.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />
