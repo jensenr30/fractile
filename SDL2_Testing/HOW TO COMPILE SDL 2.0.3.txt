@@ -4,9 +4,9 @@ Use the follwoing linker settings:
 
 Search Directories:
 Compiler
-	C:\Users\USERNAME\Programs\SDL\SDL2-2.0.3\i686-w64-mingw32\include\SDL2
-	C:\Users\USERNAME\Programs\SDL\SDL2_ttf-2.0.12\i686-w64-mingw32\include\SDL2
-	C:\Users\USERNAME\Programs\SDL\SDL2_image-2.0.0\i686-w64-mingw32\include\SDL2
+	C:\Users\USERNAME\Programs\SDL\SDL2-2.0.3\i686-w64-mingw32\include\
+	C:\Users\USERNAME\Programs\SDL\SDL2_ttf-2.0.12\i686-w64-mingw32\include\
+	C:\Users\USERNAME\Programs\SDL\SDL2_image-2.0.0\i686-w64-mingw32\include\
 Linker
 	C:\Users\USERNAME\Programs\SDL\SDL2-2.0.3\i686-w64-mingw32\lib
 	C:\Users\USERNAME\Programs\SDL\SDL2_ttf-2.0.12\i686-w64-mingw32\lib

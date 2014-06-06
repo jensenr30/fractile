@@ -58,14 +58,28 @@ int main(int argc, char *argv[]){
 	SDL_UpdateTexture(myTexture, NULL, myPixels, windW*sizeof(Uint32) );
 	*/
 	
-	
-	
-	SDL_RenderClear(myRenderer);
-	SDL_RenderCopy(myRenderer, myTexture, NULL, NULL);
-	SDL_RenderCopy(myRenderer, glider, NULL, NULL);
-	SDL_RenderPresent(myRenderer);
+	byte quit = 0;
+	byte down = 0;
+	while(quit == 0){
+		while(SDL_PollEvent(&event)){
+			// if there is a mouse button down event,
+			if(event.type == SDL_MOUSEBUTTONDOWN){
+				down = 1;
+			}
+			if(event.type == SDL_MOUSEBUTTONUP){
+				down = 0;
+			}
+			if(event.type == SDL_QUIT){
+				quit = 1;
+			}
+		}
 		
-	SDL_Delay(3000);
+		// render the glider image
+		if(down) SDL_RenderCopy(myRenderer, glider, NULL, NULL);
+		// display the renderer's result on the screen
+		SDL_RenderPresent(myRenderer);
+		SDL_RenderClear(myRenderer);
+	}
 	
 	return 0;
 }
