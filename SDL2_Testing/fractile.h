@@ -16,6 +16,18 @@ int currentVector;
 // this is a rectangular prism that has two opposite corners at <x0, y0, z0> and <x0+x, y0+y, z0+z>
 #define vt_rectprism 2
 
+
+
+
+/// these are enumerations for different types of random distributions (rdt = random distribution type)
+// this is for a random function that has an equal probability of choosing any number inside some range.
+//(uniform distribution)
+#define rdt_uniform 0
+// this is for a random distribution that has a Gaussian distribution (i.e. a standard distribution)
+#define rdt_guassian 1
+
+
+
 struct vectorData{
 	// magnitude of each component
 	double x, y, z;

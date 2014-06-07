@@ -4,11 +4,20 @@
 #include "utilities.h"
 #include "graphics.h"
 #include "globals.h"
+#include "map.h"
+#include "rand.h"
+#include "time.h"
+
 unsigned int windW = 1000;
 unsigned int windH = 600;
 
 // Windows wrapper. I'm not proud of this.
 int main(int argc, char *argv[]){
+	
+	sgenrand(time(NULL));
+	
+	/*
+	if(SDL_Init(SDL_INIT_EVERYTHING) == -1) return -99;
 	
 	myWindow = SDL_CreateWindow("My Game Window", 100, 100, windW, windH, SDL_WINDOW_RESIZABLE);
 	myRenderer = SDL_CreateRenderer(myWindow, -1, 0);
@@ -21,6 +30,7 @@ int main(int argc, char *argv[]){
 		error("main() could not create renderer using SDL_CreateRenderer");
 		return -2;
 	}
+	
 	
 	
 	SDL_SetRenderDrawColor(myRenderer, 0, 0, 0, 255);
@@ -44,7 +54,7 @@ int main(int argc, char *argv[]){
 		return -2;
 	}
 	
-	
+	*/
 	/*
 	Uint32 *myPixels;
 	myPixels = malloc(windW*windH*sizeof( Uint32));
@@ -58,6 +68,7 @@ int main(int argc, char *argv[]){
 	SDL_UpdateTexture(myTexture, NULL, myPixels, windW*sizeof(Uint32) );
 	*/
 	
+	/*
 	byte quit = 0;
 	byte down = 0;
 	while(quit == 0){
@@ -80,6 +91,12 @@ int main(int argc, char *argv[]){
 		SDL_RenderPresent(myRenderer);
 		SDL_RenderClear(myRenderer);
 	}
+	*/
+	
+	struct mapBlockData myMapBlock;
+	
+	map_block_random_fill(&myMapBlock, -10, 20);
+	map_block_print_to_file(&myMapBlock, "myMapBlock.txt");
 	
 	return 0;
 }

@@ -42,7 +42,18 @@
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="random.h" />
+		<Unit filename="map.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="map.h" />
+		<Unit filename="mt19937int.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="mt19937int.h" />
+		<Unit filename="rand.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="rand.h" />
 		<Unit filename="utilities.c">
 			<Option compilerVar="CC" />
 		</Unit>
