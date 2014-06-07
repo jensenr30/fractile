@@ -43,7 +43,7 @@ int main(int argc, char *argv[]){
 	
 	myTexture = SDL_CreateTexture(myRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, windW, windH);
 	
-	SDL_Texture *glider = load_image_to_texture("glider.jpg");
+	//SDL_Texture *glider = load_image_to_texture("glider.jpg");
 	
 	if(myTexture == NULL){
 		error("main() could not create texture using SDL_CreateTexture");
@@ -56,56 +56,70 @@ int main(int argc, char *argv[]){
 	}
 	
 	
-	/*
-	Uint32 *myPixels;
-	myPixels = malloc(windW*windH*sizeof( Uint32));
-	
-	int i, j;
-	for(j=0; j<windW; j++){
-		for(i=0; i<windH; i++){
-			myPixels[i*windW+j] = ((int)(255*i/((float)windW) + (255*j/((float)windH))))<<8;
-		}
-	}
-	SDL_UpdateTexture(myTexture, NULL, myPixels, windW*sizeof(Uint32) );
-	*/
-	
 	//--------------------------------------------------
 	// map testing stuff
 	//--------------------------------------------------
-	struct mapBlockData origin;
-	block_random_fill(&origin, -10, 20);
-	//block_print_to_file(&origin, "origin.txt");
-	
-	// generate image of map
-	SDL_Surface *mapSurface = create_surface(MAP_BLOCK_WIDTH, MAP_BLOCK_HEIGHT);
-	// if there is an error here
-	if(map_print(mapSurface, &origin)) return -5;
-	// create a texture for the map data
-	SDL_Texture *mapTexture = SDL_CreateTextureFromSurface(myRenderer, mapSurface);
+	struct blockData origin;
+	SDL_Surface *mapSurface;
+	SDL_Texture *mapTexture;
 	
 	//--------------------------------------------------
 	// event handling
 	//--------------------------------------------------
+	// this keeps tack of whether or not a new map should be generated
+	byte makeNewMap = 1;
+	// this records if the user wants to quit
 	byte quit = 0;
+	// this keeps track of if a mouse buttons is held down
 	byte down = 0;
+	// this keeps track of if the map needs to be smoothed.]
+	byte smoothMap = 0;
+	// this keeps track of what key was pressed (used only inside the event evaluation loop)
+	byte key = 0;
+	
 	while(quit == 0){
 		while(SDL_PollEvent(&event)){
 			// if there is a mouse button down event,
 			if(event.type == SDL_MOUSEBUTTONDOWN){
-				down = 1;
+				down++;
 			}
-			if(event.type == SDL_MOUSEBUTTONUP){
-				down = 0;
+			else if(event.type == SDL_MOUSEBUTTONUP){
+				down--;
 			}
-			if(event.type == SDL_QUIT){
+			else if(event.type == SDL_KEYDOWN){
+				key = event.key.keysym.sym;
+				if(key == SDLK_s){
+					smoothMap = 1;
+				}
+				if(key == SDLK_ESCAPE) quit = 1;
+				if(key == SDLK_q) makeNewMap = 1;
+			}
+			else if(event.type == SDL_QUIT){
 				quit = 1;
 			}
 		}
 		
+		if(makeNewMap||smoothMap){
+			// generate new map in origin
+			if(makeNewMap)block_random_fill(&origin, -10, 20);
+			
+			//block_print_to_file(&origin, "origin.txt");
+			
+			// smooth the map
+			if(smoothMap) block_smooth(&origin, 0.5);
+			
+			// generate image of map
+			mapSurface = create_surface(BLOCK_WIDTH, BLOCK_HEIGHT);
+			// print map to mapSurface
+			map_print(mapSurface, &origin);
+			// create a texture for the map data
+			mapTexture = SDL_CreateTextureFromSurface(myRenderer, mapSurface);
+			makeNewMap = 0;
+			smoothMap = 0;
+		}
+		// render the mapTexture to the window
 		SDL_RenderCopy(myRenderer, mapTexture, NULL, NULL);
 		
-		// render the glider image
-		if(down) SDL_RenderCopy(myRenderer, glider, NULL, NULL);
 		// display the renderer's result on the screen
 		SDL_RenderPresent(myRenderer);
 		SDL_RenderClear(myRenderer);

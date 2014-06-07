@@ -3,7 +3,10 @@
 Fractile.layout
 Fractile.depend
 
-*.exe
+*/Debug/*.exe
+SDL2_Testing/bin/Debug/SDL2_Testing.exe
+bin/Debug/Fractile.exe
+bin/Release/Fractile.exe
 *.o
 
 *stderr.txt

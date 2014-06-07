@@ -6,11 +6,11 @@
 #include "rand.h"
 #include "graphics.h"
 
-/// print a mapBlockData
+/// print a blockData
 // returns 1 on successful print to file
 // this function is to print the data from a map in a readable format.
 // THIS IS NOT FOR SAVING MAP DATA
-short block_print_to_file(struct mapBlockData *mapBlock, char *fileName){
+short block_print_to_file(struct blockData *datBlock, char *fileName){
 	
 	// open a text file to write to and append (appending should never really happen though).
 	FILE *fp = fopen(fileName, "a");
@@ -26,37 +26,37 @@ short block_print_to_file(struct mapBlockData *mapBlock, char *fileName){
 		return 0;
 	}
 	
-	if(mapBlock == NULL){
-		error("block_random_fill() could not fill mapBlock. mapBlock = NULL.");
+	if(datBlock == NULL){
+		error("block_random_fill() could not fill datBlock. datBlock = NULL.");
 		return 0;
 	}
 	
 	
 	// write all elevation data
 	int j, i;
-	for(j=0; j<MAP_BLOCK_HEIGHT; j++){
-		for(i=0; i<MAP_BLOCK_WIDTH; i++){
-			fprintf(fp, "%10.10f\t", mapBlock->elevation[i][j]);
+	for(j=0; j<BLOCK_HEIGHT; j++){
+		for(i=0; i<BLOCK_WIDTH; i++){
+			fprintf(fp, "%10.10f\t", datBlock->elevation[i][j]);
 		}
 		// new line
 		fprintf(fp, "\n");
 	}
 	
-	// wrote mapBlock to file successfully.
+	// wrote datBlock to file successfully.
 	return 1;
 }
 
 
 
 
-/// throws random data into mapBlockData
+/// throws random data into blockData
 // returns 0 on success
-// returns 1 when the mapBlock is a NULL pointer.
-short block_random_fill(struct mapBlockData *mapBlock, float range_low, float range_high){
+// returns 1 when the datBlock is a NULL pointer.
+short block_random_fill(struct blockData *datBlock, float range_low, float range_high){
 	
-	// check for mapBlock pointer being NULL.
-	if(mapBlock == NULL){
-		error("block_random_fill() could not fill mapBlock. mapBlock = NULL.");
+	// check for datBlock pointer being NULL.
+	if(datBlock == NULL){
+		error("block_random_fill() could not fill datBlock. datBlock = NULL.");
 		return 1;
 	}
 	
@@ -71,14 +71,14 @@ short block_random_fill(struct mapBlockData *mapBlock, float range_low, float ra
 	
 	// this will generate data that will statistically average zero.
 	// the data will not average zero for each set of numbers however.
-	for(i=0; i<MAP_BLOCK_WIDTH; i++){
-		for(j=0; j<MAP_BLOCK_HEIGHT; j++){
+	for(i=0; i<BLOCK_WIDTH; i++){
+		for(j=0; j<BLOCK_HEIGHT; j++){
 			// generate a random number between range_low and range_high.
-			mapBlock->elevation[i][j] = ((genrand()%100001)/100000.0)*(range_high-range_low) + range_low;//((rand()%100001)/100000.0)*(range_higher-range_lower)-((range_higher+range_lower)/2);
+			datBlock->elevation[i][j] = ((genrand()%100001)/100000.0)*(range_high-range_low) + range_low;//((rand()%100001)/100000.0)*(range_higher-range_lower)-((range_higher+range_lower)/2);
 		}
 	}
 	
-	// generated random data in mapBlock successfully.
+	// generated random data in datBlock successfully.
 	return 0;
 }
 
@@ -86,8 +86,8 @@ short block_random_fill(struct mapBlockData *mapBlock, float range_low, float ra
 
 
 // returns 0 on success
-// returns -1 when mapBlock == NULL
-short block_create_children(struct mapBlockData *source){
+// returns -1 when datBlock == NULL
+short block_create_children(struct blockData *source){
 	
 	// check for source pointer being NULL.
 	if(source == NULL){
@@ -99,7 +99,7 @@ short block_create_children(struct mapBlockData *source){
 	for(child=0; child<MAP_BLOCK_CHILDREN; child++){
 		
 		// allocate space for the child in memory.
-		source->children[child] = ((struct mapBlockData *)malloc(sizeof(struct mapBlockData)));
+		source->children[child] = ((struct blockData *)malloc(sizeof(struct blockData)));
 		if(source->children[child] == NULL){
 			error("block_create_children() could not create child. malloc returned NULL pointer. Out of memory?");
 			return child;
@@ -123,7 +123,7 @@ short block_create_children(struct mapBlockData *source){
 // returns 0 on success
 // returns 1 if sent a null block pointer
 // returns 
-short block_collector(struct mapBlockData *source, int operation){
+short block_collector(struct blockData *source, int operation){
 	
 	// if the operation is bc_collect
 	if(operation == bc_collect){
@@ -155,11 +155,11 @@ short block_collector(struct mapBlockData *source, int operation){
 
 
 
-/// this will print an image of a mapblock to a surface MAP_BLOCK_WIDTH x MAP_BLOCK_HEIGHT pixels
+/// this will print an image of a mapblock to a surface BLOCK_WIDTH x BLOCK_HEIGHT pixels
 // returns 0 on success
 // returns 1 on NULL dest surface
-// returns 2 on NULL mapBlock
-short map_print(SDL_Surface *dest, struct mapBlockData *source){
+// returns 2 on NULL datBlock
+short map_print(SDL_Surface *dest, struct blockData *source){
 	
 	if(dest == NULL){
 		error("block_collector() could not print to dest. dest = NULL.");
@@ -171,9 +171,9 @@ short map_print(SDL_Surface *dest, struct mapBlockData *source){
 	}
 	
 	int i, j;
-	for(i=0; i<MAP_BLOCK_WIDTH; i++){
-		for(j=0; j<MAP_BLOCK_HEIGHT; j++){
-			set_pixel(dest, i, j, 0xff000000|(8*((int)source->elevation[i][j] + 10)));
+	for(i=0; i<BLOCK_WIDTH; i++){
+		for(j=0; j<BLOCK_HEIGHT; j++){
+			set_pixel(dest, i, j, 0xff000000|(int)((8.0*(source->elevation[i][j] + 10))));
 		}
 	}
 	
@@ -181,9 +181,53 @@ short map_print(SDL_Surface *dest, struct mapBlockData *source){
 }
 
 
+/// this function will smooth out a block (just the block it will not smooth with respect to its adjacent blocks).
+// smoothFactor is from 0 to 1. it describes how much averaging the function will perform.
+// smoothFactor = 1 => the smoothing will replace each element with the average of those around it.
+// smoothFactor = 0.5 => the smoothing will replace each elevation with the average of itself and the aaverage of those around it.
+short block_smooth(struct blockData *source, float smoothFactor){
+	int i, j;
+	for(i=0; i<BLOCK_WIDTH; i++){
+		for(j=0; j<BLOCK_HEIGHT; j++){
+			source->elevation[i][j] = (1.0-smoothFactor)*source->elevation[i][j] + smoothFactor*block_surrounding_average(source, i, j);
+		}
+	}
+	return 0;
+}
 
 
-
-
+// this calculates the average of the elevation values around some index (x,y) into the block data.
+// returns average in floating point number form
+// returns a floating point value of 0.0 if there is any problem computing the error.
+float block_surrounding_average(struct blockData *source, unsigned int x, unsigned int y){
+	
+	if(source == NULL){
+		error("block_surrounding_average() could not open source. source = NULL.");
+		return 0.0;
+	}
+	
+	float average = 0.0;
+	int averageCount = 0;
+	
+	// add diagonal elevations to average
+	if(x>0 && y>0)							{average += source->elevation[x-1][y-1];	averageCount++;}
+	if(x>0 && y<BLOCK_HEIGHT-1)				{average += source->elevation[x-1][y+1];	averageCount++;}
+	if(x<BLOCK_WIDTH-1 && y>0)				{average += source->elevation[x+1][y-1];	averageCount++;}
+	if(x<BLOCK_WIDTH-1 && y<BLOCK_HEIGHT-1)	{average += source->elevation[x+1][y+1];	averageCount++;}
+	
+	// add adjacent elevations
+	if(x>0)					{average += source->elevation[x-1][y];	averageCount++; }
+	if(x<BLOCK_WIDTH-1)		{average += source->elevation[x+1][y];	averageCount++; }
+	if(y>0)					{average += source->elevation[x][y-1];	averageCount++; }
+	if(y<BLOCK_HEIGHT-1)	{average += source->elevation[x][y+1];	averageCount++; }
+	
+	if(averageCount < 1){
+		error_d("block_surrounding_average() had invalid averageCount! averageCount = ", averageCount);
+		return 0.0;
+	}
+	
+	// if everything went well, return the average of the surrounding elevations
+	return average/((float)averageCount);
+}
 
 
