@@ -4,6 +4,7 @@
 #include "utilities.h"
 #include "graphics.h"
 #include "globals.h"
+#include "graphics.h"
 #include "map.h"
 #include "rand.h"
 #include "time.h"
@@ -11,12 +12,12 @@
 unsigned int windW = 1000;
 unsigned int windH = 600;
 
-// Windows wrapper. I'm not proud of this.
+
 int main(int argc, char *argv[]){
 	
 	sgenrand(time(NULL));
 	
-	/*
+	
 	if(SDL_Init(SDL_INIT_EVERYTHING) == -1) return -99;
 	
 	myWindow = SDL_CreateWindow("My Game Window", 100, 100, windW, windH, SDL_WINDOW_RESIZABLE);
@@ -54,7 +55,7 @@ int main(int argc, char *argv[]){
 		return -2;
 	}
 	
-	*/
+	
 	/*
 	Uint32 *myPixels;
 	myPixels = malloc(windW*windH*sizeof( Uint32));
@@ -68,7 +69,22 @@ int main(int argc, char *argv[]){
 	SDL_UpdateTexture(myTexture, NULL, myPixels, windW*sizeof(Uint32) );
 	*/
 	
-	/*
+	//--------------------------------------------------
+	// map testing stuff
+	//--------------------------------------------------
+	struct mapBlockData origin;
+	block_random_fill(&origin, -10, 20);
+	block_print_to_file(&origin, "origin.txt");
+	// generate image of map
+	SDL_Surface *mapSurface = create_surface(MAP_BLOCK_WIDTH, MAP_BLOCK_HEIGHT);
+	// if there is an error here
+	if(map_print(mapSurface, &origin)) return -5;
+	// create a texture for the map data
+	SDL_Texture *mapTexture = SDL_CreateTextureFromSurface(myRenderer, mapSurface);
+	
+	//--------------------------------------------------
+	// event handling
+	//--------------------------------------------------
 	byte quit = 0;
 	byte down = 0;
 	while(quit == 0){
@@ -85,18 +101,19 @@ int main(int argc, char *argv[]){
 			}
 		}
 		
+		SDL_RenderCopy(myRenderer, mapTexture, NULL, NULL);
+		
 		// render the glider image
 		if(down) SDL_RenderCopy(myRenderer, glider, NULL, NULL);
 		// display the renderer's result on the screen
 		SDL_RenderPresent(myRenderer);
 		SDL_RenderClear(myRenderer);
 	}
-	*/
-	
-	struct mapBlockData myMapBlock;
-	
-	map_block_random_fill(&myMapBlock, -10, 20);
-	map_block_print_to_file(&myMapBlock, "myMapBlock.txt");
 	
 	return 0;
 }
+
+
+
+
+
