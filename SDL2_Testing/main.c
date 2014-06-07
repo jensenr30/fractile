@@ -7,9 +7,9 @@
 #include "graphics.h"
 #include "map.h"
 #include "rand.h"
-#include "time.h"
+#include <time.h>
 
-unsigned int windW = 1000;
+unsigned int windW = 600;
 unsigned int windH = 600;
 
 
@@ -74,7 +74,8 @@ int main(int argc, char *argv[]){
 	//--------------------------------------------------
 	struct mapBlockData origin;
 	block_random_fill(&origin, -10, 20);
-	block_print_to_file(&origin, "origin.txt");
+	//block_print_to_file(&origin, "origin.txt");
+	
 	// generate image of map
 	SDL_Surface *mapSurface = create_surface(MAP_BLOCK_WIDTH, MAP_BLOCK_HEIGHT);
 	// if there is an error here

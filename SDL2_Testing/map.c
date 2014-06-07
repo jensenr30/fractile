@@ -173,7 +173,7 @@ short map_print(SDL_Surface *dest, struct mapBlockData *source){
 	int i, j;
 	for(i=0; i<MAP_BLOCK_WIDTH; i++){
 		for(j=0; j<MAP_BLOCK_HEIGHT; j++){
-			set_pixel(dest, i, j, 0xff000000|(1200*((int)source->elevation[i][j] + 10)));
+			set_pixel(dest, i, j, 0xff000000|(8*((int)source->elevation[i][j] + 10)));
 		}
 	}
 	
