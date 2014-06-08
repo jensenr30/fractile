@@ -125,6 +125,15 @@ int main(int argc, char *argv[]){
 		SDL_RenderClear(myRenderer);
 	}
 	
+	//--------------------------------------------------
+	// clean up
+	//--------------------------------------------------
+	SDL_FreeSurface(mapSurface);
+	SDL_DestroyTexture(mapTexture);
+	// clean up all SDL subsystems and other non-SDL systems and global memory.
+	clean_up();
+	
+	
 	return 0;
 }
 

@@ -21,3 +21,5 @@ void error_d(char *errstr, int data);
 
 int init_SDL();
 SDL_Surface *create_surface(int witdth, int height);
+
+void clean_up();

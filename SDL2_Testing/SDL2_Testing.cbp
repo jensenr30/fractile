@@ -33,6 +33,10 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="filters.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="filters.h" />
 		<Unit filename="fractile.h" />
 		<Unit filename="globals.h" />
 		<Unit filename="graphics.c">

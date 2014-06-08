@@ -52,7 +52,7 @@ short block_random_fill(struct blockData *datBlock, float range_lower, float ran
 #define bc_collect		0
 #define bc_clean_up		1
 
-short block_collector(struct blockData *source, int operation);
+short block_collector(struct blockData *source, short operation);
 short map_print(SDL_Surface *dest, struct blockData *source);
 
 short block_smooth(struct blockData *source, float smoothFactor);

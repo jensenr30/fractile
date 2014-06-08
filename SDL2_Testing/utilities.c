@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include "utilities.h"
+#include "globals.h"
+#include "map.h"
 
 
 // this will log an error message to the error file
@@ -43,3 +45,25 @@ SDL_Surface *create_surface(int width, int height){
 	
 	return retSurf;
 }
+
+
+void clean_up(){
+	
+	// destroy the main window, main renderer, and main texture.
+	SDL_DestroyRenderer(myRenderer);
+	SDL_DestroyTexture(myTexture);
+	SDL_DestroyWindow(myWindow);
+	// erase all of the blocks that have been generated over the run time of the program.
+	block_collector(NULL, bc_clean_up);
+	
+	SDL_Quit();
+	
+	
+}
+
+
+
+
+
+
+

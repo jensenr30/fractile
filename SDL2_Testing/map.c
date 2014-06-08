@@ -131,11 +131,13 @@ short block_create_children(struct blockData *source){
 // returns 4 if it could not create a link in the list OTHER than the first.
 // returns 5 if it was asked to bc_clean_up but there was nothing to clean up.
 // returns 6 if it was asked to clean up and it reached a null previous pointer before blockCount reached 0.
-short block_collector(struct blockData *source, int operation){
+short block_collector(struct blockData *source, short operation){
 	
-	static unsigned int blockCount = 0;
+	static long long unsigned int blockCount = 0;
 	static struct blockLink *currentLink = NULL;
 	struct blockLink *tempLink = NULL;
+	
+	//check to see what the program was called to do.
 	// if the operation is bc_collect
 	if(operation == bc_collect){
 		
@@ -247,7 +249,7 @@ short block_collector(struct blockData *source, int operation){
 		return 2;
 	}
 	
-
+	// all went smoothly. not errors or problems.
 	return 0;
 }
 
