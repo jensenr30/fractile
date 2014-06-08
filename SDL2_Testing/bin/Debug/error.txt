@@ -1,2 +1,3 @@
-Ticks=   3.739	 block_collector() asked to clean up. Nothing to clean up. This is not necessarily an error. It could be an error or just a warning.
-Ticks= 366.195	 block_collector() asked to clean up. Nothing to clean up. This is not necessarily an error. It could be an error or just a warning.
+Ticks=   6.076	 block_collector() asked to clean up. Nothing to clean up. This is not necessarily an error. It could be an error or just a warning.
+Ticks=   7.436	 block_collector() asked to clean up. Nothing to clean up. This is not necessarily an error. It could be an error or just a warning.
+Ticks=   4.067	 block_collector() asked to clean up. Nothing to clean up. This is not necessarily an error. It could be an error or just a warning.

@@ -18,6 +18,13 @@ void error_d(char *errstr, int data){
 	fclose(fp);
 }
 
+// this will log an error message and a floating point number to the error file
+void error_f(char *errstr, float data){
+	FILE *fp = fopen(ERROR_FILE,ERROR_FILE_MODE);
+	fprintf( fp, ERROR_FORMAT_F, ERROR_TIMESTAMP, errstr, data );
+	fclose(fp);
+}
+
 
 
 // returns 1 if everything initialized correctly.

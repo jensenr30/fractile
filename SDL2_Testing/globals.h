@@ -1,4 +1,4 @@
-
+#define DEBUG 1
 // global display stuff
 SDL_Window *myWindow;
 SDL_Renderer *myRenderer;

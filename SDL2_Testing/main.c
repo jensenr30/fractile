@@ -7,6 +7,7 @@
 #include "graphics.h"
 #include "map.h"
 #include "rand.h"
+#include "filter.h"
 #include <time.h>
 
 unsigned int windW = 600;
@@ -106,7 +107,8 @@ int main(int argc, char *argv[]){
 			//block_print_to_file(&origin, "origin.txt");
 			
 			// smooth the map
-			if(smoothMap) block_smooth(&origin, 0.5);
+			//block_smooth(&origin, 0.5);
+			if(smoothMap) filter_lowpass_2D_f((float *)origin.elevation, NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 0.5);
 			
 			// generate image of map
 			mapSurface = create_surface(BLOCK_WIDTH, BLOCK_HEIGHT);

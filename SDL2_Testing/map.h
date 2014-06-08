@@ -4,8 +4,8 @@
 #define MAP_BLOCK_CHILDREN				9
 #define MAP_BLOCK_NEIGHBORS				8
 #define MAP_BLOCK_LINEAR_SCALE_FACTOR	3.0
-#define BLOCK_WIDTH						192
-#define BLOCK_HEIGHT					192
+#define BLOCK_WIDTH						600
+#define BLOCK_HEIGHT					600
 /// this structure contains all the information that one block needs. The map is made up of a fractal arrangement of these blocks.
 struct blockData{
 	
