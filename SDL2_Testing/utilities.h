@@ -1,9 +1,18 @@
-
+//--------------------------------------------------
+// error stuff
+//--------------------------------------------------
+// write errors to error.txt
 #define ERROR_FILE "error.txt"
+// always append.
 #define ERROR_FILE_MODE "a"
+// gametime timestamp
 #define ERROR_TIMESTAMP ((float)SDL_GetTicks()/1000.0)
+// general format
 #define ERROR_FORMAT "Ticks= %7.3f\t %s\n"
+// format with 1 integer type data argument
 #define ERROR_FORMAT_D "Ticks= %7.3f\t %s%d\n"
+
+
 #include <SDL2/SDL.h>
 
 void error(char *errstr);

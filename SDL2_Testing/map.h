@@ -1,19 +1,18 @@
 #include <SDL2/SDL.h>
 
-#define MAP_BLOCK_CHILDREN		4
-#define MAP_BLOCK_NEIGHBORS		8
-#define MAP_BLOCK_SCALE_FACTOR	4
-#define BLOCK_WIDTH			128
-#define BLOCK_HEIGHT		128
 
-
-
+#define MAP_BLOCK_CHILDREN				9
+#define MAP_BLOCK_NEIGHBORS				8
+#define MAP_BLOCK_LINEAR_SCALE_FACTOR	3.0
+#define BLOCK_WIDTH						192
+#define BLOCK_HEIGHT					192
+/// this structure contains all the information that one block needs. The map is made up of a fractal arrangement of these blocks.
 struct blockData{
 	
 	signed long long level;
 	
 	// this is the two dimensional array of elevation values for each block.
-	// 16384 points of data (128 x 128)
+	// 36864 points of data (192 x 192)
 	float elevation[BLOCK_WIDTH][BLOCK_HEIGHT];
 	
 	// this points to the block that this block is inside.
@@ -27,6 +26,19 @@ struct blockData{
 	// these are eight pointers to the eight neighbors on the same level.
 	// 
 	struct blockData *neighbors[MAP_BLOCK_NEIGHBORS];
+};
+
+
+#define BLOCK_LINK_SIZE 256
+/// this is a linked list of arrays of pointers to blockData structures.
+// this structure is here simply to facilitate garbage collection.
+// there is a function that collects pointers to all of the blocks generated.
+// when this program is terminated, every block on that list will be erased and the memory is freed.
+struct blockLink{
+	// a pointer to the previous blockLink in the list
+	struct blockLink *prev;
+	struct blockData *blocks[BLOCK_LINK_SIZE];
+	struct blockLink *next;
 };
 
 
