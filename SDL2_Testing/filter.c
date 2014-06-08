@@ -74,10 +74,6 @@ short filter_lowpass_2D_f(float *x, float *y, unsigned long long int width, unsi
 	if(y == NULL)	output = x;
 	// if y is valid, output filtered signal into array y.
 	else			output = y;
-	// this allocates memory to put the first filtering into (x-direction).
-	// this will be freed at the end of the function after it has ceased to be useful.
-	// this is a middle man that stores temporary filtering data.
-	float *midMan = malloc(width*height*sizeof(float));
 	
 	// these are single dimensional arrays for calculating single iterations of low pass filters in one direction.
 	float *tempRow1 = malloc(width*sizeof(float));
@@ -141,6 +137,14 @@ short filter_lowpass_2D_f(float *x, float *y, unsigned long long int width, unsi
 		
 	}
 	
+	
+	// free the temporary arrays.
+	// There were only used to generate the data. They don't contain it anymore.
+	if(tempRow1 != NULL) free(tempRow1);
+	if(tempRow2 != NULL) free(tempRow2);
+	if(tempCol1 != NULL) free(tempCol1);
+	if(tempCol2 != NULL) free(tempCol2);
+	*/
 	
 	// tau was too low, but the filtering was still applied at the lowest possible tau.
 	if(tauTooLow) return 5;

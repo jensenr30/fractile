@@ -110,10 +110,15 @@ int main(int argc, char *argv[]){
 			//block_smooth(&origin, 0.5);
 			if(smoothMap) filter_lowpass_2D_f((float *)origin.elevation, NULL, BLOCK_WIDTH, BLOCK_HEIGHT, 0.5);
 			
+			//clear old surface
+			if(mapSurface != NULL)SDL_FreeSurface(mapSurface);
 			// generate image of map
 			mapSurface = create_surface(BLOCK_WIDTH, BLOCK_HEIGHT);
 			// print map to mapSurface
 			map_print(mapSurface, &origin);
+			
+			// clear the old texture if it exists
+			if(mapTexture != NULL)SDL_DestroyTexture(mapTexture);
 			// create a texture for the map data
 			mapTexture = SDL_CreateTextureFromSurface(myRenderer, mapSurface);
 			makeNewMap = 0;
