@@ -144,7 +144,7 @@ short filter_lowpass_2D_f(float *x, float *y, unsigned long long int width, unsi
 	if(tempRow2 != NULL) free(tempRow2);
 	if(tempCol1 != NULL) free(tempCol1);
 	if(tempCol2 != NULL) free(tempCol2);
-	*/
+	
 	
 	// tau was too low, but the filtering was still applied at the lowest possible tau.
 	if(tauTooLow) return 5;
