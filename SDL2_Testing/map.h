@@ -4,19 +4,34 @@
 #define MAP_BLOCK_CHILDREN				9
 #define MAP_BLOCK_NEIGHBORS				8
 #define MAP_BLOCK_LINEAR_SCALE_FACTOR	3.0
-#define BLOCK_WIDTH						600
-#define BLOCK_HEIGHT					600
+#define BLOCK_WIDTH						243
+#define BLOCK_HEIGHT					243
+// each block can have 9 children.
+// each block can have one parent.
+// more children are generated as the player zooms in.
+// more parents are generated as the player zooms out.
+// the children of a single block enumeration:
+// 0 1 2
+// 3 4 5
+// 6 7 8
+// the numbers 0 through 8 correspond to a child of the current block (zooming in).
+// the number 9 represents zooming out to see the parent of the current block.
 /// this structure contains all the information that one block needs. The map is made up of a fractal arrangement of these blocks.
 struct blockData{
 	
 	signed long long level;
 	
 	// this is the two dimensional array of elevation values for each block.
-	// 36864 points of data (192 x 192)
 	float elevation[BLOCK_WIDTH][BLOCK_HEIGHT];
 	
 	// this points to the block that this block is inside.
+	// if this is NULL, a parent has not been generated yet.
 	struct blockData *parent;
+	// this is how the parent sees the child.
+	// this is a number from 0 to MAP_BLOCK_CHILDREN-1.
+	// if parentView = 3, then the parent of this block sees this block in its center left position.
+	// if parentView = 8, then the parent of
+	char parentView;
 	
 	// these are pointers to child blocks.
 	// these are pointers to other blocks inside of this main block.
@@ -24,7 +39,7 @@ struct blockData{
 	struct blockData *children[MAP_BLOCK_CHILDREN];
 	
 	// these are eight pointers to the eight neighbors on the same level.
-	// 
+	// if these are NULL, the neighbor could exist, but it just might not be entered in this blocks neighbor's index (some neighbors are friendly than others :P)
 	struct blockData *neighbors[MAP_BLOCK_NEIGHBORS];
 };
 

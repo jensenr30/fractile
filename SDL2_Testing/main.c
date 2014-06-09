@@ -16,6 +16,18 @@ unsigned int windH = 600;
 
 int main(int argc, char *argv[]){
 	
+	//--------------------------------------------------
+	// set up surfaces, textures, renderers, windows,
+	//--------------------------------------------------
+	// set all surfaces, textures, renderers, and windows to NULL initially to satify if statements that free memory that isn't needed any more.
+	// this prevents the game from crashing at startup.
+	SDL_Surface *mapSurface = NULL;
+	SDL_Texture *mapTexture = NULL;
+	myWindow = NULL;
+	myRenderer = NULL;
+	myTexture = NULL;
+	
+	
 	sgenrand(time(NULL));
 	
 	
@@ -57,12 +69,9 @@ int main(int argc, char *argv[]){
 	}
 	
 	
-	//--------------------------------------------------
-	// map testing stuff
-	//--------------------------------------------------
+	// origin block.
 	struct blockData origin;
-	SDL_Surface *mapSurface;
-	SDL_Texture *mapTexture;
+	
 	
 	//--------------------------------------------------
 	// event handling
