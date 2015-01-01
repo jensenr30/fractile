@@ -7,18 +7,20 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="DebugWin">
-				<Option output="bin/Fractile" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/DebugWin/Fractile" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/DebugWin" />
 				<Option object_output="obj/DebugWin/" />
-				<Option type="1" />
+				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
 			</Target>
 			<Target title="ReleaseWin">
-				<Option output="bin/Fractile" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/ReleaseWin/Fractile" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/ReleaseWin" />
 				<Option object_output="obj/ReleaseWin/" />
-				<Option type="1" />
+				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
@@ -31,6 +33,37 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Linker>
+			<Add option="-lmingw32 -lSDL2main -lSDL2 -lwinmm -lSDL2_image" />
+		</Linker>
+		<Unit filename="fractal.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="fractal.h" />
+		<Unit filename="globals.h" />
+		<Unit filename="graphics.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="graphics.h" />
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="mt19937int.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="mt19937int.h" />
+		<Unit filename="my_math.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="my_math.h" />
+		<Unit filename="rand.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="rand.h" />
+		<Unit filename="utilities.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="utilities.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />
