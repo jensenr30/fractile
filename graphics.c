@@ -425,6 +425,7 @@ void draw_line(SDL_Surface *dest, float x1, float y1, float x2, float y2, float 
 /// RYAN TODO:
 /// ADD DOCUMENETAION
 /// ADD SOME 0.5 NUMBERS
+/// DON'T BOTHER TAKING THE SQUARE ROOT! JUST CHECK THE SQUARES! IT HAS THE SAME EFFECT! SQUARE THE RADIUS AND THEN CHECK IF ( (i-x)*(i-x)+(j-y)*(j-y) ) is less than ( radius*radius )
 // this draws a circle with radius and color at point (x,y)
 void draw_circle(SDL_Surface *dest, float x, float y, float radius, Uint32 color){
 	if(dest == NULL) return;

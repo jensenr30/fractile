@@ -1,11 +1,37 @@
 /*
 
-This header file (in conjunction with fractile.c) specifies the structures and functions for creating and rendering vector-ish fractals
-
+fractal.h
 Ryan Jensen
 2015
 
+The purpose of this file is to draw fractals.
+This is accomplished with the SDL2 graphics library.
+The "graphics.c" and "graphics.h" files are utilized in order to draw lines, shapes, and other things on the screen.
+These lines and shapes are the building blocks of the fractals drawn here.
+
+
+Contents:
+	- fractal structure implementations
+	- fractal function prototypes
+	- fractal #definitions
 */
+
+
+
+//-------------------------------------------------------
+// header files
+//-------------------------------------------------------
+
+// need this for integer types
+#include <inttypes.h>
+// I wish I didn't have to include this here, but I need it because SDL surfaces are passed through fractal functions.
+#include "SDL2/SDL.h"
+
+
+
+//-------------------------------------------------------
+//definitions
+//-------------------------------------------------------
 
 // this is the current version of the program
 #define FRACTAL_VERSION				((float)1.0)
@@ -41,6 +67,12 @@ Ryan Jensen
 
 #define fsf_TOP				4  // this is the highest valid number for fractal shape fill
 
+
+
+//-------------------------------------------------------
+// structure declarations
+//-------------------------------------------------------
+
 /// this is an <x,y> pair 
 struct xyPair
 {
@@ -48,6 +80,7 @@ struct xyPair
 	float y;
 	
 };
+
 
 /// this is a single shape in a fractal
 struct fractalShape
@@ -59,7 +92,7 @@ struct fractalShape
 	float radius;
 	
 	
-	// this specifies the type of shape this is
+	// this specifies the type of shape this is 
 	unsigned char type;
 	// this specifies how the shape is to be rendered
 	unsigned char fillType;
@@ -77,14 +110,11 @@ struct fractalShape
 };
 
 
-
-
-
 /// this is a fractal containing a number of shapes
 struct fractal
 {
 	// these are all the shapes that make up the fractal
-	struct fractalShapes shapes[FRACTAL_MAX_SHAPES];
+	struct fractalShape shapes[FRACTAL_MAX_SHAPES];
 	
 	// these are the exits of the fractal (the points that will be used as the origin for the next iteration of this fractal.
 	// this is just an <x,y> pair
@@ -96,4 +126,16 @@ struct fractal
 	float scale;
 	
 };
+
+
+
+//-------------------------------------------------------
+// function prototypes
+//-------------------------------------------------------
+
+void fractal_render(struct fractal *frac, SDL_Surface *dest, float x, float y, float zoom);
+
+
+
+
 
