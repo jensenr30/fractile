@@ -1,30 +1,14 @@
-#include "SDL/SDL_ttf.h"
+//#include "block.h"
+#define DEBUG 1
+// global display stuff
+//SDL_Window *myWindow;
+//SDL_Renderer *myRenderer;
+//SDL_Texture *myTexture;
 
-#define DEBUG 1 // general debug output.
-
-
-//The CONSTANT initial size of the screen
-#define DEFAULT_SCREEN_WIDTH 896
-#define DEFAULT_SCREEN_HEIGHT 576
-//The DYNAMIC  initial size of the screen
-unsigned int SCREEN_WIDTH;
-unsigned int SCREEN_HEIGHT;
-
-#define within_screen(x,y) (x>=0 && x<SCREEN_WIDTH && y>=0 && y<SCREEN_HEIGHT)
-
-#define SCREEN_BPP 32
-
-// global variable that tells you the FPS of the game.
-int FPS; // arbitrary initial value
-
-// The surfaces that will be used
-SDL_Surface *screen;	// this is the surface the player sees.
-// The event structure that will be used
+// global event stuff
 SDL_Event event;
 
-// the fint that will be used
-TTF_Font *font22;
-TTF_Font *font16;
+typedef unsigned char byte;
 
-float programVersion;
-SDL_Color colorRed;
+unsigned int windW;
+unsigned int windH;

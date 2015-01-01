@@ -1,0 +1,36 @@
+
+Use the follwoing linker settings:
+	-lmingw32 -lSDL2main -lSDL2 -lwinmm
+
+Search Directories:
+Compiler
+	C:\Users\USERNAME\Programs\SDL\SDL2-2.0.3\i686-w64-mingw32\include\
+	C:\Users\USERNAME\Programs\SDL\SDL2_ttf-2.0.12\i686-w64-mingw32\include\
+	C:\Users\USERNAME\Programs\SDL\SDL2_image-2.0.0\i686-w64-mingw32\include\
+Linker
+	C:\Users\USERNAME\Programs\SDL\SDL2-2.0.3\i686-w64-mingw32\lib
+	C:\Users\USERNAME\Programs\SDL\SDL2_ttf-2.0.12\i686-w64-mingw32\lib
+	C:\Users\USERNAME\Programs\SDL\SDL2_image-2.0.0\i686-w64-mingw32\lib
+
+Make sure you have the "i686-w64-mingw32" folders selected for 32-bit compilation.
+The "x86_64-w64-mingw32" folders are for 64-bit compilation
+
+Test Program:
+	#include <SDL.h>
+	#include <stdio.h>
+
+	int main(int argc, char *argv[]){
+		
+		
+		return 0;
+	}
+
+
+You should be able to compile this.
+This will allow you to ensure your linker/compiler settings are correct and that everything is where it should be.
+
+for more detailed information, visit http://lazyfoo.net/tutorials/SDL/index.php
+
+
+Cheers,
+Jensen

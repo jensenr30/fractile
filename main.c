@@ -1,273 +1,252 @@
+#include <SDL2/SDL.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
-#include "general_functions.h"
+#include "utilities.h"
 #include "graphics.h"
 #include "globals.h"
-#include "math_custom.h"
-#include "math.h"
-#include "fractile.h"
+#include "rand.h"
+#include <time.h>
 
 
-int main( int argc, char* argv[] ) 
-{
-	colorRed.r = 0xff;
-	colorRed.g = colorRed.b = 0;
-	//random seed
-	srand(time(NULL));
+
+#define MOUSE_BUTTONS 5
+
+
+int main(int argc, char *argv[]){
 	
-	// initial screen sizes
-	SCREEN_WIDTH = DEFAULT_SCREEN_WIDTH;
-	SCREEN_HEIGHT = DEFAULT_SCREEN_HEIGHT;
 	
-	//----------------------------------------------------
-	// DEBUG THE ROTATE_POINT() function
-	//----------------------------------------------------
-	//double xtest=5, ytest=5, xresult, yresult, angle=-5*PI/2;
-	//rotate_point(xtest,ytest,&xresult,&yresult,angle);
+	error("\n\n\n\n== PROGRAM START ======================================================\n\n\n\n");
+	//--------------------------------------------------
+	// initial gamelog write
+	//--------------------------------------------------
+	gamelog("\n\n\n\n== PROGRAM START ======================================================\n\n\n\n");
+	gamelog_d("main() was sent argc =", argc);
+	int arg;
+	gamelog("START ARGV ARGUMENT LIST:");
+	// print all arguments
+	for(arg=0; arg<argc; arg++){
+		gamelog(argv[arg]);
+	}
+	gamelog("END ARGV LIST");
 	
-	//----------------------------------------------------
-	// VARIABLES USED IN MAIN()
-	//----------------------------------------------------
-    int x, y;									// this is the location of the player's mouse
-    
-    int mouseLeft[2] = {0,0};					// this keeps track of the user's left  mouse button state. [0]=current, [1]=previous
-    int mouseRight[2] = {0,0};					// this keeps track of the user's right mouse button state. [0]=current, [1]=previous
+	windW = 1300;
+	windH = 731;
 	
-	int ticksSinceLastFPSUpdate=0;				// time since last FPS update (ideally, goes from 0 to 1000 milliseconds and then resets)
-	int cumulativeFrames = 0;					// this counts how many Frames there have been since the last
-	int currentTicks = 0;						// this is how many 
-	int quit = false;							// make sure the program waits for a quit
-	int xtwist=0, ytwist=0;						// these store the user's coordinates when the user started twisting myfractal
-	bool twisting=false;						// this keeps track of whether or not the user is twisting the fractal.
-	double twistInitial=0;						// this is what the twist was for myfractal when the user started changing it.
-	double twistRadiansPerPixel = (2*PI)/SCREEN_WIDTH;	// this is how fast the twist of a fractal is changed
-	unsigned long int twistColor = 0xffff0000;	// the color of the twisting line
+	int i;
+	//--------------------------------------------------
+	// set up surfaces, textures, renderers, windows,
+	//--------------------------------------------------
+	// set all surfaces, textures, renderers, and windows to NULL initially to satify if statements that free memory that isn't needed any more.
+	// this prevents the game from crashing at startup.
 	
-	int xscale=0, yscale=0;								// initial coordinates of the mouse when the user starts scaling
-	bool scaling=false;									// this is true/false corresponding to if the user is currently scaling the fractal
-	double scaleInitial = 0.5;							// this is the initial scale value when the user began scaling
-	double scaleMultiplierPerPixel = 1.5/((float)SCREEN_WIDTH);	// this is how much the scale changes with the mouse pixel movement
-	//----------------------------------------------------
-	// initialize lots of stuff
-	//----------------------------------------------------
-    if( init() == false ) return 1;				// make sure you can boot up the necessary libraries
-    if( load_files() == false ) return 2;		// make sure all files are loaded corre
-    
-    SDL_Rect screenRect;
-    screenRect.x = 0;
-    screenRect.y = 0;
-    screenRect.w = SCREEN_WIDTH;
-    screenRect.h = SCREEN_HEIGHT;
-    
-    
-    //----------------------------------------------------
-	// testing fractal utilities
-	//----------------------------------------------------
-    struct fractalData myfractal;
-    myfractal.scale = 0.5;
-    myfractal.iterations = 3;
-    myfractal.thickness = 5;
-    myfractal.color1 = 0xff00ff00;
-    fractal_random(&myfractal, 6, 5);
-    bool ctrl=false;
-    //bool shift;
-    //bool alt;
-    
-    
-    //----------------------------------------------------
-	// enter the main while loop of the game.
-	//----------------------------------------------------
-    while(1){
+	SDL_Window *myWindow = NULL;
+	SDL_Renderer *myRenderer = NULL;
+	SDL_Texture *myTexture = NULL;
+	SDL_Surface *mySurface = NULL;
+	
+	sgenrand(time(NULL));
+	
+	
+	if(SDL_Init(SDL_INIT_EVERYTHING) == -1) return -99;
+	
+		// set network window
+	myWindow = SDL_CreateWindow("FractalMap - Network Viewer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windW, windH, SDL_WINDOW_RESIZABLE);
+	myRenderer = SDL_CreateRenderer(myWindow, -1, 0);
+	
+	if(myWindow == NULL){
+		error("main() could not create myWindow using SDL_CreateWindow");
+		return -1;
+	}
+	if(myRenderer == NULL){
+		error("main() could not create myRenderer using SDL_CreateRenderer");
+		return -2;
+	}
+	
+	SDL_SetRenderDrawColor(myRenderer, 0, 0, 0, 255);
+	SDL_RenderClear(myRenderer);
+	SDL_RenderPresent(myRenderer);
+	
+	SDL_SetRenderDrawColor(myRenderer, 0, 0, 0, 255);
+	SDL_RenderClear(myRenderer);
+	SDL_RenderPresent(myRenderer);
+	
+	
+	//--------------------------------------------------
+	// event handling
+	//--------------------------------------------------
+	
+	// this records if the user wants to quit
+	byte quit = 0;
+	const int keysSize = 256;
+	// this array keeps track of what variables were JUST pushed.
+	// A value of 1 will be set to keys that were just stroked.
+	// after an iteration through the loop, all keys are reset to 0.
+	byte keys[keysSize];
+	// this keeps track of which keys are HELD DOWN
+	int_fast8_t keysHeld[keysSize];
+	// these keep track of where the mouse is
+	int x=0, y=0;
+	// these keep track of where the mouse was just moments ago.
+	int xlast=0, ylast=0;
+	
+	// these two 2-element arrays keep the data concerning the state of the right and left mouse buttons.
+	// EX:
+		// mouse[SDL_BUTTON_LEFT][0] is the CURRENT state of the LEFT mouse button
+		// mouse[SDL_BUTTON_LEFT][1] is the LAST    state of the LEFT mouse button
+		// mouse[SDL_BUTTON_RIGHT][0] is the CURRENT state of the RIGHT mouse button
+		// mouse[SDL_BUTTON_RIGHT][1] is the LAST    state of the RIGHT mouse button
+	int mouse[MOUSE_BUTTONS][2] = { {0,0}, {0,0}, {0,0}, {0,0}, {0,0} };
+	
+	// this is similar to mouse. however, this is used to store where the user clicked when a particular mouse button was clicked.
+		// mouseClick[SDL_BUTTON_LEFT][0] is the x position where the user clicked the left  mouse button.
+		// mouseClick[SDL_BUTTON_LEFT][1] is the y position where the user clicked the left  mouse button.
+		// mouseClick[SDL_BUTTON_RIGHT][0] is the x position where the user clicked the RIGHT mouse button.
+	// etc...
+	int mouseClick[MOUSE_BUTTONS][2] = { {0,0}, {0,0}, {0,0}, {0,0}, {0,0} };
+	// these variables keep track of time and FPS
+	Uint32 ticksLast = 0;
+	Uint32 ticksNow = 0;
+	Uint32 frames = 0;
+	Uint32 FPS = 0;
+	
+	
+	
+	
+	while(quit == 0){
 		
-    	//While there's an event to handle
-    	while( SDL_PollEvent( &event ) ){
-			
-    		//If the user has Xed out the window
-    		if( event.type == SDL_QUIT || quit == true ){
-				//Quit the program
-				quit_game(0);
-			}
-			
-            if( event.type == SDL_MOUSEBUTTONDOWN ){						/// mouse down
-				x = event.motion.x;
-				y = event.motion.y;
-                if( event.button.button == SDL_BUTTON_LEFT ){
-                    mouseLeft[0] = true;
-                    fractal_editor(NULL, &myfractal, x, y, ee_left_click_down);
-                }
-                else if( event.button.button == SDL_BUTTON_RIGHT ){
-                    mouseRight[0] = true;
-					fractal_editor(NULL, &myfractal, x, y, ee_right_click_down);
-                }
-                
-                else if( event.button.button == SDL_BUTTON_WHEELUP ){
-					// more iterations
-					myfractal.iterations++;
-                }
-				else if( event.button.button == SDL_BUTTON_WHEELDOWN ){
-					// less iterations
-					myfractal.iterations--;
-					if(myfractal.iterations <1) myfractal.iterations = 1;
-				}
-				
-            }
-            else if(event.type == SDL_MOUSEBUTTONUP){						/// mouse up
-				x = event.motion.x;
-				y = event.motion.y;
+		// reset all keystroke values
+		for(i=0; i<keysSize; i++){
+			keys[i] = 0;
+		}
+		while(SDL_PollEvent(&event)){
+			// if there is a mouse button down event,
+			if(event.button.type == SDL_MOUSEBUTTONDOWN){
+				// set mouse button states
 				if(event.button.button == SDL_BUTTON_LEFT){
-					mouseLeft[0] = false;
+					// record that the left mouse button is down
+					mouse[SDL_BUTTON_LEFT][0] = 1;
+					// record where the left mouse button was clicked
+					mouseClick[SDL_BUTTON_LEFT][0] = x;
+					mouseClick[SDL_BUTTON_LEFT][1] = y;
 				}
 				else if(event.button.button == SDL_BUTTON_RIGHT){
-					fractal_editor(NULL, &myfractal, x, y, ee_right_click_up);
-					mouseRight[0] = false;
+					// record that the right mouse button is down
+					mouse[SDL_BUTTON_RIGHT][0] = 1;
+					// record where the right mouse button was clicked
+					mouseClick[SDL_BUTTON_RIGHT][0] = x;
+					mouseClick[SDL_BUTTON_RIGHT][1] = y;
 				}
-            }
-            else if( event.type == SDL_MOUSEMOTION ){						/// mouse motion
+				else if(event.button.button == SDL_BUTTON_MIDDLE){
+					// record that the middle mouse button is down
+					mouse[SDL_BUTTON_MIDDLE][0] = 1;
+					// record where the middle mouse button was clicked
+					mouseClick[SDL_BUTTON_MIDDLE][0] = x;
+					mouseClick[SDL_BUTTON_MIDDLE][1] = y;
+				}
+			}
+			else if(event.type == SDL_MOUSEBUTTONUP){
+				// set mouse button states
+				if(event.button.button == SDL_BUTTON_LEFT) mouse[SDL_BUTTON_LEFT][0] = 0;
+				if(event.button.button == SDL_BUTTON_RIGHT) mouse[SDL_BUTTON_RIGHT][0] = 0;
+				if(event.button.button == SDL_BUTTON_MIDDLE) mouse[SDL_BUTTON_MIDDLE][0] = 0;
+			}
+			else if(event.type == SDL_MOUSEWHEEL){
+				
+			}
+			else if(event.type == SDL_MOUSEMOTION){
 				x = event.motion.x;
 				y = event.motion.y;
-				// update twist
-				
-            }
-            else if(event.type == SDL_VIDEORESIZE){							/// window resize
-				
-//				float new_cell_size = CELL_SIZE * event.resize.h/((float)SCREEN_HEIGHT); // adjust the pixel size.
-//				if(new_cell_size - ((int)new_cell_size) >= 0.5f) CELL_SIZE = new_cell_size + 1;
-//				else CELL_SIZE = new_cell_size;
-				SCREEN_WIDTH = event.resize.w;
-				SCREEN_HEIGHT = event.resize.h;
-				set_window_size(event.resize.w, event.resize.h);		// set window to correct dimensions
-				screenRect.w = event.resize.w;
-				screenRect.h = event.resize.h;
-				twistRadiansPerPixel = (2*PI)/SCREEN_WIDTH;	// recalculate the twist per pixels scaler
 			}
-			
-            if( event.type == SDL_KEYDOWN ){		///keyboard event
-                switch( event.key.keysym.sym ){
-				case SDLK_F5:	fractal_random(&myfractal, 6, 5); break;
-				case SDLK_e: 	fractal_editor(NULL,&myfractal,x,y,ee_toggle); break;
-				case SDLK_w:	fractal_wobble(&myfractal, vw_toggle); break;
-				case SDLK_RCTRL:
-				case SDLK_LCTRL: ctrl = true; break;
-				case SDLK_s:
-					if(ctrl){
-						fractal_save_windows(&myfractal);
-					}
-					else{
-						xscale = x;
-						yscale = y;
-						scaleInitial = myfractal.scale;
-						scaling = true;
-					}
-					break;
-				case SDLK_l: if(ctrl)fractal_load_windows(&myfractal); break;
-				case SDLK_t:
-					xtwist = x;
-					ytwist = y;
-					twistInitial = myfractal.twist;
-					twisting = true;
-					break;
-				default: break;
+			else if(event.type == SDL_KEYDOWN){
+				if(event.key.keysym.sym >= 0){
+					// set that character, number, or letter to 1.
+					keys[(event.key.keysym.sym)%keysSize] = 1;
+					keysHeld[(event.key.keysym.sym)%keysSize] = 1;
 				}
 			}
-			if( event.type == SDL_KEYUP ){								///keyboard event
-                switch( event.key.keysym.sym ){
-				case SDLK_RCTRL:
-				case SDLK_LCTRL: ctrl = false; break;
-				case SDLK_t:
-					myfractal.twist = twistInitial + (y-ytwist)*twistRadiansPerPixel;
-					twisting = false;
-					break;
-				case SDLK_s:
-					myfractal.scale = scaleInitial*(1 - (yscale-y)*scaleMultiplierPerPixel);
-					scaling = false;
-					break;
-				default: break;
+			else if(event.type == SDL_KEYUP){
+				if(event.key.keysym.sym >= 0){
+					// set that character, number, or letter to 0.
+					keysHeld[(event.key.keysym.sym)%keysSize] = 0;
 				}
 			}
-                
-		
-    	} // end while(event)
-		//no more events to handle at the moment.
-		
-		
-		//draw_line(screen, -200,10,200,50,1,0xffff0000);
-		//draw_line(screen, (int)(y*0.9),(int)(x*0.9),x,y,1,0xffff0000);
-		//draw_line(screen, 1200,200,x,y,1,0xffff0000);
-        //draw_circle(screen, 300.0, 300.0, 50, 0x00000000);
-
-        
-        //draw_line(screen, 200, 1200, 200,-200,1,0xffff0000);
-        
-        /*
-        float theta;
-        lines += 1;
-        for(theta=0; theta<2*PI; theta = theta + 2*PI/lines){
-			draw_line(screen,SCREEN_WIDTH/2,SCREEN_HEIGHT/2,SCREEN_WIDTH*cos(theta)+SCREEN_WIDTH/2, SCREEN_WIDTH*sin(theta)+SCREEN_HEIGHT/2, 1, 0xff0000ff);
-        }
-        SDL_Delay(50);
-        //updates the screen
-        */
-		fractal_wobble(&myfractal, vw_evaluate);
-        fractal_print(screen, &myfractal);
-        fractal_editor(screen, &myfractal, x, y, ee_print);
-        // print the twisting line
-        if(twisting){
-			
-			myfractal.twist = twistInitial + (y-ytwist)*twistRadiansPerPixel;
-			draw_line(screen, x, ytwist, x, y, 1, twistColor);
-			while(myfractal.twist<0) myfractal.twist += 2*PI;
-			while(myfractal.twist>2*PI) myfractal.twist -= 2*PI;
-			
-			char degStr[] = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
-			double degrees = 180*myfractal.twist/PI;
-			int n; // this is how many whole number digits there are in degrees.
-			
-			itoa(((int)degrees), degStr, 10);
-			if(degrees < 10){
-				n = 1;
+			// check for window events
+			else if(event.type == SDL_WINDOWEVENT ){
+				if(event.window.event == SDL_WINDOWEVENT_CLOSE){
+					quit = 1;
+				}
+				
+				// if the window was resized, the new window width and height need to be recorded.
+				if( event.window.event == SDL_WINDOWEVENT_RESIZED){
+					windW = event.window.data1;
+					windH = event.window.data2;
+				}
 			}
-			else if(degrees < 100){
-				n = 2;
+			else if(event.type == SDL_QUIT){
+				quit = 1;
 			}
-			else {
-				n = 3;
-			}
-			
-			degStr[n] = '.';
-			
-			degStr[n+1] = (degrees*10) - ((int)degrees)*10 + 48;
-			
-			strcat(&degStr[n+2], " degrees");
-			
-			apply_text(screen, x, (y+ytwist)/2, font16, degStr, colorRed);
-        }
-        if(scaling){
-			myfractal.scale = scaleInitial*(1 - (yscale-y)*scaleMultiplierPerPixel);
-        }
-        SDL_Flip(screen);
-        SDL_FillRect(screen, &screenRect, 0xff000000);
-        
-        //----------------------------------------------------------------------
-		// FPS calculation and variable handling
-		//----------------------------------------------------------------------
-        currentTicks = SDL_GetTicks();
-        // it is officially the next second
-        if(currentTicks >= ticksSinceLastFPSUpdate + 1000){
-			// calculate the FPS
-			FPS = cumulativeFrames;//(cumulativeFrames*1000 ) / (currentTicks-ticksSinceLastFPSUpdate);
-			cumulativeFrames=0;				// reset cumulative amount of frames
-			ticksSinceLastFPSUpdate = currentTicks;	// reset the last FPS update to the number of ticks now.
-        }
-        cumulativeFrames++;
-        mouseRight[1] = mouseRight[0];	// make the previous mouse state equal the current one (for the next loop iteration)
-        mouseLeft[1]  = mouseLeft[0];	// ^
-        
-        
-    }// end while(quit == false)
-
-
-    // quit the game
-    quit_game(0);
-
-    return 0;
+		}
+		
+		
+		
+		// clear the old texture if it exists
+		if(mySurface != NULL)SDL_FreeSurface(mySurface);
+		mySurface = create_surface(windW, windH);
+		
+		
+		// generate texture for the block network
+		myTexture = SDL_CreateTextureFromSurface(myRenderer, mySurface);
+		// render the mySurface to the myWindow
+		SDL_RenderCopy(myRenderer, myTexture, NULL, NULL);
+		if(myTexture != NULL)SDL_DestroyTexture(myTexture);
+		// display the renderer's result on the screen and clear it when done
+		SDL_RenderPresent(myRenderer);
+		SDL_RenderClear(myRenderer);
+		
+		
+		
+		// store the current x and y values and use them as the "last" values in the next iteration of the loop
+		xlast = x;
+		ylast = y;
+		
+		// save all current mouse states.
+		for(i=0; i<MOUSE_BUTTONS; i++){
+			// set the last state of this mouse button to the current state (for the next loop iteration)
+			mouse[i][1] = mouse[i][0];
+		}
+		
+		// increase the frame counter (as we have just successfully rendered a frame)
+		frames++;
+		// get the current value of ticks
+		ticksNow = SDL_GetTicks();
+		// if more than a second has passed since the last FPS calculation,
+		if(ticksNow - ticksLast >= 1000){
+			FPS = (int)(frames/(((float)(ticksNow-ticksLast))/1000.0f) + 0.5f );
+			// reset frame counter
+			frames = 0;
+			// set the last tick time to the current time (this will make the program wait 1 second until recalculating the FPS)
+			ticksLast = ticksNow;
+			gamelog_d("FPS =", FPS);
+		}
+		
+	}
+	
+	
+	//--------------------------------------------------
+	// clean up
+	//--------------------------------------------------
+	if(myRenderer != NULL) SDL_DestroyRenderer(myRenderer);
+	if(myTexture  != NULL) SDL_DestroyTexture (myTexture);
+	if(myWindow   != NULL) SDL_DestroyWindow  (myWindow);
+	
+	// clean up all SDL subsystems and other non-SDL systems and global memory.
+	clean_up();
+	
+	
+	return 0;
 }
+
+
+
+
+
