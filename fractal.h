@@ -28,7 +28,6 @@ Contents:
 #include "SDL2/SDL.h"
 
 
-
 //-------------------------------------------------------
 //definitions
 //-------------------------------------------------------
@@ -43,7 +42,15 @@ Contents:
 #define FRACTAL_MAX_CHILDREN		20
 // this is the number of <x,y> pairs each fractal shape has.
 // currently, there are 3 (just enough to specify triangles)
-#define FRACTAL_SHAPE_XY_PAIRS	 	3
+#define FRACTAL_MAX_SHAPE_POINTS 	3
+
+// this is how many iterations fractals will have by default
+#define FRACTAL_DEFAULT_ITERATIONS		5
+#define FRACTAL_DEFAULT_CHILDREN		9
+#define FRACTAL_DEFAULT_SHAPES			1
+#define FRACTAL_DEFAULT_ZOOM			0.4
+#define FRACTAL_DEFAULT_SCALE			0.707107
+#define FRACTAL_DEFAULT_TWIST			45		// degrees
 
 
 /// these are all of the fractal shape types (fst = fractal shape type)
@@ -59,7 +66,7 @@ Contents:
 
 /// these are all of the ways a fractal shape can be filled (fsr = fractal shape fill)
 
-#define fsf_fill			0	// this will fill the entire shape. This is the most "normal" or "plain" setting.
+#define fsf_full			0	// this will fill the entire shape. This is the most "normal" or "plain" setting.
 #define fsf_outline			1	// this will only draw the outline of a shape
 #define fsf_diag			2	// this fills shapes with a diagonal checkerboard pattern
 #define fsf_rand			3	// this will randomly fill pixels in the shape
@@ -86,7 +93,8 @@ struct xyPair
 struct fractalShape
 {
 	// each shape has some number of x,y pairs
-	struct xyPair points[FRACTAL_SHAPE_XY_PAIRS];
+	float x[FRACTAL_MAX_SHAPE_POINTS];
+	float y[FRACTAL_MAX_SHAPE_POINTS];
 	
 	float center;
 	float radius;
@@ -115,15 +123,26 @@ struct fractal
 {
 	// these are all the shapes that make up the fractal
 	struct fractalShape shapes[FRACTAL_MAX_SHAPES];
+	// this tells us how many shapes the fractal has.
+	unsigned int numberOfShapes;
 	
 	// these are the exits of the fractal (the points that will be used as the origin for the next iteration of this fractal.
 	// this is just an <x,y> pair
 	struct xyPair children[FRACTAL_MAX_CHILDREN];
+	// this tells us how many children the fractal has.
+	unsigned int numberOfChildren;
 	
-	// this is a number (in radians) that specifies how much each child is rotated with respect to its parent.
+	// this is a number (in degrees) that specifies how much each child is rotated with respect to its parent.
 	float twist;
 	// this describes the size of children with respect to their parents.
 	float scale;
+	// this is the number of iterations the fractal is to be evaluated.
+	float iterations;
+	
+	// this is how zoomed in/out we are when rendering the fractal. 
+	float zoom;
+	// these are the position of the origin of the fractal on SDL_Surface the fractal is rendered to
+	float x, y;
 	
 };
 
@@ -135,7 +154,7 @@ struct fractal
 
 void fractal_render(struct fractal *frac, SDL_Surface *dest, float x, float y, float zoom);
 
+void fractal_render_iteration(struct fractal *frac, SDL_Surface *dest, int iteration, float x, float y, float scale);
 
-
-
+void fractal_set_default(struct fractal *frac);
 

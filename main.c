@@ -6,7 +6,7 @@
 #include "globals.h"
 #include "rand.h"
 #include <time.h>
-
+#include "fractal.h"
 
 
 #define MOUSE_BUTTONS 5
@@ -36,13 +36,11 @@ int main(int argc, char *argv[]){
 	//--------------------------------------------------
 	// set up surfaces, textures, renderers, windows,
 	//--------------------------------------------------
-	// set all surfaces, textures, renderers, and windows to NULL initially to satify if statements that free memory that isn't needed any more.
-	// this prevents the game from crashing at startup.
 	
 	SDL_Window *myWindow = NULL;
 	SDL_Renderer *myRenderer = NULL;
 	SDL_Texture *myTexture = NULL;
-	SDL_Surface *mySurface = NULL;
+	SDL_Surface *mySurface = create_surface(windW, windH);
 	
 	sgenrand(time(NULL));
 	
@@ -103,14 +101,33 @@ int main(int argc, char *argv[]){
 		// mouseClick[SDL_BUTTON_RIGHT][0] is the x position where the user clicked the RIGHT mouse button.
 	// etc...
 	int mouseClick[MOUSE_BUTTONS][2] = { {0,0}, {0,0}, {0,0}, {0,0}, {0,0} };
+	
+	
+	//--------------------------------------------------
 	// these variables keep track of time and FPS
+	//--------------------------------------------------
+	
 	Uint32 ticksLast = 0;
 	Uint32 ticksNow = 0;
 	Uint32 frames = 0;
 	Uint32 FPS = 0;
 	
 	
+	//--------------------------------------------------
+	// these variables are for fractal stuff
+	//--------------------------------------------------
 	
+	// declare a fractal.
+	struct fractal myFractal;
+	// set the fractal to default.
+	fractal_set_default(&myFractal);
+	float zoomFactor = 1.05;
+	
+	//--------------------------------------------------
+	// this is the fabled "main while() loop"
+	// This is where the user input is interpreted.
+	// mouse motion, mouse clicks, keystrokes, etc...
+	//--------------------------------------------------
 	
 	while(quit == 0){
 		
@@ -151,7 +168,10 @@ int main(int argc, char *argv[]){
 				if(event.button.button == SDL_BUTTON_MIDDLE) mouse[SDL_BUTTON_MIDDLE][0] = 0;
 			}
 			else if(event.type == SDL_MOUSEWHEEL){
-				
+				if(event.wheel.y > 0)
+					myFractal.zoom *= zoomFactor;
+				else
+					myFractal.zoom /= zoomFactor;
 			}
 			else if(event.type == SDL_MOUSEMOTION){
 				x = event.motion.x;
@@ -189,13 +209,26 @@ int main(int argc, char *argv[]){
 		
 		
 		
-		// clear the old texture if it exists
-		if(mySurface != NULL)SDL_FreeSurface(mySurface);
-		mySurface = create_surface(windW, windH);
+		
+		// render the fractal
+		fractal_render(&myFractal, mySurface, myFractal.x, myFractal.y, myFractal.zoom);
+		
+		
+		
+		
+		//--------------------------------------------------
+		// this area of the code puts whatever was rendered
+		// into mySurface onto the screen for the user to see
+		//--------------------------------------------------
+		
+		
 		
 		
 		// generate texture for the block network
 		myTexture = SDL_CreateTextureFromSurface(myRenderer, mySurface);
+		// clear the old texture if it exists
+		if(mySurface != NULL)SDL_FreeSurface(mySurface);
+		mySurface = create_surface(windW, windH);
 		// render the mySurface to the myWindow
 		SDL_RenderCopy(myRenderer, myTexture, NULL, NULL);
 		if(myTexture != NULL)SDL_DestroyTexture(myTexture);
