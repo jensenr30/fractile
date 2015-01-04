@@ -128,26 +128,25 @@ int main(int argc, char *argv[]){
 	myFractal.shapes[0].type = fst_circle;
 	myFractal.shapes[0].radius = 3;
 	myFractal.children[0].scale = 1;
-	myFractal.children[1].scale = 0.8;
-	myFractal.children[2].scale = 0.8*myFractal.children[1].scale;
-	myFractal.children[3].scale = 0.8*myFractal.children[2].scale;
-	myFractal.children[4].scale = 0.8*myFractal.children[3].scale;
-	myFractal.children[5].scale = 0.8*myFractal.children[4].scale;
-	myFractal.children[6].scale = 0.8*myFractal.children[5].scale;
-	myFractal.children[7].scale = 0.8*myFractal.children[6].scale;
-	myFractal.children[8].scale = 0.8*myFractal.children[7].scale;
-	myFractal.children[9].scale = 0.8*myFractal.children[8].scale;
-	myFractal.children[10].scale = 0.8*myFractal.children[9].scale;
-	myFractal.children[11].scale = 0.8*myFractal.children[10].scale;
-	myFractal.children[12].scale = 0.8*myFractal.children[11].scale;
-	myFractal.children[13].scale = 0.8*myFractal.children[12].scale;
-	myFractal.children[14].scale = 0.8*myFractal.children[13].scale;
-	myFractal.children[15].scale = 0.8*myFractal.children[14].scale;
-	myFractal.children[16].scale = 0.8*myFractal.children[15].scale;
-	myFractal.children[17].scale = 0.8*myFractal.children[16].scale;
-	myFractal.children[18].scale = 0.8*myFractal.children[17].scale;
-	myFractal.children[19].scale = 0.8*myFractal.children[18].scale;
-	myFractal.children[20].scale = 0.8*myFractal.children[19].scale;
+	myFractal.children[1].scale = 0.95;
+	myFractal.children[2].scale = 0.95*myFractal.children[1].scale;
+	myFractal.children[3].scale = 0.95*myFractal.children[2].scale;
+	myFractal.children[4].scale = 0.95*myFractal.children[3].scale;
+	myFractal.children[5].scale = 0.95*myFractal.children[4].scale;
+	myFractal.children[6].scale = 0.95*myFractal.children[5].scale;
+	myFractal.children[7].scale = 0.95*myFractal.children[6].scale;
+	myFractal.children[8].scale = 0.95*myFractal.children[7].scale;
+	myFractal.children[9].scale = 0.95*myFractal.children[8].scale;
+	myFractal.children[10].scale = 0.95*myFractal.children[9].scale;
+	myFractal.children[11].scale = 0.95*myFractal.children[10].scale;
+	myFractal.children[12].scale = 0.95*myFractal.children[11].scale;
+	myFractal.children[13].scale = 0.95*myFractal.children[12].scale;
+	myFractal.children[14].scale = 0.95*myFractal.children[13].scale;
+	myFractal.children[15].scale = 0.95*myFractal.children[14].scale;
+	myFractal.children[16].scale = 0.95*myFractal.children[15].scale;
+	myFractal.children[17].scale = 0.95*myFractal.children[16].scale;
+	myFractal.children[18].scale = 0.95*myFractal.children[17].scale;
+	myFractal.children[19].scale = 0.95*myFractal.children[18].scale;
 	
 	float zoomFactor = 1.05;
 	
@@ -305,7 +304,6 @@ int main(int argc, char *argv[]){
 				panning = 0;
 			}
 		}
-		
 		fractal_render_children(&myFractal, mySurface, 1);
 		// render the fractal
 		fractal_render(&myFractal, mySurface);

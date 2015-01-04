@@ -43,7 +43,7 @@ void fractal_render(struct fractal *frac, SDL_Surface *dest)
 	
 	
 	// call the first iteration. from here, all of the other iterations will be recursively called.
-	fractal_render_iteration(frac, dest, 1, frac->x, frac->y, frac->zoom);
+	fractal_render_iteration(frac, dest, 1, frac->x, frac->y, frac->zoom, frac->twist);
 	
 }
 
@@ -57,8 +57,9 @@ void fractal_render(struct fractal *frac, SDL_Surface *dest)
 // <x,y> is the position of the fractal's origin on the screen (units of pixels, but still floating point numbers to retain accuracy)
 // scale tells us what scale this iteration is at.
 // NOTE: this function does not check for a bad fractal pointer or a bad SDL_Surface pointer. So don't send this function any NULL or 0xbaadf00d pointers.
-void fractal_render_iteration(struct fractal *frac, SDL_Surface *dest, int iteration, float x, float y, float scale)
+void fractal_render_iteration(struct fractal *frac, SDL_Surface *dest, int iteration, float x, float y, float scale, float twist)
 {
+	
 	int i;
 	// render all the shapes. this is where the magic happens
 	for(i=0; i<frac->numberOfShapes; i++)
@@ -76,7 +77,7 @@ void fractal_render_iteration(struct fractal *frac, SDL_Surface *dest, int itera
 				break;
 			
 		}
-			
+		
 	}
 	
 	// if this iteration is not supposed to be the last iteration,
@@ -86,14 +87,16 @@ void fractal_render_iteration(struct fractal *frac, SDL_Surface *dest, int itera
 		for(i=0; i<frac->numberOfChildren; i++)
 		{
 			// render a child recursively
-			fractal_render_iteration(frac, dest, iteration + 1, x + frac->children[i].x*scale, y + frac->children[i].y*scale, frac->children[i].scale*scale);
+			fractal_render_iteration(frac, dest, iteration + 1, x + frac->children[i].x*scale, y + frac->children[i].y*scale, frac->children[i].scale*scale, twist + frac->children[i].twist);
 		}
 	}
+	
 }
 
 
 void fractal_render_children(struct fractal *frac, SDL_Surface *dest, int iterations)
 {
+	
 	int c;
 	for(c=0; c<frac->numberOfChildren; c++)
 	{
@@ -133,7 +136,7 @@ void fractal_set_default(struct fractal *frac)
 		frac->children[c].x = 200*cos(3.1415*2*c/((float)FRACTAL_MAX_CHILDREN));	// distribute the children points initially radially outward from the fractal origin.
 		frac->children[c].y = 200*sin(3.1415*2*c/((float)FRACTAL_MAX_CHILDREN));	// "
 		frac->children[c].scale = FRACTAL_DEFAULT_SCALE;							// default scale
-		frac->children[c].twist = FRACTAL_DEFAULT_TWIST;							// default twist
+		frac->children[c].twist = FRACTAL_DEFAULT_CHILDREN_TWIST;					// default twist for children
 	
 	}
 	// set defaults for other things
@@ -142,6 +145,7 @@ void fractal_set_default(struct fractal *frac)
 	frac->numberOfChildren = FRACTAL_DEFAULT_CHILDREN;				// default number of children
 	frac->numberOfShapes = FRACTAL_DEFAULT_SHAPES;					// default number of shapes
 	frac->zoom = FRACTAL_DEFAULT_ZOOM;								// default zoom scale
+	frac->twist = FRACTAL_DEFAULT_TWIST;							// default twist
 	frac->x = windW/2;												// default placement of origin on SDL_Surface rendered to is the center of the screen
 	frac->y = windH/2;												// "
 }

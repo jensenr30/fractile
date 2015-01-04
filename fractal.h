@@ -45,16 +45,17 @@ Contents:
 #define FRACTAL_MAX_SHAPE_POINTS 	3
 
 // this is how many iterations fractals will have by default
-#define FRACTAL_DEFAULT_ITERATIONS				5
-#define FRACTAL_DEFAULT_ITERATIONS_CHILDREN		1
-#define FRACTAL_DEFAULT_CHILDREN				10
-#define FRACTAL_DEFAULT_SHAPES					2
-#define FRACTAL_DEFAULT_ZOOM					0.7
-#define FRACTAL_DEFAULT_SCALE					1;		//0.707107
-#define FRACTAL_DEFAULT_TWIST					45		// degrees
+#define FRACTAL_DEFAULT_ITERATIONS				4		
+#define FRACTAL_DEFAULT_ITERATIONS_CHILDREN		1		
+#define FRACTAL_DEFAULT_CHILDREN				20		
+#define FRACTAL_DEFAULT_SHAPES					1		
+#define FRACTAL_DEFAULT_ZOOM					1	
+#define FRACTAL_DEFAULT_SCALE					1		//0.707107
+#define FRACTAL_DEFAULT_TWIST					0		// degrees
+#define FRACTAL_DEFAULT_CHILDREN_TWIST			0		
 
 // this is how big the circle is that is displayed where children are
-#define FRACTAL_CHILDREN_DISPLAY_RADIUS			3
+#define FRACTAL_CHILDREN_DISPLAY_RADIUS			3		
 
 /// these are all of the fractal shape types (fst = fractal shape type)
 // they tell the renderer how to interpret the <x,y> data of the fractal shape.
@@ -151,6 +152,8 @@ struct fractal
 	
 	// this is how zoomed in/out we are when rendering the fractal.
 	float zoom;
+	// this is how much the entire fractal is twisted
+	float twist;
 	// these are the position of the origin of the fractal on SDL_Surface the fractal is rendered to
 	float x, y;
 	
@@ -164,7 +167,7 @@ struct fractal
 
 void fractal_render(struct fractal *frac, SDL_Surface *dest);
 
-void fractal_render_iteration(struct fractal *frac, SDL_Surface *dest, int iteration, float x, float y, float scale);
+void fractal_render_iteration(struct fractal *frac, SDL_Surface *dest, int iteration, float x, float y, float scale, float twist);
 
 void fractal_render_children(struct fractal *frac, SDL_Surface *dest, int iterations);
 
