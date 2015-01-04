@@ -77,9 +77,9 @@ int main(int argc, char *argv[]){
 	// this keeps track of which keys are HELD DOWN
 	int_fast8_t keysHeld[keysSize];
 	// these keep track of where the mouse is
-	int x=0, y=0;
+	float x=0, y=0;
 	// these keep track of where the mouse was just moments ago.
-	int xlast=0, ylast=0;
+	float xlast=0, ylast=0;
 	
 	// these two 2-element arrays keep the data concerning the state of the right and left mouse buttons.
 	// EX:
@@ -127,7 +127,7 @@ int main(int argc, char *argv[]){
 	fractal_set_default(&myFractal);
 	myFractal.shapes[0].type = fst_circle;
 	myFractal.shapes[0].radius = 3;
-	myFractal.children[0].scale = 1;
+	myFractal.children[0].scale = 0.999;
 	myFractal.children[1].scale = 0.95;
 	myFractal.children[2].scale = 0.95*myFractal.children[1].scale;
 	myFractal.children[3].scale = 0.95*myFractal.children[2].scale;
@@ -307,6 +307,21 @@ int main(int argc, char *argv[]){
 		fractal_render_children(&myFractal, mySurface, 1);
 		// render the fractal
 		fractal_render(&myFractal, mySurface);
+		
+		
+		
+		/*
+		// the following code tests the operation of the twist_xy function to ensure it works properly.
+		// the results should be a series of circles that twist around the center of the screen
+		draw_circle(mySurface, x, y, 10, 0xff0000ff);
+		float xt;
+		float yt;
+		for(i=45; i<360; i+=45)
+		{
+			twist_xy(x-windW/2,y-windH/2, i, &xt, &yt);
+			draw_circle(mySurface, xt+windW/2, yt+windH/2, 10, 0xff0000ff);
+		}
+		*/
 		
 		
 		//--------------------------------------------------

@@ -42,6 +42,7 @@ void fractal_render(struct fractal *frac, SDL_Surface *dest)
 	}
 	
 	
+	
 	// call the first iteration. from here, all of the other iterations will be recursively called.
 	fractal_render_iteration(frac, dest, 1, frac->x, frac->y, frac->zoom, frac->twist);
 	
@@ -61,6 +62,8 @@ void fractal_render_iteration(struct fractal *frac, SDL_Surface *dest, int itera
 {
 	
 	int i;
+	float tx[FRACTAL_MAX_SHAPE_POINTS];
+	float ty[FRACTAL_MAX_SHAPE_POINTS];
 	// render all the shapes. this is where the magic happens
 	for(i=0; i<frac->numberOfShapes; i++)
 	{
@@ -68,12 +71,15 @@ void fractal_render_iteration(struct fractal *frac, SDL_Surface *dest, int itera
 		switch(frac->shapes[i].type)
 		{
 			case fst_circle:
-				draw_circle(dest, x + frac->shapes[i].x[0]*scale, y + frac->shapes[i].y[0]*scale, frac->shapes[i].radius*scale, frac->shapes[i].color);
+				twist_xy(frac->shapes[i].x[0], frac->shapes[i].y[0], twist, &tx[0], &ty[0]);
+				draw_circle(dest, x + tx[0]*scale, y + ty[0]*scale, frac->shapes[i].radius*scale, frac->shapes[i].color);
 				break;
 			
 			default:
 			case fst_line:
-				draw_line(dest, x + frac->shapes[i].x[0]*scale, y + frac->shapes[i].y[0]*scale, x + frac->shapes[i].x[1]*scale, y + frac->shapes[i].y[1]*scale, frac->shapes[i].radius, frac->shapes[i].color);
+				twist_xy(frac->shapes[i].x[0], frac->shapes[i].y[0], twist, &tx[0], &ty[0]);
+				twist_xy(frac->shapes[i].x[1], frac->shapes[i].y[1], twist, &tx[1], &ty[1]);
+				draw_line(dest, x + tx[0]*scale, y + ty[0]*scale, x + tx[1]*scale, y + ty[1]*scale, frac->shapes[i].radius*scale, frac->shapes[i].color);
 				break;
 			
 		}
@@ -86,14 +92,57 @@ void fractal_render_iteration(struct fractal *frac, SDL_Surface *dest, int itera
 		// render each child.
 		for(i=0; i<frac->numberOfChildren; i++)
 		{
+			// calculate the twist for each child (using the tx and ty variables)
+			twist_xy(frac->children[i].x, frac->children[i].y, twist, &tx[0], &ty[0]);
 			// render a child recursively
-			fractal_render_iteration(frac, dest, iteration + 1, x + frac->children[i].x*scale, y + frac->children[i].y*scale, frac->children[i].scale*scale, twist + frac->children[i].twist);
+			fractal_render_iteration(frac, dest, iteration + 1, x + tx[0]*scale, y + ty[0]*scale, frac->children[i].scale*scale, twist + frac->children[i].twist);
 		}
 	}
 	
 }
 
+/// this will take a point <x,y> and rotate it around 0 by twist degrees
+// <x,y> is a point relative to <0,0>
+// twist is the amount (in degrees) that <x,y> should be twisted
+// <x_ret,y_ret> is <x,y> rotated by the angle twist
+void twist_xy(float x, float y, float twist, float *x_ret, float *y_ret)
+{
+	float mag = sqrt(x*x + y*y);
+	
+	float ang;
+	
+	if(x != 0)
+	{
+		ang = atan(y/x);
+		// if x is less that 0, then we need to add this correction factor because of the 180 degree cyclic nature of the atan() function
+		if(x < 0) ang -= 3.141592654;
+	}
+	// if x IS equal to zero, then we cannot use atan(y/x) because we would be dividing by zero. fortunately for us, we know the angle must either be positive or negative 90 degrees based on the sign on y
+	else
+	{
+		if(y > 0)
+		{
+			ang = 1.570796;
+		}
+		else
+		{
+			ang = -1.570796;
+		}
+	}
+	
+	
+	
+	// convert twist to radians and add it to the angle
+	ang += twist*0.01745329252;
+	
+	// return the twisted x and y coordinates
+	*x_ret = mag*cos(ang);
+	*y_ret = mag*sin(ang);
+	
+}
 
+/// this function renders the children's placement as simple circles.
+// this allows the user to visually see where the fractal's "exit" points are. Where it will copy itself
 void fractal_render_children(struct fractal *frac, SDL_Surface *dest, int iterations)
 {
 	
