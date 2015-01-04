@@ -108,6 +108,16 @@ int main(int argc, char *argv[]){
 	
 	
 	//--------------------------------------------------
+	// these variables are for panning
+	//--------------------------------------------------
+	float pan_orig_x;
+	float pan_orig_y;
+	float orig_x;
+	float orig_y;
+	char panning = 0;
+	
+	
+	//--------------------------------------------------
 	// these variables are for fractal stuff
 	//--------------------------------------------------
 	
@@ -115,6 +125,30 @@ int main(int argc, char *argv[]){
 	struct fractal myFractal;
 	// set the fractal to default.
 	fractal_set_default(&myFractal);
+	myFractal.shapes[0].type = fst_circle;
+	myFractal.shapes[0].radius = 3;
+	myFractal.children[0].scale = 1;
+	myFractal.children[1].scale = 0.8;
+	myFractal.children[2].scale = 0.8*myFractal.children[1].scale;
+	myFractal.children[3].scale = 0.8*myFractal.children[2].scale;
+	myFractal.children[4].scale = 0.8*myFractal.children[3].scale;
+	myFractal.children[5].scale = 0.8*myFractal.children[4].scale;
+	myFractal.children[6].scale = 0.8*myFractal.children[5].scale;
+	myFractal.children[7].scale = 0.8*myFractal.children[6].scale;
+	myFractal.children[8].scale = 0.8*myFractal.children[7].scale;
+	myFractal.children[9].scale = 0.8*myFractal.children[8].scale;
+	myFractal.children[10].scale = 0.8*myFractal.children[9].scale;
+	myFractal.children[11].scale = 0.8*myFractal.children[10].scale;
+	myFractal.children[12].scale = 0.8*myFractal.children[11].scale;
+	myFractal.children[13].scale = 0.8*myFractal.children[12].scale;
+	myFractal.children[14].scale = 0.8*myFractal.children[13].scale;
+	myFractal.children[15].scale = 0.8*myFractal.children[14].scale;
+	myFractal.children[16].scale = 0.8*myFractal.children[15].scale;
+	myFractal.children[17].scale = 0.8*myFractal.children[16].scale;
+	myFractal.children[18].scale = 0.8*myFractal.children[17].scale;
+	myFractal.children[19].scale = 0.8*myFractal.children[18].scale;
+	myFractal.children[20].scale = 0.8*myFractal.children[19].scale;
+	
 	float zoomFactor = 1.05;
 	
 	//--------------------------------------------------
@@ -136,6 +170,9 @@ int main(int argc, char *argv[]){
 			// if a mouse button is pressed,
 			//--------------------------------------------------
 			if(event.button.type == SDL_MOUSEBUTTONDOWN){
+				
+				x = event.button.x;
+				y = event.button.y;
 				
 				// set mouse button states
 				if(event.button.button == SDL_BUTTON_LEFT){
@@ -243,6 +280,29 @@ int main(int argc, char *argv[]){
 			//--------------------------------------------------
 			else if(event.type == SDL_QUIT){
 				quit = 1;
+			}
+		}
+		
+		
+		if(mouse[SDL_BUTTON_LEFT][0] && !mouse[SDL_BUTTON_LEFT][1])
+		{
+			pan_orig_x = x;
+			pan_orig_y = y;
+			orig_x = myFractal.x;
+			orig_y = myFractal.y;
+			panning = 1;
+		}
+		
+		if(panning)
+		{
+			if(mouse[SDL_BUTTON_LEFT][0])
+			{
+				myFractal.x = orig_x + (x - pan_orig_x);//*myFractal.zoom;
+				myFractal.y = orig_y + (y - pan_orig_y);//*myFractal.zoom;
+			}
+			else
+			{
+				panning = 0;
 			}
 		}
 		

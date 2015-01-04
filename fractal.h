@@ -46,10 +46,10 @@ Contents:
 
 // this is how many iterations fractals will have by default
 #define FRACTAL_DEFAULT_ITERATIONS		5
-#define FRACTAL_DEFAULT_CHILDREN		9
-#define FRACTAL_DEFAULT_SHAPES			1
-#define FRACTAL_DEFAULT_ZOOM			0.4
-#define FRACTAL_DEFAULT_SCALE			0.707107
+#define FRACTAL_DEFAULT_CHILDREN		10
+#define FRACTAL_DEFAULT_SHAPES			2
+#define FRACTAL_DEFAULT_ZOOM			0.7
+#define FRACTAL_DEFAULT_SCALE			1;//0.707107
 #define FRACTAL_DEFAULT_TWIST			45		// degrees
 
 
@@ -81,10 +81,17 @@ Contents:
 //-------------------------------------------------------
 
 /// this is an <x,y> pair 
-struct xyPair
+struct child
 {
+	// this is the x position of the child with respect to its parent
 	float x;
+	// this is the y position of the child with respect to its parent
 	float y;
+	
+	// this is a number (in degrees) that specifies how much this child is rotated with respect to its parent.
+	float twist;
+	// this describes the size of this child is with respect to their parents.
+	float scale;
 	
 };
 
@@ -92,15 +99,16 @@ struct xyPair
 /// this is a single shape in a fractal
 struct fractalShape
 {
+	
 	// each shape has some number of x,y pairs
 	float x[FRACTAL_MAX_SHAPE_POINTS];
 	float y[FRACTAL_MAX_SHAPE_POINTS];
 	
-	float center;
+	// for a line, this might be the thickness of the line. for a circle, this would be its radius
 	float radius;
 	
 	
-	// this specifies the type of shape this is 
+	// this specifies the type of shape this is
 	unsigned char type;
 	// this specifies how the shape is to be rendered
 	unsigned char fillType;
@@ -121,6 +129,7 @@ struct fractalShape
 /// this is a fractal containing a number of shapes
 struct fractal
 {
+	
 	// these are all the shapes that make up the fractal
 	struct fractalShape shapes[FRACTAL_MAX_SHAPES];
 	// this tells us how many shapes the fractal has.
@@ -128,18 +137,14 @@ struct fractal
 	
 	// these are the exits of the fractal (the points that will be used as the origin for the next iteration of this fractal.
 	// this is just an <x,y> pair
-	struct xyPair children[FRACTAL_MAX_CHILDREN];
+	struct child children[FRACTAL_MAX_CHILDREN];
 	// this tells us how many children the fractal has.
 	unsigned int numberOfChildren;
 	
-	// this is a number (in degrees) that specifies how much each child is rotated with respect to its parent.
-	float twist;
-	// this describes the size of children with respect to their parents.
-	float scale;
 	// this is the number of iterations the fractal is to be evaluated.
 	float iterations;
 	
-	// this is how zoomed in/out we are when rendering the fractal. 
+	// this is how zoomed in/out we are when rendering the fractal.
 	float zoom;
 	// these are the position of the origin of the fractal on SDL_Surface the fractal is rendered to
 	float x, y;

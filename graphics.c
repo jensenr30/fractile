@@ -434,12 +434,13 @@ void draw_circle(SDL_Surface *dest, float x, float y, float radius, Uint32 color
 	float xHighBound= x + radius;
 	float yLowBound = y - radius;
 	float yHighBound= y + radius;
+	
 	int i,j;
 	float dist;
 	for(i=(int)xLowBound; i<=(int)(xHighBound+1); i++){
 		for(j=(int)yLowBound; j<=(int)(yHighBound+1); j++){
 			dist = sqrtf((i-x)*(i-x) + (j-y)*(j-y) );
-			if(dist <= radius && i>=0 && j>=0 && i<dest->h && j<dest->w)
+			if(dist <= radius && i>=0 && j>=0 && i<dest->w && j<dest->h)
 				set_pixel(dest, i, j, color);
 		}
 	}

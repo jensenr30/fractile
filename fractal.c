@@ -64,7 +64,19 @@ void fractal_render_iteration(struct fractal *frac, SDL_Surface *dest, int itera
 	for(i=0; i<frac->numberOfShapes; i++)
 	{
 		// draw a line between <x[0],y[0]> and <x[1],y[1]>
-		draw_line(dest, x + frac->shapes[i].x[0]*scale, y + frac->shapes[i].y[0]*scale, x + frac->shapes[i].x[1]*scale, y + frac->shapes[i].y[1]*scale, frac->shapes[i].radius, frac->shapes[i].color);
+		switch(frac->shapes[i].type)
+		{
+			case fst_circle:
+				draw_circle(dest, x + frac->shapes[i].x[0]*scale, y + frac->shapes[i].y[0]*scale, frac->shapes[i].radius, frac->shapes[i].color);
+				break;
+			
+			default:
+			case fst_line:
+				draw_line(dest, x + frac->shapes[i].x[0]*scale, y + frac->shapes[i].y[0]*scale, x + frac->shapes[i].x[1]*scale, y + frac->shapes[i].y[1]*scale, frac->shapes[i].radius, frac->shapes[i].color);
+				break;
+			
+		}
+			
 	}
 	
 	// if this iteration is not supposed to be the last iteration,
@@ -74,7 +86,7 @@ void fractal_render_iteration(struct fractal *frac, SDL_Surface *dest, int itera
 		for(i=0; i<frac->numberOfChildren; i++)
 		{
 			// render a child recursively
-			fractal_render_iteration(frac, dest, iteration + 1, x + frac->children[i].x*scale, y + frac->children[i].y*scale, frac->scale*scale);
+			fractal_render_iteration(frac, dest, iteration + 1, x + frac->children[i].x*scale, y + frac->children[i].y*scale, frac->children[i].scale*scale);
 		}
 	}
 }
@@ -91,7 +103,6 @@ void fractal_set_default(struct fractal *frac)
 	for(s=0; s<FRACTAL_MAX_SHAPES; s++)
 	{
 		// set defaults
-		frac->shapes[s].center = 0;						// the center is 0 by default
 		frac->shapes[s].color = 0xFFFF00FF;				// magenta by default
 		frac->shapes[s].fillPercent = 0.5;				// 50% by default
 		frac->shapes[s].fillType = fsf_full;			// diagonal fill by default
@@ -111,13 +122,14 @@ void fractal_set_default(struct fractal *frac)
 		// set defaults
 		frac->children[c].x = 200*cos(3.1415*2*c/((float)FRACTAL_MAX_CHILDREN));	// distribute the children points initially radially outward from the fractal origin.
 		frac->children[c].y = 200*sin(3.1415*2*c/((float)FRACTAL_MAX_CHILDREN));	// "
+		frac->children[c].scale = FRACTAL_DEFAULT_SCALE;							// default scale
+		frac->children[c].twist = FRACTAL_DEFAULT_TWIST;							// default twist
+	
 	}
 	// set defaults for other things
 	frac->iterations = FRACTAL_DEFAULT_ITERATIONS;			// default iterations
 	frac->numberOfChildren = FRACTAL_DEFAULT_CHILDREN;		// default number of children
 	frac->numberOfShapes = FRACTAL_DEFAULT_SHAPES;			// default number of shapes
-	frac->scale = FRACTAL_DEFAULT_SCALE;					// default scale
-	frac->twist = FRACTAL_DEFAULT_TWIST;					// default twist
 	frac->zoom = FRACTAL_DEFAULT_ZOOM;						// default zoom scale
 	frac->x = windW/2;										// default placement of origin on SDL_Surface rendered to
 	frac->y = windH/2;										// "
