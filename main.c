@@ -15,19 +15,13 @@
 int main(int argc, char *argv[]){
 	
 	
+	
 	error("\n\n\n\n== PROGRAM START ======================================================\n\n\n\n");
+	
 	//--------------------------------------------------
 	// initial gamelog write
 	//--------------------------------------------------
-	gamelog("\n\n\n\n== PROGRAM START ======================================================\n\n\n\n");
-	gamelog_d("main() was sent argc =", argc);
-	int arg;
-	gamelog("START ARGV ARGUMENT LIST:");
-	// print all arguments
-	for(arg=0; arg<argc; arg++){
-		gamelog(argv[arg]);
-	}
-	gamelog("END ARGV LIST");
+	gamelog_startup(argc, argv);
 	
 	windW = 1300;
 	windH = 731;
@@ -196,10 +190,14 @@ int main(int argc, char *argv[]){
 					quit = 1;
 				}
 				
-				// if the window was resized, the new window width and height need to be recorded.
+				// if the window was resized, 
 				if( event.window.event == SDL_WINDOWEVENT_RESIZED){
+					// the new window width and height need to be recorded
 					windW = event.window.data1;
 					windH = event.window.data2;
+					// also the surface needs to be changed right away
+					if(mySurface != NULL)SDL_FreeSurface(mySurface);
+					mySurface = create_surface(windW, windH);
 				}
 			}
 			else if(event.type == SDL_QUIT){

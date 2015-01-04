@@ -10,3 +10,7 @@ Fractile.depend
 *stdout.txt
 *.orig
 *Thumbs.db
+bin/DebugWin/error.txt
+bin/DebugWin/gamelog.txt
+bin/ReleaseWin/error.txt
+bin/ReleaseWin/gamelog.txt

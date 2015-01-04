@@ -77,6 +77,21 @@ void gamelog_f(char *gamestr, float data){
 }
 
 
+void gamelog_startup( int argc, char **argv)
+{
+	gamelog("\n\n\n\n== PROGRAM START ======================================================\n\n\n\n");
+	gamelog_d("main() was sent argc =", argc);
+	int arg;
+	gamelog("START ARGV ARGUMENT LIST:");
+	// print all arguments
+	for(arg=0; arg<argc; arg++){
+		gamelog(argv[arg]);
+	}
+	gamelog("END ARGV LIST");
+	
+}
+
+
 
 // returns 1 if everything initialized correctly.
 // returns 0 if anything screwed up.
