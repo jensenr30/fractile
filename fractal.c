@@ -44,7 +44,7 @@ void fractal_render(struct fractal *frac, SDL_Surface *dest)
 	
 	
 	// call the first iteration. from here, all of the other iterations will be recursively called.
-	fractal_render_iteration(frac, dest, 1, frac->x, frac->y, frac->zoom, frac->twist);
+	fractal_render_iteration(frac, dest, 0, frac->x, frac->y, frac->zoom, frac->twist);
 	
 }
 
