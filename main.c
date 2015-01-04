@@ -130,8 +130,13 @@ int main(int argc, char *argv[]){
 			keys[i] = 0;
 		}
 		while(SDL_PollEvent(&event)){
-			// if there is a mouse button down event,
+			
+			
+			//--------------------------------------------------
+			// if a mouse button is pressed,
+			//--------------------------------------------------
 			if(event.button.type == SDL_MOUSEBUTTONDOWN){
+				
 				// set mouse button states
 				if(event.button.button == SDL_BUTTON_LEFT){
 					// record that the left mouse button is down
@@ -140,6 +145,7 @@ int main(int argc, char *argv[]){
 					mouseClick[SDL_BUTTON_LEFT][0] = x;
 					mouseClick[SDL_BUTTON_LEFT][1] = y;
 				}
+				
 				else if(event.button.button == SDL_BUTTON_RIGHT){
 					// record that the right mouse button is down
 					mouse[SDL_BUTTON_RIGHT][0] = 1;
@@ -147,6 +153,7 @@ int main(int argc, char *argv[]){
 					mouseClick[SDL_BUTTON_RIGHT][0] = x;
 					mouseClick[SDL_BUTTON_RIGHT][1] = y;
 				}
+				
 				else if(event.button.button == SDL_BUTTON_MIDDLE){
 					// record that the middle mouse button is down
 					mouse[SDL_BUTTON_MIDDLE][0] = 1;
@@ -155,22 +162,42 @@ int main(int argc, char *argv[]){
 					mouseClick[SDL_BUTTON_MIDDLE][1] = y;
 				}
 			}
+			
+			
+			//--------------------------------------------------
+			// if a mouse button has been released,
+			//--------------------------------------------------
 			else if(event.type == SDL_MOUSEBUTTONUP){
 				// set mouse button states
 				if(event.button.button == SDL_BUTTON_LEFT) mouse[SDL_BUTTON_LEFT][0] = 0;
 				if(event.button.button == SDL_BUTTON_RIGHT) mouse[SDL_BUTTON_RIGHT][0] = 0;
 				if(event.button.button == SDL_BUTTON_MIDDLE) mouse[SDL_BUTTON_MIDDLE][0] = 0;
 			}
+			
+			
+			//--------------------------------------------------
+			// if the mouse wheel is turned,
+			//--------------------------------------------------
 			else if(event.type == SDL_MOUSEWHEEL){
 				if(event.wheel.y > 0)
 					myFractal.zoom *= zoomFactor;
 				else
 					myFractal.zoom /= zoomFactor;
 			}
+			
+			
+			//--------------------------------------------------
+			// if the mouse has moved,
+			//--------------------------------------------------
 			else if(event.type == SDL_MOUSEMOTION){
 				x = event.motion.x;
 				y = event.motion.y;
 			}
+			
+			
+			//--------------------------------------------------
+			// if a key has been pressed,
+			//--------------------------------------------------
 			else if(event.type == SDL_KEYDOWN){
 				if(event.key.keysym.sym >= 0){
 					// set that character, number, or letter to 1.
@@ -178,18 +205,27 @@ int main(int argc, char *argv[]){
 					keysHeld[(event.key.keysym.sym)%keysSize] = 1;
 				}
 			}
+			
+			
+			//--------------------------------------------------
+			// if a key has been released,
+			//--------------------------------------------------
 			else if(event.type == SDL_KEYUP){
 				if(event.key.keysym.sym >= 0){
 					// set that character, number, or letter to 0.
 					keysHeld[(event.key.keysym.sym)%keysSize] = 0;
 				}
 			}
-			// check for window events
+			
+			
+			//--------------------------------------------------
+			// if there has been a window event
+			//--------------------------------------------------
 			else if(event.type == SDL_WINDOWEVENT ){
+				// if the window has been closed,
 				if(event.window.event == SDL_WINDOWEVENT_CLOSE){
 					quit = 1;
 				}
-				
 				// if the window was resized, 
 				if( event.window.event == SDL_WINDOWEVENT_RESIZED){
 					// the new window width and height need to be recorded
@@ -200,27 +236,25 @@ int main(int argc, char *argv[]){
 					mySurface = create_surface(windW, windH);
 				}
 			}
+			
+			
+			//--------------------------------------------------
+			// if there has been a quit event,
+			//--------------------------------------------------
 			else if(event.type == SDL_QUIT){
 				quit = 1;
 			}
 		}
 		
 		
-		
-		
 		// render the fractal
 		fractal_render(&myFractal, mySurface, myFractal.x, myFractal.y, myFractal.zoom);
-		
-		
 		
 		
 		//--------------------------------------------------
 		// this area of the code puts whatever was rendered
 		// into mySurface onto the screen for the user to see
 		//--------------------------------------------------
-		
-		
-		
 		
 		// generate texture for the block network
 		myTexture = SDL_CreateTextureFromSurface(myRenderer, mySurface);
@@ -235,17 +269,23 @@ int main(int argc, char *argv[]){
 		SDL_RenderClear(myRenderer);
 		
 		
+		//--------------------------------------------------
+		// records mouse position and button states
+		//--------------------------------------------------
 		
 		// store the current x and y values and use them as the "last" values in the next iteration of the loop
 		xlast = x;
 		ylast = y;
-		
 		// save all current mouse states.
 		for(i=0; i<MOUSE_BUTTONS; i++){
 			// set the last state of this mouse button to the current state (for the next loop iteration)
 			mouse[i][1] = mouse[i][0];
 		}
 		
+		
+		//--------------------------------------------------
+		// tracks FPS of the game
+		//--------------------------------------------------
 		// increase the frame counter (as we have just successfully rendered a frame)
 		frames++;
 		// get the current value of ticks
