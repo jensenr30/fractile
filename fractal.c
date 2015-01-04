@@ -13,7 +13,7 @@
 	// scale = 0.1: 	the image should be shrunk ten times (zoomed out)
 	// scale = 10:		the fractal rendered should look very large (zoomed in)
 // scale allows the user to zoom in/out
-void fractal_render(struct fractal *frac, SDL_Surface *dest, float x, float y, float scale)
+void fractal_render(struct fractal *frac, SDL_Surface *dest)
 {
 	
 	// check for NULL pointers for frac
@@ -43,7 +43,7 @@ void fractal_render(struct fractal *frac, SDL_Surface *dest, float x, float y, f
 	
 	
 	// call the first iteration. from here, all of the other iterations will be recursively called.
-	fractal_render_iteration(frac, dest, 1, x, y, scale);
+	fractal_render_iteration(frac, dest, 1, frac->x, frac->y, frac->zoom);
 	
 }
 
@@ -67,7 +67,7 @@ void fractal_render_iteration(struct fractal *frac, SDL_Surface *dest, int itera
 		switch(frac->shapes[i].type)
 		{
 			case fst_circle:
-				draw_circle(dest, x + frac->shapes[i].x[0]*scale, y + frac->shapes[i].y[0]*scale, frac->shapes[i].radius, frac->shapes[i].color);
+				draw_circle(dest, x + frac->shapes[i].x[0]*scale, y + frac->shapes[i].y[0]*scale, frac->shapes[i].radius*scale, frac->shapes[i].color);
 				break;
 			
 			default:
@@ -91,6 +91,16 @@ void fractal_render_iteration(struct fractal *frac, SDL_Surface *dest, int itera
 	}
 }
 
+
+void fractal_render_children(struct fractal *frac, SDL_Surface *dest, int iterations)
+{
+	int c;
+	for(c=0; c<frac->numberOfChildren; c++)
+	{
+		draw_circle(dest, frac->x + frac->children[c].x*frac->zoom, frac->y + frac->children[c].y*frac->zoom, FRACTAL_CHILDREN_DISPLAY_RADIUS*frac->zoom, 0xffffffff);
+	}
+	
+}
 
 
 
@@ -127,12 +137,13 @@ void fractal_set_default(struct fractal *frac)
 	
 	}
 	// set defaults for other things
-	frac->iterations = FRACTAL_DEFAULT_ITERATIONS;			// default iterations
-	frac->numberOfChildren = FRACTAL_DEFAULT_CHILDREN;		// default number of children
-	frac->numberOfShapes = FRACTAL_DEFAULT_SHAPES;			// default number of shapes
-	frac->zoom = FRACTAL_DEFAULT_ZOOM;						// default zoom scale
-	frac->x = windW/2;										// default placement of origin on SDL_Surface rendered to
-	frac->y = windH/2;										// "
+	frac->iterations = FRACTAL_DEFAULT_ITERATIONS;					// default iterations
+	frac->iterationsChildren = FRACTAL_DEFAULT_ITERATIONS_CHILDREN;	// default iterations of rendered children points
+	frac->numberOfChildren = FRACTAL_DEFAULT_CHILDREN;				// default number of children
+	frac->numberOfShapes = FRACTAL_DEFAULT_SHAPES;					// default number of shapes
+	frac->zoom = FRACTAL_DEFAULT_ZOOM;								// default zoom scale
+	frac->x = windW/2;												// default placement of origin on SDL_Surface rendered to is the center of the screen
+	frac->y = windH/2;												// "
 }
 
 

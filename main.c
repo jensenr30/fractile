@@ -306,9 +306,9 @@ int main(int argc, char *argv[]){
 			}
 		}
 		
-		
+		fractal_render_children(&myFractal, mySurface, 1);
 		// render the fractal
-		fractal_render(&myFractal, mySurface, myFractal.x, myFractal.y, myFractal.zoom);
+		fractal_render(&myFractal, mySurface);
 		
 		
 		//--------------------------------------------------
