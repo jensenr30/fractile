@@ -57,11 +57,16 @@ Contents:
 // this is how big the circle is that is displayed where children are
 #define FRACTAL_CHILDREN_DISPLAY_RADIUS			3		
 
+
+// this is how far away (in pixels) a user's click has to be from an object for it to count as being selected
+#define FRACTAL_SELECT_UNSELECTED -1
+#define FRACTAL_SELECT_PIXEL_DISTANCE 13
+
 /// these are all of the fractal shape types (fst = fractal shape type)
 // they tell the renderer how to interpret the <x,y> data of the fractal shape.
 #define fst_line			0	// this draws a line between <x[0],y[0]> and <x[1],y[1]>
 #define fst_pixel			1	// this draws a pixel at <x[0],y[0]>
-#define fst_circle			2	// this draws a circle using the [center] and [radius] variables
+#define fst_circle			2	// this draws a circle with center <x[0],y[0]> and a radius of the [radius] variable
 #define fst_tri				3	// this uses <x[0],y[0]>, <x[1],y[1]>, and <x[2],y[2]> as points to specify a triangle.
 #define fst_rect			4	// this uses <x[0],y[0]> and <x[1],y[1]> as opposite vertices of a rectangle
 
@@ -85,7 +90,7 @@ Contents:
 //-------------------------------------------------------
 
 /// this is an <x,y> pair 
-struct child
+struct fractalChild
 {
 	// this is the x position of the child with respect to its parent
 	float x;
@@ -141,7 +146,7 @@ struct fractal
 	
 	// these are the exits of the fractal (the points that will be used as the origin for the next iteration of this fractal.
 	// this is just an <x,y> pair
-	struct child children[FRACTAL_MAX_CHILDREN];
+	struct fractalChild children[FRACTAL_MAX_CHILDREN];
 	// this tells us how many children the fractal has.
 	unsigned int numberOfChildren;
 	
@@ -155,8 +160,31 @@ struct fractal
 	// this is how much the entire fractal is twisted
 	float twist;
 	// these are the position of the origin of the fractal on SDL_Surface the fractal is rendered to
+	// these are in pixel space (screen space)
 	float x, y;
 	
+	// this keeps track of what part of the fractal is being selected
+	struct fractalSelect select;
+	
+};
+
+
+
+/// this structure is used to store which component of a fractal is selected and being graphically adjusted (manually) by the user
+// this keeps track of what part(s) of a fractal is being played with
+// this structure is built in such a way as to allow the user to select multiple parts of a fractal at one time.
+struct fractalSelect
+{
+	// this tells us which xy pair the user has selected (if any)
+	// 0 = unselected, 1 = selected
+	uint8_t shapePoints[FRACTAL_MAX_SHAPES][FRACTAL_MAX_SHAPE_POINTS];
+	// this tells if the radius of a shape was selected
+	// 0 = unselected, 1 = selected
+	uint8_t shapeRadius[FRACTAL_MAX_SHAPES];
+	
+	// this tells us which child the user has selected
+	// 0 = unselected, 1 = selected
+	uint8_t child[FRACTAL_MAX_CHILDREN];
 };
 
 

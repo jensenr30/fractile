@@ -18,3 +18,5 @@
 // this becomes useful for weighting things based on their distances in a geometric sense.
 #define weighted_ave_3_recip_f(x,y,z,a,b,c) (  ( x/((float)(a)) + y/((float)(b)) + z/((float)(c)) )  /  (1/((float)(a)) + 1/((float)(b)) + 1/((float)(c)))  )
 
+/// performs a squaring operation on the operand
+#define sqr(A) ((A)*(A))

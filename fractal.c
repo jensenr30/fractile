@@ -60,7 +60,6 @@ void fractal_render(struct fractal *frac, SDL_Surface *dest)
 // NOTE: this function does not check for a bad fractal pointer or a bad SDL_Surface pointer. So don't send this function any NULL or 0xbaadf00d pointers.
 void fractal_render_iteration(struct fractal *frac, SDL_Surface *dest, int iteration, float x, float y, float scale, float twist)
 {
-	
 	int i;
 	float tx[FRACTAL_MAX_SHAPE_POINTS];
 	float ty[FRACTAL_MAX_SHAPE_POINTS];
@@ -105,8 +104,10 @@ void fractal_render_iteration(struct fractal *frac, SDL_Surface *dest, int itera
 // <x,y> is a point relative to <0,0>
 // twist is the amount (in degrees) that <x,y> should be twisted
 // <x_ret,y_ret> is <x,y> rotated by the angle twist
+// NOTE: this function does NOT check for NULL x_ret, y_ret pointers. SO DON'T SEND IT ANY!
 void twist_xy(float x, float y, float twist, float *x_ret, float *y_ret)
 {
+	
 	float mag = sqrt(x*x + y*y);
 	
 	float ang;
@@ -158,6 +159,13 @@ void fractal_render_children(struct fractal *frac, SDL_Surface *dest, int iterat
 
 void fractal_set_default(struct fractal *frac)
 {
+	// check for a NULL frac pointer
+	if(frac == NULL)
+	{
+		error("fractal_set_default() was sent a NULL [frac] pointer! Aborting function call.");
+		return;
+	}
+	
 	// shape, child, pair.
 	int s,c,p;
 	
@@ -198,5 +206,126 @@ void fractal_set_default(struct fractal *frac)
 	frac->x = windW/2;												// default placement of origin on SDL_Surface rendered to is the center of the screen
 	frac->y = windH/2;												// "
 }
+
+
+void fractal_select_deselect_all(struct fractalSelect *select)
+{
+	// check for a NULL select pointer
+	if(select == NULL)
+	{
+		error("fractal_select_clear() was sent a NULL [select] pointer. Aborting function call");
+		return;
+	}
+	int s,sp;
+	// for every fractal shape,
+	for(s=0; s<FRACTAL_MAX_SHAPES; s++)
+	{
+		// deselect each points set of xy points
+		for(sp=0; sp<FRACTAL_MAX_SHAPE_POINTS sp++)
+		{
+			select->shapePoints[s][sp] = 0;
+		}
+		// deselect each point's radius
+		select->radius[s] = 0;
+	}
+	int c;
+	// for each child,
+	for(c=0; c<FRACTAL_MAX_CHILDREN; c++)
+	{
+		// deselect that child
+		select->child[c] = 0;
+	}
+	
+}
+
+
+
+/// this function inputs a position that a user has clicked and a fractal and determines if the user selected any of the fractal's parts.
+// x and y are in pixel space (screen space). they are converted to fractal space internally in this function
+void fractal_select_point(struct fractal *frac, float x, float y)
+{
+	// check for a NULL frac pointer
+	if(frac == NULL)
+	{
+		error("fractal_select_clear() was sent a NULL [frac] pointer! Aborting function call.");
+		return;
+	}
+	
+	// calculate the <x,y> position in fractal space
+	xf = x*frac->zoom - frac->x;
+	yf = y*frac->zoom - frac->y;
+	// this keeps track of how close the input <x,y> pair is to the closest part of the fractal.
+	// however, for sake of speed of execution, this is stored as a square value.
+	// this number is always delta_x^2 + delta_y^2
+	// this number's square root is found after all fractal parts have been checked.
+	// closest2 is pronounced "closest squared"
+	// set to a really high number initially so that everything else is smaller
+	float closest2 = __FLT_MAX__;
+	// this is used to store the calculation of distance between <x,y> and the current point being checked
+	// dist2, like closest2, is pronounced "distance squared"
+	float dist2;
+	
+	int s;
+	int sp;
+	// for each fractal shape
+	for(s=0; s<FRACTAL_MAX_SHAPES; s++)
+	{
+		/// TODO: only check the relevant xy points (i.e. for a line, only check points [0] and [1]. for a triangle only points [0], [1], and [2]. for a pixel, only look at [0].)
+		// for each xy point,
+		for(sp=0; sp<FRACTAL_MAX_SHAPE_POINTS; sp++)
+		{
+			// calculate the distance between where the user clicked and the xy point of this shape
+			dist2 = sqr(xf-frac->shapes[s].x[sp]) + sqr(yf-frac->shapes[s].y[sp]);
+			// if the current dist2 is less than the so-far closest found dist2, we have found a new closest point
+			if(dist2 < closest)
+			{
+				// forget all previously selected parts.
+				fractal_select_deselect_all(&frac->select);
+				// set closest squared to the current calculated distance squared.
+				closest2 = dist2;
+				// set the selected part to the appropriate child number
+				frac->select.shapePoints[s][sp] = 1;
+			}
+		}
+		/// TODO: add a check to see if the shape is shape-type that actually uses the radius variable (like a circle)
+		// calculate the dist2 between <xf,yf> and the first point <x[0],y[0]>
+		dist2 = sqr(xf-frac->shapes[s].x[0]) + sqr(yf-frac->shapes[s].y[0]);
+		// now calculate the difference between that and the radius to get how close the user is to selecting that radius
+		dist2 = dist2 + sqr(frac->shapes[s].radius);
+		// if the <xf,yf> point is close to being one radius away from the shape,
+		if(dist2 < clostest2)
+		{
+			// forget all previously selected parts.
+			fractal_select_deselect_all(&frac->select);
+			// set closest squared to the current calculated distance squared.
+			closest2 = dist2;
+			// set the selected part to the appropriate child number
+			frac->select.radius[s] = 1;
+		}
+		
+	}
+	
+	int c;
+	// check all children
+	for(c=0; c<FRACTAL_MAX_CHILDREN; c++)
+	{
+		// calculate the distance between where the user clicked and the child point
+		dist2 = sqr(xf-frac->children.x) + sqr(yf-frac->children.y);
+		// if the current dist2 is less than the reining champion closest2 value, we have found a new closest point
+		if(dist2 < clostest2)
+		{
+			// forget all previously selected parts.
+			fractal_select_deselect_all(&frac->select);
+			// set closest squared to the current calculated distance squared.
+			closest2 = dist2;
+			// set the selected part to the appropriate child number
+			frac->select.child[c] = 1;
+		}
+	}
+	
+}
+
+
+
 
 

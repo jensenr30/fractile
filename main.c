@@ -241,6 +241,16 @@ int main(int argc, char *argv[]){
 					keys[(event.key.keysym.sym)%keysSize] = 1;
 					keysHeld[(event.key.keysym.sym)%keysSize] = 1;
 				}
+				switch(event.key.keysym.sym){
+				case SDLK_DOWN:
+					myFractal.iterations--;
+					break;
+				case SDLK_UP:
+					myFractal.iterations++;
+					break;
+				default:
+					break;
+				}
 			}
 			
 			
