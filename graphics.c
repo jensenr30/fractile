@@ -45,6 +45,13 @@ void set_pixel(SDL_Surface *surf, int x, int y, Uint32 pixel){
 	*p = pixel;
 }
 
+/// draws a pixel to the screen BUT FIRST CHECKING that it is within the screen
+// this is a bounded pixel set (it won't crash the program when it tells SDL to set a pixel outside of a surface
+void draw_pixel(SDL_Surface *dest, int x, int y, Uint32 color)
+{
+	if(x >= 0 && y >=0 && x < dest->w && y < dest->h) set_pixel(dest, x, y, color);
+}
+
 /// this function will mix two colors (according to their respective weight) and return the resulting color.
 // everything is Uint32, 32 bits unsigned integer
 Uint32 color_mix_weighted(Uint32 color1, Uint32 color2, Uint32 weight1, Uint32 weight2){
@@ -446,3 +453,6 @@ void draw_circle(SDL_Surface *dest, float x, float y, float radius, Uint32 color
 	}
 	
 }
+
+
+

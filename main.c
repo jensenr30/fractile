@@ -113,10 +113,14 @@ int main(int argc, char *argv[]){
 	struct fractal myFractal;
 	// set the fractal to default.
 	fractal_set_default(&myFractal);
-	float decayFact = 1;
-	myFractal.shapes[0].type = fst_circle;
-	myFractal.shapes[0].radius = 3;
-	myFractal.children[0].scale = 0.8;
+	float decayFact = 0.7;
+	myFractal.shapes[0].type = fst_line;
+	myFractal.shapes[0].x[0] = 0;
+	myFractal.shapes[0].y[0] = 0;
+	myFractal.shapes[0].x[1] = 10;
+	myFractal.shapes[0].y[1] = 10;
+	
+	myFractal.children[0].scale = 0.7;
 	myFractal.children[1].scale = decayFact*myFractal.children[0].scale;
 	myFractal.children[2].scale = decayFact*myFractal.children[1].scale;
 	myFractal.children[3].scale = decayFact*myFractal.children[2].scale;
@@ -302,9 +306,9 @@ int main(int argc, char *argv[]){
 		
 		if(mouse[SDL_BUTTON_LEFT][0] && !mouse[SDL_BUTTON_LEFT][1])
 		{
-			// record the original <x,y> position of the mouse
-			pan_orig_x = x;
-			pan_orig_y = y;
+			// store original x,y positions of mouse
+			orig_x = x;
+			orig_y = y;
 			
 			// see if the user intended to click a
 			int clickedPart = fractal_select_point(mySurface, &myFractal, x, y);
@@ -324,8 +328,8 @@ int main(int argc, char *argv[]){
 				// enter the screen panning mode
 				panning = 1;
 				// record the original <x,y> position of the fractal on the screen
-				orig_x = myFractal.x;
-				orig_y = myFractal.y;
+				pan_orig_x = myFractal.x;
+				pan_orig_y = myFractal.y;
 			}
 		}
 		
@@ -335,7 +339,11 @@ int main(int argc, char *argv[]){
 			// if the user has the left mouse button held down
 			if(mouse[SDL_BUTTON_LEFT][0])
 			{
-				draw_circle(mySurface, 200, 200, 66.67, 0xFF0000FF);
+				//draw_circle(mySurface, 200, 200, 66.67, 0xFF0000FF);
+				// copy the original state of myFractal into the myFractal
+				fractal_copy(&myFractalOrig, &myFractal);
+				// modify myFractal
+				fractal_select_modify(&myFractal, (x-orig_x)/myFractalOrig.zoom, (y-orig_y)/myFractalOrig.zoom);
 			}
 			// otherwise,
 			else
@@ -350,8 +358,8 @@ int main(int argc, char *argv[]){
 			// if the user has the left mouse button held down
 			if(mouse[SDL_BUTTON_LEFT][0])
 			{
-				myFractal.x = orig_x + (x - pan_orig_x);//*myFractal.zoom;
-				myFractal.y = orig_y + (y - pan_orig_y);//*myFractal.zoom;
+				myFractal.x = pan_orig_x + x - orig_x;//*myFractal.zoom;
+				myFractal.y = pan_orig_y + y - orig_y;//*myFractal.zoom;
 			}
 			// otherwise,
 			else

@@ -75,13 +75,17 @@ void fractal_render_iteration(struct fractal *frac, SDL_Surface *dest, int itera
 				draw_circle(dest, x + tx[0]*scale, y + ty[0]*scale, frac->shapes[i].radius*scale, frac->shapes[i].color);
 				break;
 			
-			default:
 			case fst_line:
 				twist_xy(frac->shapes[i].x[0], frac->shapes[i].y[0], twist, &tx[0], &ty[0]);
 				twist_xy(frac->shapes[i].x[1], frac->shapes[i].y[1], twist, &tx[1], &ty[1]);
 				draw_line(dest, x + tx[0]*scale, y + ty[0]*scale, x + tx[1]*scale, y + ty[1]*scale, frac->shapes[i].radius*scale, frac->shapes[i].color);
 				break;
 			
+			default:
+			case fst_pixel:
+				twist_xy(frac->shapes[i].x[0], frac->shapes[i].y[0], twist, &tx[0], &ty[0]);
+				draw_pixel(dest, (x + tx[0]*scale)+0.5, (y + ty[0]*scale)+0.5, frac->shapes[i].color);
+				break;
 		}
 		
 	}
@@ -380,7 +384,8 @@ int fractal_select_point(SDL_Surface *dest, struct fractal *frac, float x, float
 	float xf = (x - frac->x) / frac->zoom;
 	float yf = (y - frac->y) / frac->zoom;
 	
-	draw_circle(dest, xf, yf, 10, 0xFFFF3311);
+	// debugging
+	//draw_circle(dest, xf, yf, 10, 0xFFFF3311);
 	
 	// this keeps track of how close the input <x,y> pair is to the closest part of the fractal.
 	// however, for sake of speed of execution, this is stored as a square value.
@@ -418,7 +423,7 @@ int fractal_select_point(SDL_Surface *dest, struct fractal *frac, float x, float
 		
 		
 		//---------------------------------------------
-		// check if the user clicked near an xy point
+		// check if the user clicked near any xy points
 		//---------------------------------------------
 		
 		// for each xy point, check if the user clicked near that point. In this case, "near" mean
@@ -507,6 +512,80 @@ int fractal_select_point(SDL_Surface *dest, struct fractal *frac, float x, float
 	return clickedPart;
 }
 
+
+
+/// this function will input some fractal, and modify it based on a change in x and a change in y
+// this function will modify all selected parts of the input fractal SIMULTANEOUSLY.
+// this allows this function to modify a fractal that has a GROUP of parts selected at the same time (a group modification).
+// this function does not care how many parts are selected. It just fucking works. Like a good function should.
+// frac is the fractal to be modified
+// x is the change in the x direction (in pixels, the unit of the fractal space)
+// y is the change in the y direction (in pixels, the unit of the fractal space)
+// returns 0 on successful modification
+// returns -1 on NULL frac pointer
+int fractal_select_modify(struct fractal *frac, float x, float y)
+{
+	// check for NULL pointer
+	if(frac == NULL)
+	{
+		error("fractal_select_modify() was sent a NULL [frac] pointer! Aborting function call.");
+		return -1;
+	}
+	
+	//---------------------------------------------
+	// check if shapes need to be modified
+	//---------------------------------------------
+	
+	int s, sp;
+	// for all shapes, modify the selected ones
+	for(s=0; s<FRACTAL_MAX_SHAPES; s++)
+	{
+		//---------------------------------------------
+		// check if the user wants to modify any xy points
+		//---------------------------------------------
+		
+		// for each xy point, check if the user clicked near that point. In this case, "near" mean
+		for(sp=0; sp<FRACTAL_MAX_SHAPE_POINTS; sp++)
+		{
+			// if the current shape point is selected for modification,
+			if(frac->select.shapePoints[s][sp])
+			{
+				frac->shapes[s].x[sp] += x;
+				frac->shapes[s].y[sp] += y;
+			}
+		}
+		
+		//---------------------------------------------
+		// check if the user wants to modify the radius
+		//---------------------------------------------
+		
+		// if the radius is selected for modification,
+		if(frac->select.shapeRadius[s])
+		{
+			// modify the radius
+			frac->shapes[s].radius += x; /// TODO: fix this stupid hack. The radius needs to be configurable is a user-friendly way.
+		}
+		
+	}// for(shape)
+	
+	//---------------------------------------------
+	// check if children need to be modifies
+	//---------------------------------------------
+	
+	int c;
+	// check all children
+	for(c=0; c<FRACTAL_MAX_CHILDREN; c++)
+	{
+		// if this child is selected for modification,
+		if(frac->select.child[c])
+		{
+			frac->children[c].x += x;
+			frac->children[c].y += y;
+		}
+	}// for(children)
+	
+	return 0; // success
+}
 
 
 

@@ -46,8 +46,8 @@ Contents:
 
 // this is how many iterations fractals will have by default
 #define FRACTAL_DEFAULT_ITERATIONS				3	
-#define FRACTAL_DEFAULT_CHILDREN				20		
-#define FRACTAL_DEFAULT_SHAPES					1			
+#define FRACTAL_DEFAULT_CHILDREN				3		
+#define FRACTAL_DEFAULT_SHAPES					3			
 #define FRACTAL_DEFAULT_ZOOM					1		
 #define FRACTAL_DEFAULT_SCALE					0.707107	//sqrt(0.5)
 #define FRACTAL_DEFAULT_TWIST					0			// degrees
@@ -91,9 +91,9 @@ Contents:
 /// this is an <x,y> pair 
 struct fractalChild
 {
-	// this is the x position of the child with respect to its parent
+	// this is the x position of the child with respect to its parent (units of pixels)
 	float x;
-	// this is the y position of the child with respect to its parent
+	// this is the y position of the child with respect to its parent (units of pixels)
 	float y;
 	
 	// this is a number (in degrees) that specifies how much this child is rotated with respect to its parent.
@@ -109,10 +109,12 @@ struct fractalShape
 {
 	
 	// each shape has some number of x,y pairs
+	// x and y are in units of pixels
 	float x[FRACTAL_MAX_SHAPE_POINTS];
 	float y[FRACTAL_MAX_SHAPE_POINTS];
 	
 	// for a line, this might be the thickness of the line. for a circle, this would be its radius
+	// units of pixels
 	float radius;
 	
 	
@@ -177,7 +179,8 @@ struct fractal
 	// this is how much the entire fractal is twisted
 	float twist;
 	// these are the position of the origin of the fractal on SDL_Surface the fractal is rendered to
-	// these are in pixel space (screen space)
+	// think of these variables as offsets.
+	// these are in units of pixels. the space of the fractal is also in units of pixels.
 	float x, y;
 	
 	// this keeps track of what part of the fractal is being selected
@@ -204,3 +207,6 @@ int fractal_copy(struct fractal *source, struct fractal *dest);
 void fractal_set_default(struct fractal *frac);
 
 int fractal_select_point(SDL_Surface *dest, struct fractal *frac, float x, float y);
+int fractal_select_modify(struct fractal *frac, float x, float y);
+
+
