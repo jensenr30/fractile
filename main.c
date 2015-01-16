@@ -100,7 +100,6 @@ int main(int argc, char *argv[]){
 	//--------------------------------------------------
 	// these variables keep track of time and FPS
 	//--------------------------------------------------
-	
 	Uint32 ticksLast = 0;
 	Uint32 ticksNow = 0;
 	Uint32 frames = 0;
@@ -108,19 +107,8 @@ int main(int argc, char *argv[]){
 	
 	
 	//--------------------------------------------------
-	// these variables are for panning
-	//--------------------------------------------------
-	float pan_orig_x;
-	float pan_orig_y;
-	float orig_x;
-	float orig_y;
-	char panning = 0;
-	
-	
-	//--------------------------------------------------
 	// these variables are for fractal stuff
 	//--------------------------------------------------
-	
 	// declare a fractal.
 	struct fractal myFractal;
 	// set the fractal to default.
@@ -150,6 +138,24 @@ int main(int argc, char *argv[]){
 	myFractal.children[19].scale = decayFact*myFractal.children[18].scale;
 	
 	float zoomFactor = 1.05;
+	
+	
+	//--------------------------------------------------
+	// these variables are for panning / fractal part modification
+	//--------------------------------------------------
+	// these keep track of the mouse position when panning/part modification began
+	float pan_orig_x;
+	float pan_orig_y;
+	// these two keep track of the original <x,y> values of the fractal when panning
+	float orig_x;
+	float orig_y;
+	// keeps track of whether or not we are panning
+	char panning = 0;
+	// keeps track of whether or now we are modifying a part of the fractal
+	char modPart = 0;
+	// this is used to store a version of myFractal in
+	struct fractal myFractalOrig;
+	
 	
 	//--------------------------------------------------
 	// this is the fabled "main while() loop"
@@ -296,20 +302,58 @@ int main(int argc, char *argv[]){
 		
 		if(mouse[SDL_BUTTON_LEFT][0] && !mouse[SDL_BUTTON_LEFT][1])
 		{
+			// record the original <x,y> position of the mouse
 			pan_orig_x = x;
 			pan_orig_y = y;
-			orig_x = myFractal.x;
-			orig_y = myFractal.y;
-			panning = 1;
+			
+			// see if the user intended to click a
+			int clickedPart = fractal_select_point(mySurface, &myFractal, x, y);
+			
+			// if a valid part was found
+			if(clickedPart >= 1)
+			{
+				// enter the part modification mode
+				modPart = 1;
+				// make a copy of the fractal's original state when modification happened.
+				// now myFractal will be set to some modified version of myFractalOrig
+				fractal_copy(&myFractal, &myFractalOrig);
+			}
+			// otherwise, no valid part was found
+			else
+			{
+				// enter the screen panning mode
+				panning = 1;
+				// record the original <x,y> position of the fractal on the screen
+				orig_x = myFractal.x;
+				orig_y = myFractal.y;
+			}
 		}
 		
+		// if the user is currently modifying a part,
+		if(modPart)
+		{
+			// if the user has the left mouse button held down
+			if(mouse[SDL_BUTTON_LEFT][0])
+			{
+				draw_circle(mySurface, 200, 200, 66.67, 0xFF0000FF);
+			}
+			// otherwise,
+			else
+			{
+				modPart = 0;
+			}
+		}
+		
+		// if the user is currently panning,
 		if(panning)
 		{
+			// if the user has the left mouse button held down
 			if(mouse[SDL_BUTTON_LEFT][0])
 			{
 				myFractal.x = orig_x + (x - pan_orig_x);//*myFractal.zoom;
 				myFractal.y = orig_y + (y - pan_orig_y);//*myFractal.zoom;
 			}
+			// otherwise,
 			else
 			{
 				panning = 0;

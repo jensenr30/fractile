@@ -38,6 +38,7 @@ void error_f(char *errstr, float data);
 
 void gamelog(char *gamestr);
 void gamelog_d(char *gamestr, int data);
+void gamelog_startup( int argc, char **argv);
 
 int init_SDL();
 SDL_Surface *create_surface(int witdth, int height);

@@ -59,7 +59,6 @@ Contents:
 
 
 // this is how far away (in pixels) a user's click has to be from an object for it to count as being selected
-#define FRACTAL_SELECT_UNSELECTED -1
 #define FRACTAL_SELECT_PIXEL_DISTANCE 13
 
 /// these are all of the fractal shape types (fst = fractal shape type)
@@ -135,6 +134,24 @@ struct fractalShape
 };
 
 
+/// this structure is used to store which component of a fractal is selected and being graphically adjusted (manually) by the user
+// this keeps track of what part(s) of a fractal is being played with
+// this structure is built in such a way as to allow the user to select multiple parts of a fractal at one time.
+struct fractalSelect
+{
+	// this tells us which xy pair the user has selected (if any)
+	// 0 = unselected, 1 = selected
+	uint8_t shapePoints[FRACTAL_MAX_SHAPES][FRACTAL_MAX_SHAPE_POINTS];
+	// this tells if the radius of a shape was selected
+	// 0 = unselected, 1 = selected
+	uint8_t shapeRadius[FRACTAL_MAX_SHAPES];
+	
+	// this tells us which child the user has selected
+	// 0 = unselected, 1 = selected
+	uint8_t child[FRACTAL_MAX_CHILDREN];
+};
+
+
 /// this is a fractal containing a number of shapes
 struct fractal
 {
@@ -170,23 +187,6 @@ struct fractal
 
 
 
-/// this structure is used to store which component of a fractal is selected and being graphically adjusted (manually) by the user
-// this keeps track of what part(s) of a fractal is being played with
-// this structure is built in such a way as to allow the user to select multiple parts of a fractal at one time.
-struct fractalSelect
-{
-	// this tells us which xy pair the user has selected (if any)
-	// 0 = unselected, 1 = selected
-	uint8_t shapePoints[FRACTAL_MAX_SHAPES][FRACTAL_MAX_SHAPE_POINTS];
-	// this tells if the radius of a shape was selected
-	// 0 = unselected, 1 = selected
-	uint8_t shapeRadius[FRACTAL_MAX_SHAPES];
-	
-	// this tells us which child the user has selected
-	// 0 = unselected, 1 = selected
-	uint8_t child[FRACTAL_MAX_CHILDREN];
-};
-
 
 
 //-------------------------------------------------------
@@ -194,14 +194,13 @@ struct fractalSelect
 //-------------------------------------------------------
 
 void fractal_render(struct fractal *frac, SDL_Surface *dest);
-
 void fractal_render_iteration(struct fractal *frac, SDL_Surface *dest, int iteration, float x, float y, float scale, float twist);
+void fractal_render_children(struct fractal *frac, SDL_Surface *dest, int iterations);
 
 void twist_xy(float x, float y, float twist, float *x_ret, float *y_ret);
 
-void fractal_render_children(struct fractal *frac, SDL_Surface *dest, int iterations);
-
-
-
+int fractal_select_copy(struct fractalSelect *source, struct fractalSelect *dest);
+int fractal_copy(struct fractal *source, struct fractal *dest);
 void fractal_set_default(struct fractal *frac);
 
+int fractal_select_point(SDL_Surface *dest, struct fractal *frac, float x, float y);
