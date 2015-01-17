@@ -45,11 +45,11 @@ Contents:
 #define FRACTAL_MAX_SHAPE_POINTS 	3
 
 // this is how many iterations fractals will have by default
-#define FRACTAL_DEFAULT_ITERATIONS				10000	
-#define FRACTAL_DEFAULT_CHILDREN				1		
+#define FRACTAL_DEFAULT_ITERATIONS				5
+#define FRACTAL_DEFAULT_CHILDREN				3		
 #define FRACTAL_DEFAULT_SHAPES					3			
 #define FRACTAL_DEFAULT_ZOOM					1		
-#define FRACTAL_DEFAULT_SCALE					0.9999	//sqrt(0.5)
+#define FRACTAL_DEFAULT_SCALE					0.9998	//sqrt(0.5)
 #define FRACTAL_DEFAULT_TWIST					0			// degrees
 #define FRACTAL_DEFAULT_CHILDREN_TWIST			39.502059//9.53	
 #define FRACTAL_DEFAULT_ITERATIONS_CHILDREN		1		
@@ -196,17 +196,19 @@ struct fractal
 // function prototypes
 //-------------------------------------------------------
 
+// these functions are centered around rendering a fractal
 void fractal_render(struct fractal *frac, SDL_Surface *dest);
 void fractal_render_iteration(struct fractal *frac, SDL_Surface *dest, int iteration, float x, float y, float scale, float twist);
 void fractal_render_children(struct fractal *frac, SDL_Surface *dest, int iterations);
-
 void twist_xy(float x, float y, float twist, float *x_ret, float *y_ret);
 
+// these functions are centered around batch manipulation of data in a fractal structure.
 int fractal_select_copy(struct fractalSelect *source, struct fractalSelect *dest);
 int fractal_copy(struct fractal *source, struct fractal *dest);
 void fractal_set_default(struct fractal *frac);
 
+// these functions are centered around user interface
 int fractal_select_point(SDL_Surface *dest, struct fractal *frac, float x, float y);
 int fractal_select_modify(struct fractal *frac, float x, float y);
-
+void fractal_zoom(struct fractal *frac, float zoomFactor, float x, float y);
 

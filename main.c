@@ -226,9 +226,9 @@ int main(int argc, char *argv[]){
 			//--------------------------------------------------
 			else if(event.type == SDL_MOUSEWHEEL){
 				if(event.wheel.y > 0)
-					myFractal.zoom *= zoomFactor;
+					fractal_zoom(&myFractal, zoomFactor, x, y);
 				else
-					myFractal.zoom /= zoomFactor;
+					fractal_zoom(&myFractal, 1/zoomFactor, x, y);
 			}
 			
 			

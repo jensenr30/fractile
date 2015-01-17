@@ -589,4 +589,26 @@ int fractal_select_modify(struct fractal *frac, float x, float y)
 
 
 
-
+void fractal_zoom(struct fractal *frac, float zoomFactor, float x, float y)
+{
+	// make sure frac is a valid pointer
+	if(frac == NULL)
+	{
+		error("fractal_zoom() was sent a NULL frac poitner! Aborting function call.");
+		return;
+	}
+	
+	// adjust the zoom of the fractal
+	frac->zoom *= zoomFactor;
+	
+	// calculate the deltas between the <x,y> point of the fractal on the screen and the mouse click on the screen
+	float dx = frac->x - x;
+	float dy = frac->y - y;
+	// scale the deltas by the zoomFactor
+	dx *= zoomFactor;
+	dy *= zoomFactor;
+	// modify the position of the fractal on the screen such that the user will feel as though the zoom occurred centered on their mouse location
+	frac->x = x + dx;
+	frac->y = y + dy;
+	
+}
