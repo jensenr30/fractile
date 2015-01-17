@@ -120,7 +120,6 @@ int main(int argc, char *argv[]){
 	myFractal.shapes[0].x[1] = 10;
 	myFractal.shapes[0].y[1] = 10;
 	
-	myFractal.children[0].scale = 0.7;
 	myFractal.children[1].scale = decayFact*myFractal.children[0].scale;
 	myFractal.children[2].scale = decayFact*myFractal.children[1].scale;
 	myFractal.children[3].scale = decayFact*myFractal.children[2].scale;
