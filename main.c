@@ -158,7 +158,9 @@ int main(int argc, char *argv[]){
 	char modPart = 0;
 	// this is used to store a version of myFractal in
 	struct fractal myFractalOrig;
-	
+	//  this is used to point to the fractal that is being operated on
+	// (this will be set to myFractal or myFractalOrig depending on if the user is editing things or not)
+	struct fractal *fracOp;
 	
 	//--------------------------------------------------
 	// this is the fabled "main while() loop"
@@ -167,6 +169,17 @@ int main(int argc, char *argv[]){
 	//--------------------------------------------------
 	
 	while(quit == 0){
+		
+		// check to see which fractal structure will be operated on.
+		// this depends on whether or not the user is modifying a part or panning.
+		if(panning || modPart)
+		{
+			fracOp = &myFractalOrig;
+		}
+		else
+		{
+			fracOp = &myFractal;
+		}
 		
 		// reset all keystroke values
 		for(i=0; i<keysSize; i++){
@@ -226,9 +239,9 @@ int main(int argc, char *argv[]){
 			//--------------------------------------------------
 			else if(event.type == SDL_MOUSEWHEEL){
 				if(event.wheel.y > 0)
-					fractal_zoom(&myFractal, zoomFactor, x, y);
+					fractal_zoom(fracOp, zoomFactor, x, y);
 				else
-					fractal_zoom(&myFractal, 1/zoomFactor, x, y);
+					fractal_zoom(fracOp, 1/zoomFactor, x, y);
 			}
 			
 			
@@ -252,10 +265,10 @@ int main(int argc, char *argv[]){
 				}
 				switch(event.key.keysym.sym){
 				case SDLK_DOWN:
-					myFractal.iterations--;
+					fracOp->iterations--;
 					break;
 				case SDLK_UP:
-					myFractal.iterations++;
+					fracOp->iterations++;
 					break;
 				default:
 					break;
