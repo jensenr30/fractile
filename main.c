@@ -142,8 +142,8 @@ int main(int argc, char *argv[]){
 	myFractal.shapes[4].radius = 9;
 	
 	myFractal.children[0].twist = 0;
-	myFractal.children[1].twist = 120;
-	myFractal.children[2].twist = 30;
+	myFractal.children[1].twist = 395.2424;
+	myFractal.children[2].twist = -98.234;
 	
 	myFractal.children[0].scale = 0.4;
 	myFractal.children[1].scale = 0.8;
