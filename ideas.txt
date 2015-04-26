@@ -1,0 +1,13 @@
+//-----------------------------------------------------
+// HIGHLIGHTING
+//-----------------------------------------------------
+make the editable objects highlighted, but only when the mouse cursor is near them.
+In other words, when you place your mouse cursor close to or over a shape, highlight it somehow.
+I think it would be fantastic for the highlighting to fall off with the square of the distance between the cursor and the object.
+THE PURPOSE OF THIS is to make the user interface better.
+This will allow the user to move his mouse around the screen wildly and quickly locate the editable objects (shapes, children, origin, etc...)
+
+
+//-----------------------------------------------------
+// 
+//-----------------------------------------------------

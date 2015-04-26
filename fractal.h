@@ -45,13 +45,13 @@ Contents:
 #define FRACTAL_MAX_SHAPE_POINTS 	3
 
 // this is how many iterations fractals will have by default
-#define FRACTAL_DEFAULT_ITERATIONS				1500
-#define FRACTAL_DEFAULT_CHILDREN				1
-#define FRACTAL_DEFAULT_SHAPES					11
+#define FRACTAL_DEFAULT_ITERATIONS				5
+#define FRACTAL_DEFAULT_CHILDREN				2
+#define FRACTAL_DEFAULT_SHAPES					5
 #define FRACTAL_DEFAULT_ZOOM					1
-#define FRACTAL_DEFAULT_SCALE					0.99	//sqrt(0.5)
+#define FRACTAL_DEFAULT_SCALE					1.01	//sqrt(0.5)
 #define FRACTAL_DEFAULT_TWIST					0			// degrees
-#define FRACTAL_DEFAULT_CHILDREN_TWIST			11.5879204//9.53
+#define FRACTAL_DEFAULT_CHILDREN_TWIST			15//9.53
 #define FRACTAL_DEFAULT_ITERATIONS_CHILDREN		1
 
 // this is how big the circle is that is displayed where children are

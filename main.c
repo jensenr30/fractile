@@ -42,7 +42,7 @@ int main(int argc, char *argv[]){
 	if(SDL_Init(SDL_INIT_EVERYTHING) == -1) return -99;
 	
 		// set network window
-	myWindow = SDL_CreateWindow("FractalMap - Network Viewer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windW, windH, SDL_WINDOW_RESIZABLE);
+	myWindow = SDL_CreateWindow("Fractile 1.0", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windW, windH, SDL_WINDOW_RESIZABLE);
 	myRenderer = SDL_CreateRenderer(myWindow, -1, 0);
 	
 	if(myWindow == NULL){
@@ -114,12 +114,42 @@ int main(int argc, char *argv[]){
 	// set the fractal to default.
 	fractal_set_default(&myFractal);
 	float decayFact = 0.7;
-	myFractal.shapes[0].type = fst_line;
+	
+	myFractal.numberOfChildren = 3;
+	myFractal.shapes[0].type = fst_circle;
+	myFractal.shapes[0].radius = 15;
 	myFractal.shapes[0].x[0] = 0;
 	myFractal.shapes[0].y[0] = 0;
 	myFractal.shapes[0].x[1] = 10;
 	myFractal.shapes[0].y[1] = 10;
+	myFractal.shapes[0].color = 0xFF003322;
 	
+	myFractal.shapes[1].type = fst_circle;
+	myFractal.shapes[1].radius = 5;
+	myFractal.shapes[1].color = 0xFF003344;
+	
+	myFractal.shapes[2].type = fst_circle;
+	myFractal.shapes[2].radius = 12;
+	myFractal.shapes[2].color = 0xFF004466;
+	myFractal.shapes[2].color = 0xFF006678;
+	
+	myFractal.shapes[3].type = fst_circle;
+	myFractal.shapes[3].radius = 3;
+	myFractal.shapes[3].color = 0xFF15668b;
+	
+	myFractal.shapes[4].color = 0xFF1933Af;
+	myFractal.shapes[4].type = fst_circle;
+	myFractal.shapes[4].radius = 9;
+	
+	myFractal.children[0].twist = 0;
+	myFractal.children[1].twist = 120;
+	myFractal.children[2].twist = 30;
+	
+	myFractal.children[0].scale = 0.4;
+	myFractal.children[1].scale = 0.8;
+	myFractal.children[2].scale = 0.717;
+	
+	/*
 	myFractal.children[1].scale = decayFact*myFractal.children[0].scale;
 	myFractal.children[2].scale = decayFact*myFractal.children[1].scale;
 	myFractal.children[3].scale = decayFact*myFractal.children[2].scale;
@@ -139,6 +169,7 @@ int main(int argc, char *argv[]){
 	myFractal.children[17].scale = decayFact*myFractal.children[16].scale;
 	myFractal.children[18].scale = decayFact*myFractal.children[17].scale;
 	myFractal.children[19].scale = decayFact*myFractal.children[18].scale;
+	*/
 	
 	float zoomFactor = 1.05;
 	
