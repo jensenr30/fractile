@@ -116,38 +116,38 @@ int main(int argc, char *argv[]){
 	float decayFact = 0.7;
 	
 	myFractal.numberOfChildren = 3;
+	myFractal.numberOfShapes = 4;
 	myFractal.shapes[0].type = fst_circle;
 	myFractal.shapes[0].radius = 15;
-	myFractal.shapes[0].x[0] = 0;
-	myFractal.shapes[0].y[0] = 0;
-	myFractal.shapes[0].x[1] = 10;
-	myFractal.shapes[0].y[1] = 10;
-	myFractal.shapes[0].color = 0xFF003322;
+	myFractal.shapes[0].x[0] = 10;
+	myFractal.shapes[0].y[0] = -10;
+	myFractal.shapes[0].color = 0xFF7f7f7f;
 	
 	myFractal.shapes[1].type = fst_circle;
 	myFractal.shapes[1].radius = 5;
-	myFractal.shapes[1].color = 0xFF003344;
+	myFractal.shapes[1].color = 0xFF5672b8;
 	
 	myFractal.shapes[2].type = fst_circle;
-	myFractal.shapes[2].radius = 12;
-	myFractal.shapes[2].color = 0xFF004466;
-	myFractal.shapes[2].color = 0xFF006678;
+	myFractal.shapes[2].color = 0xFF3388e0;
 	
 	myFractal.shapes[3].type = fst_circle;
-	myFractal.shapes[3].radius = 3;
-	myFractal.shapes[3].color = 0xFF15668b;
+	myFractal.shapes[3].radius = 14;
+	myFractal.shapes[3].color = 0xFFFFFFFF;
 	
-	myFractal.shapes[4].color = 0xFF1933Af;
+	myFractal.shapes[4].color = 0xFF3388e0;
 	myFractal.shapes[4].type = fst_circle;
-	myFractal.shapes[4].radius = 9;
+	myFractal.shapes[4].radius = 25;
+	
+	myFractal.shapes[5].type = fst_circle;
+	myFractal.shapes[5].color = 0xFF1144FF;
 	
 	myFractal.children[0].twist = 0;
-	myFractal.children[1].twist = 395.2424;
-	myFractal.children[2].twist = -98.234;
+	myFractal.children[1].twist = 0;
+	myFractal.children[2].twist = 0;
 	
-	myFractal.children[0].scale = 0.4;
+	myFractal.children[0].scale = 0.93;
 	myFractal.children[1].scale = 0.8;
-	myFractal.children[2].scale = 0.717;
+	myFractal.children[2].scale = sqrt(0.5);
 	
 	/*
 	myFractal.children[1].scale = decayFact*myFractal.children[0].scale;
@@ -297,6 +297,7 @@ int main(int argc, char *argv[]){
 				switch(event.key.keysym.sym){
 				case SDLK_DOWN:
 					fracOp->iterations--;
+					if(fracOp->iterations < 0) fracOp->iterations = 0;
 					break;
 				case SDLK_UP:
 					fracOp->iterations++;
@@ -410,6 +411,34 @@ int main(int argc, char *argv[]){
 				panning = 0;
 			}
 		}
+		
+		/*
+		// testing random movement in shapes
+		myFractal.children[0].x += rand_range_f(-5,5);
+		myFractal.children[0].y += rand_range_f(-5,5);
+		myFractal.children[1].x += rand_range_f(-5,5);
+		myFractal.children[1].y += rand_range_f(-5,5);
+		
+		
+		myFractal.shapes[0].x[0] += rand_range_f(-5,5);
+		myFractal.shapes[0].y[0] += rand_range_f(-5,5);
+		myFractal.shapes[1].x[0] += rand_range_f(-5,5);
+		myFractal.shapes[1].y[0] += rand_range_f(-5,5);
+		myFractal.shapes[2].x[0] += rand_range_f(-5,5);
+		myFractal.shapes[2].y[0] += rand_range_f(-5,5);
+		myFractal.shapes[3].x[0] += rand_range_f(-5,5);
+		myFractal.shapes[3].y[0] += rand_range_f(-5,5);
+		myFractal.shapes[4].x[0] += rand_range_f(-5,5);
+		myFractal.shapes[4].y[0] += rand_range_f(-5,5);
+		*/
+		
+		// testing automatic twist
+		int c;
+		for(c=0; c<myFractal.numberOfChildren; c++)
+		{
+			myFractal.children[c].twist += c*0.5 + 0.5;
+		}
+		
 		fractal_render_children(&myFractal, mySurface, 1);
 		// render the fractal
 		fractal_render(&myFractal, mySurface);
