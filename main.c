@@ -116,11 +116,12 @@ int main(int argc, char *argv[]){
 	float decayFact = 0.7;
 	
 	myFractal.numberOfChildren = 3;
-	myFractal.numberOfShapes = 4;
+	myFractal.numberOfShapes = 3;
+	myFractal.iterations = 5;
 	myFractal.shapes[0].type = fst_circle;
 	myFractal.shapes[0].radius = 15;
-	myFractal.shapes[0].x[0] = 10;
-	myFractal.shapes[0].y[0] = -10;
+	myFractal.shapes[0].x[0] = 0;
+	myFractal.shapes[0].y[0] = 200;
 	myFractal.shapes[0].color = 0xFF7f7f7f;
 	
 	myFractal.shapes[1].type = fst_circle;
@@ -141,12 +142,15 @@ int main(int argc, char *argv[]){
 	myFractal.shapes[5].type = fst_circle;
 	myFractal.shapes[5].color = 0xFF1144FF;
 	
+	myFractal.children[0].x = 0;
+	myFractal.children[0].y = 0;
+	
 	myFractal.children[0].twist = 0;
 	myFractal.children[1].twist = 0;
 	myFractal.children[2].twist = 0;
 	
-	myFractal.children[0].scale = 0.93;
-	myFractal.children[1].scale = 0.8;
+	myFractal.children[0].scale = sqrt(0.5);
+	myFractal.children[1].scale = sqrt(0.5);
 	myFractal.children[2].scale = sqrt(0.5);
 	
 	/*
@@ -436,7 +440,7 @@ int main(int argc, char *argv[]){
 		int c;
 		for(c=0; c<myFractal.numberOfChildren; c++)
 		{
-			myFractal.children[c].twist += c*0.5 + 0.5;
+			myFractal.children[c].twist += c*0.679842 + 0.29778;
 		}
 		
 		fractal_render_children(&myFractal, mySurface, 1);
