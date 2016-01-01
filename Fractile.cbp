@@ -60,6 +60,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="rand.h" />
+		<Unit filename="sidebar.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sidebar.h" />
 		<Unit filename="utilities.c">
 			<Option compilerVar="CC" />
 		</Unit>

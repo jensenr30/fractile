@@ -7,7 +7,7 @@
 #include "rand.h"
 #include <time.h>
 #include "fractal.h"
-
+#include "sidebar.h"
 
 #define MOUSE_BUTTONS 5
 
@@ -41,7 +41,7 @@ int main(int argc, char *argv[]){
 
 	if(SDL_Init(SDL_INIT_EVERYTHING) == -1) return -99;
 
-    // set network window
+	// set network window
 	myWindow = SDL_CreateWindow("Fractile 1.0", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windW, windH, SDL_WINDOW_RESIZABLE);
 	myRenderer = SDL_CreateRenderer(myWindow, -1, 0);
 
@@ -61,8 +61,8 @@ int main(int argc, char *argv[]){
 	SDL_SetRenderDrawColor(myRenderer, 0, 0, 0, 255);
 	SDL_RenderClear(myRenderer);
 	SDL_RenderPresent(myRenderer);
-
-
+	
+	
 	//--------------------------------------------------
 	// event handling
 	//--------------------------------------------------
@@ -84,9 +84,9 @@ int main(int argc, char *argv[]){
 	// these two 2-element arrays keep the data concerning the state of the right and left mouse buttons.
 	// EX:
 		// mouse[SDL_BUTTON_LEFT][0] is the CURRENT state of the LEFT mouse button
-		// mouse[SDL_BUTTON_LEFT][1] is the LAST    state of the LEFT mouse button
+		// mouse[SDL_BUTTON_LEFT][1] is the LAST	state of the LEFT mouse button
 		// mouse[SDL_BUTTON_RIGHT][0] is the CURRENT state of the RIGHT mouse button
-		// mouse[SDL_BUTTON_RIGHT][1] is the LAST    state of the RIGHT mouse button
+		// mouse[SDL_BUTTON_RIGHT][1] is the LAST	state of the RIGHT mouse button
 	int mouse[MOUSE_BUTTONS][2] = { {0,0}, {0,0}, {0,0}, {0,0}, {0,0} };
 
 	// this is similar to mouse. however, this is used to store where the user clicked when a particular mouse button was clicked.
@@ -115,21 +115,21 @@ int main(int argc, char *argv[]){
 	fractal_set_default(&myFractal);
 	float decayFact = 0.7;
 
-	myFractal.numberOfChildren = 1;
+	myFractal.numberOfChildren = 4;
 	myFractal.numberOfShapes = 3;
-	myFractal.iterations = 5000;
+	myFractal.iterations = 3;
 	myFractal.shapes[0].type = fst_line;
 	myFractal.shapes[0].radius = 15;
 	myFractal.shapes[0].x[0] = 0;
 	myFractal.shapes[0].y[0] = 200;
-	myFractal.shapes[0].color = 0xFFee3300;
+	myFractal.shapes[0].color = 0xFF39e583;
 
 	myFractal.shapes[1].type = fst_line;
 	myFractal.shapes[1].radius = 5;
-	myFractal.shapes[1].color = 0xFF770011;
+	myFractal.shapes[1].color = 0xFF39b9ea;
 
 	myFractal.shapes[2].type = fst_circle;
-	myFractal.shapes[2].color = 0xFFeecc11;
+	myFractal.shapes[2].color = 0xFF290be9;
 
 	myFractal.shapes[3].type = fst_circle;
 	myFractal.shapes[3].radius = 14;
@@ -145,11 +145,11 @@ int main(int argc, char *argv[]){
 	myFractal.children[0].x = 0;
 	myFractal.children[0].y = 0;
 
-	myFractal.children[0].twist = 1;
-	myFractal.children[1].twist = 60;
+	myFractal.children[0].twist = 35.0468;
+	myFractal.children[1].twist = 27.91;
 	myFractal.children[2].twist = 30;
 
-	myFractal.children[0].scale = 0.995;
+	myFractal.children[0].scale = 0.8;
 	myFractal.children[1].scale = sqrt(0.5);
 	myFractal.children[2].scale = sqrt(0.5);
 
@@ -176,7 +176,20 @@ int main(int argc, char *argv[]){
 	*/
 
 	float zoomFactor = 1.05;
-
+	
+	
+	
+	//--------------------------------------------------
+	// sidebar stuff
+	//--------------------------------------------------
+	// create sidebar
+	struct sidebar mySideBar;
+	// init sidebar
+	sidebar_init(&mySideBar);
+	// create a surface to print the sidebar onto.
+	SDL_Surface *mySideBarSurface = create_surface(mySideBar.rect.w, mySideBar.rect.h);
+	// point the sidebar at the fractal you are playing with
+	mySideBar.frac = &myFractal;
 
 	//--------------------------------------------------
 	// these variables are for panning / fractal part modification
@@ -436,22 +449,24 @@ int main(int argc, char *argv[]){
 		myFractal.shapes[4].y[0] += rand_range_f(-5,5);
 		*/
 
-        /*
+		/*
 		// testing automatic twist
 		int c;
 		for(c=0; c<myFractal.numberOfChildren; c++)
 		{
 			myFractal.children[c].twist += c*c + c*0.2679842 + 0.129778;
 		}
-        */
-        // render the child points
+		*/
+		// render the child points
 		fractal_render_children(&myFractal, mySurface, 3);
 
 		// render the fractal itself
 		fractal_render(&myFractal, mySurface);
-
-
-
+		
+		// render the sidebar
+		
+		sidebar_render(&mySideBar,mySideBarSurface);
+		
 		/*
 		// the following code tests the operation of the twist_xy function to ensure it works properly.
 		// the results should be a series of circles that twist around the center of the screen
