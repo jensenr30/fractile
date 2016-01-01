@@ -115,7 +115,7 @@ int main(int argc, char *argv[]){
 	fractal_set_default(&myFractal);
 	float decayFact = 0.7;
 
-	myFractal.numberOfChildren = 4;
+	myFractal.numberOfChildren = 2;
 	myFractal.numberOfShapes = 3;
 	myFractal.iterations = 3;
 	myFractal.shapes[0].type = fst_line;
@@ -128,7 +128,7 @@ int main(int argc, char *argv[]){
 	myFractal.shapes[1].radius = 5;
 	myFractal.shapes[1].color = 0xFF39b9ea;
 
-	myFractal.shapes[2].type = fst_circle;
+	myFractal.shapes[2].type = fst_line;
 	myFractal.shapes[2].color = 0xFF290be9;
 
 	myFractal.shapes[3].type = fst_circle;
@@ -145,13 +145,15 @@ int main(int argc, char *argv[]){
 	myFractal.children[0].x = 0;
 	myFractal.children[0].y = 0;
 
-	myFractal.children[0].twist = 35.0468;
-	myFractal.children[1].twist = 27.91;
+	myFractal.children[0].twist = 30;
+	myFractal.children[1].twist = 30;
 	myFractal.children[2].twist = 30;
+	myFractal.children[3].twist = 30;
 
-	myFractal.children[0].scale = 0.8;
+	myFractal.children[0].scale = sqrt(0.5);
 	myFractal.children[1].scale = sqrt(0.5);
 	myFractal.children[2].scale = sqrt(0.5);
+	myFractal.children[3].scale = sqrt(0.5);
 
 	/*
 	myFractal.children[1].scale = decayFact*myFractal.children[0].scale;
@@ -466,6 +468,8 @@ int main(int argc, char *argv[]){
 		// render the sidebar
 		
 		sidebar_render(&mySideBar,mySideBarSurface);
+		
+		SDL_BlitSurface(mySideBarSurface, NULL, mySurface, &mySideBar.rect );
 		
 		/*
 		// the following code tests the operation of the twist_xy function to ensure it works properly.
