@@ -10,38 +10,38 @@
 
 /// this returns the pixel data of a pixel at a certain point on a surface (color and alpha in an Uint32)
 Uint32 get_pixel(SDL_Surface *surface, int x, int y){
-    int bpp = surface->format->BytesPerPixel;
-    /* Here p is the address to the pixel we want to retrieve */
-    Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
+	int bpp = surface->format->BytesPerPixel;
+	/* Here p is the address to the pixel we want to retrieve */
+	Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
 	
-    switch(bpp) {
-    case 1:
-        return *p;
-        break;
+	switch(bpp) {
+	case 1:
+		return *p;
+		break;
 	
-    case 2:
-        return *(Uint16 *)p;
-        break;
+	case 2:
+		return *(Uint16 *)p;
+		break;
 	
-    case 3:
-        if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
-            return p[0] << 16 | p[1] << 8 | p[2];
-        else
-            return p[0] | p[1] << 8 | p[2] << 16;
-        break;
+	case 3:
+		if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
+			return p[0] << 16 | p[1] << 8 | p[2];
+		else
+			return p[0] | p[1] << 8 | p[2] << 16;
+		break;
 	
-    case 4:
-        return *(Uint32 *)p;
-        break;
+	case 4:
+		return *(Uint32 *)p;
+		break;
 	
-    default:
-        return 0;       /* shouldn't happen, but avoids warnings */
-    }
+	default:
+		return 0;	   /* shouldn't happen, but avoids warnings */
+	}
 }
 
 /// this sets's a pixel's data (color and alpha)
 void set_pixel(SDL_Surface *surf, int x, int y, Uint32 pixel){
-    Uint32 *p = (Uint32 *)( surf->pixels + (surf->pitch * y) + x*surf->format->BytesPerPixel );
+	Uint32 *p = (Uint32 *)( surf->pixels + (surf->pitch * y) + x*surf->format->BytesPerPixel );
 	*p = pixel;
 }
 
@@ -63,7 +63,7 @@ Uint32 color_mix_weighted(Uint32 color1, Uint32 color2, Uint32 weight1, Uint32 w
 	Uint32 alpha =		( ((color1>>24)&0xff)*weight1 + ((color2>>24)&0xff)*weight2 ) / (weight);
 	Uint32 red =		( ((color1>>16)&0xff)*weight1 + ((color2>>16)&0xff)*weight2 ) / (weight);
 	Uint32 green =		( ((color1>>8 )&0xff)*weight1 + ((color2>>8 )&0xff)*weight2 ) / (weight);
-	Uint32 blue =		( ((color1    )&0xff)*weight1 + ((color2    )&0xff)*weight2 ) / (weight);
+	Uint32 blue =		( ((color1	)&0xff)*weight1 + ((color2	)&0xff)*weight2 ) / (weight);
 	
 	// return the weighted, mixed color.
 	return (alpha<<24) | (red<<16) | (green<<8) | blue;
@@ -78,7 +78,7 @@ Uint32 color_mix_weighted_f(unsigned int color1, unsigned int color2, float weig
 	Uint32 alpha =		( ((color1>>24)&0xff)*weight1 + ((color2>>24)&0xff)*weight2 ) / (weight);
 	Uint32 red =		( ((color1>>16)&0xff)*weight1 + ((color2>>16)&0xff)*weight2 ) / (weight);
 	Uint32 green =		( ((color1>>8 )&0xff)*weight1 + ((color2>>8 )&0xff)*weight2 ) / (weight);
-	Uint32 blue =		( ((color1    )&0xff)*weight1 + ((color2    )&0xff)*weight2 ) / (weight);
+	Uint32 blue =		( ((color1	)&0xff)*weight1 + ((color2	)&0xff)*weight2 ) / (weight);
 	
 	// return the weighted, mixed color.
 	return (alpha<<24) | (red<<16) | (green<<8) | blue;
@@ -455,4 +455,26 @@ void draw_circle(SDL_Surface *dest, float x, float y, float radius, Uint32 color
 }
 
 
-
+/// this will tell if you if a point is within a rectangle
+// returns
+//	0	<x,y> is NOT within the given rectangle
+//	1	<x,y> IS	 within the given rectangle
+//	0	rect is NULL
+char within_rect(int x, int y,SDL_Rect *rect)
+{
+	
+	if(rect == NULL)
+	{
+		error("within_rect() was sent a NULL rect!");
+		return 0;
+	}
+	
+	if(x >= rect->x && y >= rect->y && x <= rect->x+rect->w && y <= rect->y+rect->h)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}

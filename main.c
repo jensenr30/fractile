@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "utilities.h"
 #include "graphics.h"
 #include "globals.h"
@@ -87,13 +88,14 @@ int main(int argc, char *argv[]){
 		// mouse[SDL_BUTTON_LEFT][1] is the LAST	state of the LEFT mouse button
 		// mouse[SDL_BUTTON_RIGHT][0] is the CURRENT state of the RIGHT mouse button
 		// mouse[SDL_BUTTON_RIGHT][1] is the LAST	state of the RIGHT mouse button
+		// etc...
 	int mouse[MOUSE_BUTTONS][2] = { {0,0}, {0,0}, {0,0}, {0,0}, {0,0} };
 
 	// this is similar to mouse. however, this is used to store where the user clicked when a particular mouse button was clicked.
 		// mouseClick[SDL_BUTTON_LEFT][0] is the x position where the user clicked the left  mouse button.
 		// mouseClick[SDL_BUTTON_LEFT][1] is the y position where the user clicked the left  mouse button.
 		// mouseClick[SDL_BUTTON_RIGHT][0] is the x position where the user clicked the RIGHT mouse button.
-	// etc...
+		// etc...
 	int mouseClick[MOUSE_BUTTONS][2] = { {0,0}, {0,0}, {0,0}, {0,0}, {0,0} };
 
 
@@ -111,12 +113,14 @@ int main(int argc, char *argv[]){
 	//--------------------------------------------------
 	// declare a fractal.
 	struct fractal myFractal;
+	// print the size of the fractal structure to file
+	gamelog_d("sizeof(struct fractal) (in bytes) = ",sizeof(struct fractal));
 	// set the fractal to default.
 	fractal_set_default(&myFractal);
-	float decayFact = 0.7;
+	//float decayFact = 0.7;
 
 	myFractal.numberOfChildren = 2;
-	myFractal.numberOfShapes = 3;
+	myFractal.numberOfShapes = 1;
 	myFractal.iterations = 3;
 	myFractal.shapes[0].type = fst_line;
 	myFractal.shapes[0].radius = 15;
@@ -128,7 +132,7 @@ int main(int argc, char *argv[]){
 	myFractal.shapes[1].radius = 5;
 	myFractal.shapes[1].color = 0xFF39b9ea;
 
-	myFractal.shapes[2].type = fst_line;
+	myFractal.shapes[2].type = fst_circle;
 	myFractal.shapes[2].color = 0xFF290be9;
 
 	myFractal.shapes[3].type = fst_circle;
@@ -145,12 +149,12 @@ int main(int argc, char *argv[]){
 	myFractal.children[0].x = 0;
 	myFractal.children[0].y = 0;
 
-	myFractal.children[0].twist = 30;
-	myFractal.children[1].twist = 30;
+	myFractal.children[0].twist = 0;
+	myFractal.children[1].twist = 0;
 	myFractal.children[2].twist = 30;
 	myFractal.children[3].twist = 30;
 
-	myFractal.children[0].scale = sqrt(0.5);
+	myFractal.children[0].scale =  sqrt(0.5);
 	myFractal.children[1].scale = sqrt(0.5);
 	myFractal.children[2].scale = sqrt(0.5);
 	myFractal.children[3].scale = sqrt(0.5);
@@ -236,132 +240,141 @@ int main(int argc, char *argv[]){
 			keys[i] = 0;
 		}
 		while(SDL_PollEvent(&event)){
+			
+			// if the event is NOT relevant to the sidebar,
+			if(!sidebar_evaluate(&mySideBar, &event))
+			{
+				//--------------------------------------------------
+				// if a mouse button is pressed,
+				//--------------------------------------------------
+				if(event.button.type == SDL_MOUSEBUTTONDOWN){
 
+					x = event.button.x;
+					y = event.button.y;
 
-			//--------------------------------------------------
-			// if a mouse button is pressed,
-			//--------------------------------------------------
-			if(event.button.type == SDL_MOUSEBUTTONDOWN){
+					// set mouse button states
+					if(event.button.button == SDL_BUTTON_LEFT){
+						// record that the left mouse button is down
+						mouse[SDL_BUTTON_LEFT][0] = 1;
+						// record where the left mouse button was clicked
+						mouseClick[SDL_BUTTON_LEFT][0] = x;
+						mouseClick[SDL_BUTTON_LEFT][1] = y;
+					}
 
-				x = event.button.x;
-				y = event.button.y;
+					else if(event.button.button == SDL_BUTTON_RIGHT){
+						// record that the right mouse button is down
+						mouse[SDL_BUTTON_RIGHT][0] = 1;
+						// record where the right mouse button was clicked
+						mouseClick[SDL_BUTTON_RIGHT][0] = x;
+						mouseClick[SDL_BUTTON_RIGHT][1] = y;
+					}
 
-				// set mouse button states
-				if(event.button.button == SDL_BUTTON_LEFT){
-					// record that the left mouse button is down
-					mouse[SDL_BUTTON_LEFT][0] = 1;
-					// record where the left mouse button was clicked
-					mouseClick[SDL_BUTTON_LEFT][0] = x;
-					mouseClick[SDL_BUTTON_LEFT][1] = y;
+					else if(event.button.button == SDL_BUTTON_MIDDLE){
+						// record that the middle mouse button is down
+						mouse[SDL_BUTTON_MIDDLE][0] = 1;
+						// record where the middle mouse button was clicked
+						mouseClick[SDL_BUTTON_MIDDLE][0] = x;
+						mouseClick[SDL_BUTTON_MIDDLE][1] = y;
+					}
 				}
 
-				else if(event.button.button == SDL_BUTTON_RIGHT){
-					// record that the right mouse button is down
-					mouse[SDL_BUTTON_RIGHT][0] = 1;
-					// record where the right mouse button was clicked
-					mouseClick[SDL_BUTTON_RIGHT][0] = x;
-					mouseClick[SDL_BUTTON_RIGHT][1] = y;
+
+				//--------------------------------------------------
+				// if a mouse button has been released,
+				//--------------------------------------------------
+				else if(event.type == SDL_MOUSEBUTTONUP){
+					// set mouse button states
+					if(event.button.button == SDL_BUTTON_LEFT) mouse[SDL_BUTTON_LEFT][0] = 0;
+					if(event.button.button == SDL_BUTTON_RIGHT) mouse[SDL_BUTTON_RIGHT][0] = 0;
+					if(event.button.button == SDL_BUTTON_MIDDLE) mouse[SDL_BUTTON_MIDDLE][0] = 0;
 				}
 
-				else if(event.button.button == SDL_BUTTON_MIDDLE){
-					// record that the middle mouse button is down
-					mouse[SDL_BUTTON_MIDDLE][0] = 1;
-					// record where the middle mouse button was clicked
-					mouseClick[SDL_BUTTON_MIDDLE][0] = x;
-					mouseClick[SDL_BUTTON_MIDDLE][1] = y;
+
+				//--------------------------------------------------
+				// if the mouse wheel is turned,
+				//--------------------------------------------------
+				else if(event.type == SDL_MOUSEWHEEL){
+					if(event.wheel.y > 0)
+						fractal_zoom(fracOp, zoomFactor, x, y);
+					else
+						fractal_zoom(fracOp, 1/zoomFactor, x, y);
+				}
+
+
+				//--------------------------------------------------
+				// if the mouse has moved,
+				//--------------------------------------------------
+				else if(event.type == SDL_MOUSEMOTION){
+					x = event.motion.x;
+					y = event.motion.y;
+				}
+
+
+				//--------------------------------------------------
+				// if a key has been pressed,
+				//--------------------------------------------------
+				else if(event.type == SDL_KEYDOWN){
+					if(event.key.keysym.sym >= 0){
+						// set that character, number, or letter to 1.
+						keys[(event.key.keysym.sym)%keysSize] = 1;
+						keysHeld[(event.key.keysym.sym)%keysSize] = 1;
+					}
+					switch(event.key.keysym.sym){
+					case SDLK_DOWN:
+						fracOp->iterations--;
+						if(fracOp->iterations < 0) fracOp->iterations = 0;
+						break;
+					case SDLK_UP:
+						fracOp->iterations++;
+						break;
+					default:
+						break;
+					}
+				}
+
+
+				//--------------------------------------------------
+				// if a key has been released,
+				//--------------------------------------------------
+				else if(event.type == SDL_KEYUP){
+					if(event.key.keysym.sym >= 0){
+						// set that character, number, or letter to 0.
+						keysHeld[(event.key.keysym.sym)%keysSize] = 0;
+					}
+				}
+
+
+				//--------------------------------------------------
+				// if there has been a window event
+				//--------------------------------------------------
+				else if(event.type == SDL_WINDOWEVENT ){
+					// if the window has been closed,
+					if(event.window.event == SDL_WINDOWEVENT_CLOSE){
+						quit = 1;
+					}
+					// if the window was resized,
+					if( event.window.event == SDL_WINDOWEVENT_RESIZED){
+						// the new window width and height need to be recorded
+						windW = event.window.data1;
+						windH = event.window.data2;
+						// also the surface needs to be changed right away
+						if(mySurface != NULL)SDL_FreeSurface(mySurface);
+						mySurface = create_surface(windW, windH);
+						
+						// we need to resize the height of the sidebar
+						mySideBar.rect.h = windH;
+						// the old sidebar surface will no longer serve us.
+						if(mySideBarSurface != NULL)SDL_FreeSurface(mySideBarSurface);
+						// create a new one with the proper dimensions.
+						mySideBarSurface = create_surface(mySideBar.rect.w, mySideBar.rect.h);
+					}
 				}
 			}
-
-
-			//--------------------------------------------------
-			// if a mouse button has been released,
-			//--------------------------------------------------
-			else if(event.type == SDL_MOUSEBUTTONUP){
-				// set mouse button states
-				if(event.button.button == SDL_BUTTON_LEFT) mouse[SDL_BUTTON_LEFT][0] = 0;
-				if(event.button.button == SDL_BUTTON_RIGHT) mouse[SDL_BUTTON_RIGHT][0] = 0;
-				if(event.button.button == SDL_BUTTON_MIDDLE) mouse[SDL_BUTTON_MIDDLE][0] = 0;
-			}
-
-
-			//--------------------------------------------------
-			// if the mouse wheel is turned,
-			//--------------------------------------------------
-			else if(event.type == SDL_MOUSEWHEEL){
-				if(event.wheel.y > 0)
-					fractal_zoom(fracOp, zoomFactor, x, y);
-				else
-					fractal_zoom(fracOp, 1/zoomFactor, x, y);
-			}
-
-
-			//--------------------------------------------------
-			// if the mouse has moved,
-			//--------------------------------------------------
-			else if(event.type == SDL_MOUSEMOTION){
-				x = event.motion.x;
-				y = event.motion.y;
-			}
-
-
-			//--------------------------------------------------
-			// if a key has been pressed,
-			//--------------------------------------------------
-			else if(event.type == SDL_KEYDOWN){
-				if(event.key.keysym.sym >= 0){
-					// set that character, number, or letter to 1.
-					keys[(event.key.keysym.sym)%keysSize] = 1;
-					keysHeld[(event.key.keysym.sym)%keysSize] = 1;
-				}
-				switch(event.key.keysym.sym){
-				case SDLK_DOWN:
-					fracOp->iterations--;
-					if(fracOp->iterations < 0) fracOp->iterations = 0;
-					break;
-				case SDLK_UP:
-					fracOp->iterations++;
-					break;
-				default:
-					break;
-				}
-			}
-
-
-			//--------------------------------------------------
-			// if a key has been released,
-			//--------------------------------------------------
-			else if(event.type == SDL_KEYUP){
-				if(event.key.keysym.sym >= 0){
-					// set that character, number, or letter to 0.
-					keysHeld[(event.key.keysym.sym)%keysSize] = 0;
-				}
-			}
-
-
-			//--------------------------------------------------
-			// if there has been a window event
-			//--------------------------------------------------
-			else if(event.type == SDL_WINDOWEVENT ){
-				// if the window has been closed,
-				if(event.window.event == SDL_WINDOWEVENT_CLOSE){
-					quit = 1;
-				}
-				// if the window was resized,
-				if( event.window.event == SDL_WINDOWEVENT_RESIZED){
-					// the new window width and height need to be recorded
-					windW = event.window.data1;
-					windH = event.window.data2;
-					// also the surface needs to be changed right away
-					if(mySurface != NULL)SDL_FreeSurface(mySurface);
-					mySurface = create_surface(windW, windH);
-				}
-			}
-
 
 			//--------------------------------------------------
 			// if there has been a quit event,
 			//--------------------------------------------------
-			else if(event.type == SDL_QUIT){
+			if(event.type == SDL_QUIT){
 				quit = 1;
 			}
 		}
@@ -456,9 +469,14 @@ int main(int argc, char *argv[]){
 		int c;
 		for(c=0; c<myFractal.numberOfChildren; c++)
 		{
-			myFractal.children[c].twist += c*c + c*0.2679842 + 0.129778;
+			myFractal.children[c].twist += 0.08;// c*0.2679842 + 0.129778;
 		}
 		*/
+		
+		myFractal.children[0].twist += 0.08;
+		myFractal.children[1].twist -= 0.132674;
+		
+		
 		// render the child points
 		fractal_render_children(&myFractal, mySurface, 3);
 

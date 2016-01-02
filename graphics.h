@@ -15,7 +15,7 @@ void draw_line(SDL_Surface *dest, float x1, float y1, float x2, float y2, float 
 void draw_circle(SDL_Surface *dest, float x, float y, float radius, Uint32 color);
 short draw_rect(SDL_Surface *dest, int x, int y, int w, int h, int borderThickness, Uint32 colorBorder, Uint32 colorFill, char doFill);
 void draw_pixel(SDL_Surface *dest, int x, int y, Uint32 color);
-
+char within_rect(int x, int y, SDL_Rect *rect);
 
 // this returns a even mixture of color1 and color2
 #define color_mix(color1, color2) ( ((((0xff000000&color1)>>1)+((0xff000000&color2)>>1))&0xff000000) | ((((0xff0000&color1)+(0xff0000&color2))>>1)&0xff0000) | ((((0xff00&color1)+(0xff00&color2))>>1)&0xff00) | ((((0xff&color1)+(0xff&color2))>>1)&0xff) )
