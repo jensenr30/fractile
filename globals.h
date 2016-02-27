@@ -10,5 +10,6 @@ SDL_Event event;
 
 typedef unsigned char byte;
 
+
 unsigned int windW;
 unsigned int windH;

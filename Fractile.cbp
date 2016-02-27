@@ -34,7 +34,7 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Linker>
-			<Add option="-lmingw32 -lSDL2main -lSDL2 -lwinmm -lSDL2_image" />
+			<Add option="-lmingw32 -lSDL2main -lSDL2 -lwinmm -lSDL2_image -lSDL2_ttf" />
 		</Linker>
 		<Unit filename="fractal.c">
 			<Option compilerVar="CC" />

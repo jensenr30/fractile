@@ -118,6 +118,10 @@ int sidebar_render(struct sidebar *sb, SDL_Surface *dest)
 		b++;
 	}
 	
+	
+	
+	
+	
 	return 0;
 }
 

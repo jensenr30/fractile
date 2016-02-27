@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -11,6 +12,9 @@
 #include "sidebar.h"
 
 #define MOUSE_BUTTONS 5
+
+// the font that is used for most stuff
+TTF_Font *font = NULL;
 
 
 int main(int argc, char *argv[]){
@@ -63,6 +67,28 @@ int main(int argc, char *argv[]){
 	SDL_RenderClear(myRenderer);
 	SDL_RenderPresent(myRenderer);
 	
+	
+	//--------------------------------------------------
+	// load the font
+	//--------------------------------------------------
+	//Initialize SDL_ttf
+    if( TTF_Init() == -1 )
+    {
+        return -13;    
+    }
+    
+    //Open the font
+    font = TTF_OpenFont( "absender1.ttf", 24 );
+    
+	//If there was an error in loading the font
+    if( font == NULL )
+    {
+        return -14;
+    }
+    // render a test surface
+    SDL_Surface* message = NULL;
+    SDL_Color textColor = {230,230,230};
+    message = TTF_RenderText_Blended(font, "1 2 3 4 5 6 7 8 9 0 The quick brown fox jumps over the lazy dog", textColor);
 	
 	//--------------------------------------------------
 	// event handling
@@ -120,7 +146,7 @@ int main(int argc, char *argv[]){
 	//float decayFact = 0.7;
 	
 	myFractal.numberOfChildren = 2;
-	myFractal.numberOfShapes = 4;
+	myFractal.numberOfShapes = 1;
 	myFractal.iterations = 1;
 	myFractal.shapes[0].type = fst_line;
 	myFractal.shapes[0].radius = 15;
@@ -146,13 +172,22 @@ int main(int argc, char *argv[]){
 	myFractal.shapes[5].type = fst_circle;
 	myFractal.shapes[5].color = 0xFF1144FF;
 	
-	myFractal.children[0].x = 0;
+	myFractal.children[0].x = -100;
 	myFractal.children[0].y = 0;
+	
+	myFractal.children[1].x = 100;
+	myFractal.children[1].y = 0;
+	
+	myFractal.children[2].x = 20;
+	myFractal.children[2].y = 0;
+	
+	myFractal.children[3].x = 30;
+	myFractal.children[3].y = 0;
 	
 	myFractal.children[0].twist = 0;
 	myFractal.children[1].twist = 0;
-	myFractal.children[2].twist = 30;
-	myFractal.children[3].twist = 30;
+	myFractal.children[2].twist = 0;
+	myFractal.children[3].twist = 0;
 	
 	myFractal.children[0].scale = sqrt(0.5);
 	myFractal.children[1].scale = sqrt(0.5);
@@ -482,10 +517,13 @@ int main(int argc, char *argv[]){
 		}
 		*/
 		
-		myFractal.children[0].twist += 0.3643885;
-		myFractal.children[1].twist -= 0.525564;
-		myFractal.children[2].twist -= 0.7992432;
-		
+		//myFractal.children[0].twist += 0.3643885;
+		//myFractal.children[1].twist -= 0.525564;
+		//myFractal.children[2].twist -= 0.7992432;
+		myFractal.children[0].twist -= 0.2;
+		myFractal.children[1].twist += 0.2;
+		myFractal.children[2].twist += 0.3;
+		myFractal.children[3].twist += 0.3;
 		
 		// render the child points
 		fractal_render_children(&myFractal, mySurface, 3);
@@ -519,11 +557,21 @@ int main(int argc, char *argv[]){
 		
 		
 		//--------------------------------------------------
+		// testing font creation
+		//--------------------------------------------------
+		SDL_Rect testRect;
+		testRect.x = 23;
+		testRect.y = 4;
+		testRect.w = message->w;
+		testRect.h = message->h;
+		SDL_BlitSurface(message, NULL, mySurface, &testRect);
+		
+		
+		//--------------------------------------------------
 		// this area of the code puts whatever was rendered
 		// into mySurface onto the screen for the user to see
 		//--------------------------------------------------
 		
-		// generate texture for the block network
 		myTexture = SDL_CreateTextureFromSurface(myRenderer, mySurface);
 		// if the user does not want the image to persist,
 		if(!persist)
