@@ -15,7 +15,7 @@ struct sidebar
 	
 	
 	//--------------------------------------------------------------------------
-	// These buttons span the width of the sidebar
+	// These buttons are at the top of the sidebar and span its width
 	//--------------------------------------------------------------------------
 	
 	// this indicates the user's position in the top buttons.
@@ -27,7 +27,7 @@ struct sidebar
 	// this is the width of the left << and right >> buttons.
 	unsigned int topButtonsLeftRightWidth;
 	// this is the width of the buttons borders (pixels)
-	unsigned int topButtonsBorder;
+	//unsigned int topButtonsBorder;
 	
 	
 	// this points to the fractal whose information is being displayed in the sidebar
@@ -58,4 +58,4 @@ struct sidebar
 
 int sidebar_render(struct sidebar *sb, SDL_Surface *dest);
 int sidebar_init(struct sidebar *sb);
-int sidebar_evaluate(struct sidebar *sb, SDL_Event *event);
+int sidebar_evaluate(struct sidebar *sb, SDL_Event *event, uint16_t x, uint16_t y);
