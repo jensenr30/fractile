@@ -32,7 +32,7 @@ int sidebar_init(struct sidebar *sb)
 	sb->topButtonsHeight = 24;
 	sb->topButtonsWidth = 24;
 	sb->topButtonsLeftRightWidth = 16;
-	//sb->topButtonsBorder = 1;
+	sb->buttonsBorder = 1;
 	
 	// set the fractal to NULL
 	sb->frac = NULL;
@@ -78,10 +78,45 @@ int sidebar_render(struct sidebar *sb, SDL_Surface *dest)
 	genrect.h = sb->topButtonsHeight;
 	SDL_FillRect(dest, &genrect, sb->colorButtonsBorder);
 	
+	// print the << left arrow button background
+	genrect.x = 0 + sb->buttonsBorder;
+	genrect.y = 0 + sb->buttonsBorder;
+	genrect.w = sb->topButtonsLeftRightWidth - 2*sb->buttonsBorder;
+	genrect.h = sb->topButtonsHeight - 2*sb->buttonsBorder;
+	SDL_FillRect(dest, &genrect, sb->colorButtonsBG);
+	
+	// print the >> right arrow button
+	genrect.x = sb->rect.w - sb->topButtonsLeftRightWidth + sb->buttonsBorder;
+	genrect.y = 0 + sb->buttonsBorder;
+	genrect.w = sb->topButtonsLeftRightWidth - 2*sb->buttonsBorder;
+	genrect.h = sb->topButtonsHeight - 2*sb->buttonsBorder;
+	SDL_FillRect(dest, &genrect, sb->colorButtonsBG);
+	
 	// calculate how many top buttons can fit between the left and right top buttons.
-	int b = (sb->rect.w - sb->topButtonsLeftRightWidth*2)/sb->topButtonsWidth;
+	uint8_t topButtonsFit = (sb->rect.w - sb->topButtonsLeftRightWidth*2)/sb->topButtonsWidth;
+	uint8_t b = 0;
 	
+	// print buttons for children
+	while(b < topButtonsFit && b < sb->frac->numberOfChildren)
+	{
+		genrect.x = sb->topButtonsLeftRightWidth + b*sb->topButtonsWidth + sb->buttonsBorder;
+		genrect.y = 0 + sb->buttonsBorder;
+		genrect.w = sb->topButtonsWidth - 2*sb->buttonsBorder;
+		genrect.h = sb->topButtonsHeight - 2*sb->buttonsBorder;
+		SDL_FillRect(dest, &genrect, sb->colorButtonsBG);
+		b++;
+	}
 	
+	// print buttons for the shapes
+	while(b < topButtonsFit && b < sb->frac->numberOfChildren + sb->frac->numberOfShapes)
+	{
+		genrect.x = sb->topButtonsLeftRightWidth + b*sb->topButtonsWidth + sb->buttonsBorder;
+		genrect.y = 0 + sb->buttonsBorder;
+		genrect.w = sb->topButtonsWidth - 2*sb->buttonsBorder;
+		genrect.h = sb->topButtonsHeight - 2*sb->buttonsBorder;
+		SDL_FillRect(dest, &genrect, sb->colorButtonsBG);
+		b++;
+	}
 	
 	return 0;
 }

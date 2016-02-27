@@ -119,8 +119,8 @@ int main(int argc, char *argv[]){
 	fractal_set_default(&myFractal);
 	//float decayFact = 0.7;
 	
-	myFractal.numberOfChildren = 4;
-	myFractal.numberOfShapes = 1;
+	myFractal.numberOfChildren = 2;
+	myFractal.numberOfShapes = 4;
 	myFractal.iterations = 1;
 	myFractal.shapes[0].type = fst_line;
 	myFractal.shapes[0].radius = 15;

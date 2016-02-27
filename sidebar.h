@@ -26,9 +26,6 @@ struct sidebar
 	unsigned int topButtonsWidth;
 	// this is the width of the left << and right >> buttons.
 	unsigned int topButtonsLeftRightWidth;
-	// this is the width of the buttons borders (pixels)
-	//unsigned int topButtonsBorder;
-	
 	
 	// this points to the fractal whose information is being displayed in the sidebar
 	struct fractal *frac;
@@ -50,6 +47,11 @@ struct sidebar
 	uint32_t colorButtonsBG;
 	// this is the border color of all the buttons
 	uint32_t colorButtonsBorder;
+	
+	// this is the width of the buttons borders (pixels)
+	// this does not change the size of the buttons or the hit-box area.
+	// this only specifies the color border inside each button to make it look nicer
+	unsigned int buttonsBorder;
 	
 };
 
