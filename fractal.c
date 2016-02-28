@@ -64,32 +64,36 @@ void fractal_render_iteration(struct fractal *frac, SDL_Surface *dest, int itera
 	int i;
 	float tx[FRACTAL_MAX_SHAPE_POINTS];
 	float ty[FRACTAL_MAX_SHAPE_POINTS];
-	// render all the shapes. this is where the magic happens
-	for(i=0; i<frac->numberOfShapes; i++)
-	{
-		// draw a line between <x[0],y[0]> and <x[1],y[1]>
-		switch(frac->shapes[i].type)
-		{
-			case fst_circle:
-				twist_xy(frac->shapes[i].x[0], frac->shapes[i].y[0], twist, &tx[0], &ty[0]);
-				draw_circle(dest, x + tx[0]*scale, y + ty[0]*scale, frac->shapes[i].radius*scale, frac->shapes[i].color);
-				break;
-			
-			case fst_line:
-				twist_xy(frac->shapes[i].x[0], frac->shapes[i].y[0], twist, &tx[0], &ty[0]);
-				twist_xy(frac->shapes[i].x[1], frac->shapes[i].y[1], twist, &tx[1], &ty[1]);
-				draw_line(dest, x + tx[0]*scale, y + ty[0]*scale, x + tx[1]*scale, y + ty[1]*scale, frac->shapes[i].radius*scale, frac->shapes[i].color);
-				break;
-			
-			default:
-			case fst_pixel:
-				twist_xy(frac->shapes[i].x[0], frac->shapes[i].y[0], twist, &tx[0], &ty[0]);
-				draw_pixel(dest, (x + tx[0]*scale)+0.5, (y + ty[0]*scale)+0.5, frac->shapes[i].color);
-				break;
-		}
-		
-	}
 	
+	// if this is the iteration the user wants to print
+	if(iteration == 3)
+	{
+		// render all the shapes. this is where the magic happens
+		for(i=0; i<frac->numberOfShapes; i++)
+		{
+			// draw a line between <x[0],y[0]> and <x[1],y[1]>
+			switch(frac->shapes[i].type)
+			{
+				case fst_circle:
+					twist_xy(frac->shapes[i].x[0], frac->shapes[i].y[0], twist, &tx[0], &ty[0]);
+					draw_circle(dest, x + tx[0]*scale, y + ty[0]*scale, frac->shapes[i].radius*scale, frac->shapes[i].color);
+					break;
+				
+				case fst_line:
+					twist_xy(frac->shapes[i].x[0], frac->shapes[i].y[0], twist, &tx[0], &ty[0]);
+					twist_xy(frac->shapes[i].x[1], frac->shapes[i].y[1], twist, &tx[1], &ty[1]);
+					draw_line(dest, x + tx[0]*scale, y + ty[0]*scale, x + tx[1]*scale, y + ty[1]*scale, frac->shapes[i].radius*scale, frac->shapes[i].color);
+					break;
+				
+				default:
+				case fst_pixel:
+					twist_xy(frac->shapes[i].x[0], frac->shapes[i].y[0], twist, &tx[0], &ty[0]);
+					draw_pixel(dest, (x + tx[0]*scale)+0.5, (y + ty[0]*scale)+0.5, frac->shapes[i].color);
+					break;
+			}
+			
+		}
+	}
 	// if this iteration is not supposed to be the last iteration,
 	if(iteration < frac->iterations)
 	{

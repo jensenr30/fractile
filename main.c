@@ -13,8 +13,7 @@
 
 #define MOUSE_BUTTONS 5
 
-// the font that is used for most stuff
-TTF_Font *font = NULL;
+
 
 
 int main(int argc, char *argv[]){
@@ -43,9 +42,20 @@ int main(int argc, char *argv[]){
 	
 	sgenrand(time(NULL));
 	
+	// initialize all SDL stuff
+	if(SDL_Init(SDL_INIT_EVERYTHING) == -1)
+	{
+		error("SDL_Init() failed!");
+		return -99;
+	}
 	
-	if(SDL_Init(SDL_INIT_EVERYTHING) == -1) return -99;
-	
+	//Initialize SDL_ttf
+    if( TTF_Init() == -1 )
+    {
+    	error("TTF_Init() failed!");
+    	return -13;
+    }
+    
 	// set network window
 	myWindow = SDL_CreateWindow("Fractile 1.0", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windW, windH, SDL_WINDOW_RESIZABLE);
 	myRenderer = SDL_CreateRenderer(myWindow, -1, 0);
@@ -68,27 +78,43 @@ int main(int argc, char *argv[]){
 	SDL_RenderPresent(myRenderer);
 	
 	
-	//--------------------------------------------------
-	// load the font
-	//--------------------------------------------------
-	//Initialize SDL_ttf
-    if( TTF_Init() == -1 )
-    {
-        return -13;    
-    }
-    
-    //Open the font
-    font = TTF_OpenFont( "absender1.ttf", 24 );
-    
-	//If there was an error in loading the font
-    if( font == NULL )
-    {
-        return -14;
-    }
-    // render a test surface
-    SDL_Surface* message = NULL;
-    SDL_Color textColor = {230,230,230};
-    message = TTF_RenderText_Blended(font, "1 2 3 4 5 6 7 8 9 0 The quick brown fox jumps over the lazy dog", textColor);
+	
+//	//--------------------------------------------------
+//	// load the font
+//	//--------------------------------------------------
+//	//Initialize SDL_ttf
+//    if( TTF_Init() == -1 )
+//    {
+//        return -13;    
+//    }
+//    
+//    //Open the font
+//    char *fontName = "absender1.ttf";
+//    font = TTF_OpenFont( fontName, 24 );
+//    
+//	//If there was an error in loading the font
+//    if( font == NULL )
+//    {
+//    	error_s("could not open font, ",fontName);
+//        return -14;
+//    }
+//    // render a test surface
+//    SDL_Surface* message = NULL;
+//    SDL_Color textColor = {230,230,230};
+//    message = TTF_RenderText_Blended(font, "1 2 3 4 5 6 7 8 9 0 The quick brown fox jumps over the lazy dog", textColor);
+//	
+//	// render all 10 digits (0 through 9) so that they are ready to go when they are needed.
+//	uint8_t n;
+//	char myStr[2] = "0";
+//	for(n = 0; n < 10; n++)
+//	{
+//		myStr[0] = '0' + n;
+//		numbers[n] = TTF_RenderText_Blended(font, myStr, textColor);
+//	}
+//	
+//	// render the letter 'F' so it is ready to go
+//	letterF = TTF_RenderText_Blended(font, "F", textColor);
+	
 	
 	//--------------------------------------------------
 	// event handling
@@ -145,9 +171,9 @@ int main(int argc, char *argv[]){
 	fractal_set_default(&myFractal);
 	//float decayFact = 0.7;
 	
-	myFractal.numberOfChildren = 2;
+	myFractal.numberOfChildren = 1;
 	myFractal.numberOfShapes = 1;
-	myFractal.iterations = 1;
+	myFractal.iterations = 20000;
 	myFractal.shapes[0].type = fst_line;
 	myFractal.shapes[0].radius = 15;
 	myFractal.shapes[0].x[0] = 0;
@@ -189,7 +215,7 @@ int main(int argc, char *argv[]){
 	myFractal.children[2].twist = 0;
 	myFractal.children[3].twist = 0;
 	
-	myFractal.children[0].scale = sqrt(0.5);
+	myFractal.children[0].scale = 0.98;//sqrt(0.5);
 	myFractal.children[1].scale = sqrt(0.5);
 	myFractal.children[2].scale = sqrt(0.5);
 	myFractal.children[3].scale = sqrt(0.5);
@@ -556,16 +582,24 @@ int main(int argc, char *argv[]){
 		
 		
 		
-		//--------------------------------------------------
-		// testing font creation
-		//--------------------------------------------------
-		SDL_Rect testRect;
-		testRect.x = 23;
-		testRect.y = 4;
-		testRect.w = message->w;
-		testRect.h = message->h;
-		SDL_BlitSurface(message, NULL, mySurface, &testRect);
-		
+//		//--------------------------------------------------
+//		// testing font creation
+//		//--------------------------------------------------
+//		SDL_Rect testRect;
+//		testRect.x = 23;
+//		testRect.y = 4;
+//		testRect.w = message->w;
+//		testRect.h = message->h;
+//		SDL_BlitSurface(message, NULL, mySurface, &testRect);
+//		
+//		for(n = 0; n < 10; n++)
+//		{
+//			testRect.x = 25*n;
+//			testRect.y = 50*n;
+//			testRect.w = numbers[n]->w;
+//			testRect.h = numbers[n]->h;
+//			SDL_BlitSurface(numbers[n], NULL, mySurface, &testRect);
+//		}
 		
 		//--------------------------------------------------
 		// this area of the code puts whatever was rendered
@@ -632,7 +666,7 @@ int main(int argc, char *argv[]){
 	// clean up all SDL subsystems and other non-SDL systems and global memory.
 	clean_up();
 	
-	
+	gamelog("Program exiting normally.");
 	return 0;
 }
 

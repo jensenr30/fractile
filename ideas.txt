@@ -3,11 +3,81 @@
 //-----------------------------------------------------
 make the editable objects highlighted, but only when the mouse cursor is near them.
 In other words, when you place your mouse cursor close to or over a shape, highlight it somehow.
-I think it would be fantastic for the highlighting to fall off with the square of the distance between the cursor and the object.
+I think it would be fantastic for the highlighting to fall off
+with the square of the distance between the cursor and the object.
 THE PURPOSE OF THIS is to make the user interface better.
-This will allow the user to move his mouse around the screen wildly and quickly locate the editable objects (shapes, children, origin, etc...)
+This will allow the user to move his mouse around the screen
+wildly and quickly locate the editable objects (shapes, children, origin, etc...)
 
 
 //-----------------------------------------------------
-// 
+// Persistence 
 //-----------------------------------------------------
+
+allow the user to control the persistence of the color
+initial playing around:
+	at the moment the user can either turn this ON or OFF.
+	The image either persists for an eternity, or it doesn't persist at all.
+	This is very easy to implement.
+
+Better persistence feature:
+allow the user to specify persistence as:
+- no persistence (each frame is totally seperate)
+- full persistence (each frame is written to the screen in succession with no reset/decay)
+- some persistence (periodically, the screen is overwritten with the background color at some level of alpha.
+Details on some persistence:
+allow a decay time for image data
+this could perhaps be accomplished by periodically printing the entire screen
+with the background color with a very low alpha (high opacity).
+e.g., if the background color is black, you would print a fully black screen with high alpha:
+0x01000000
+RED = 0, GREEN = 0, BLUE = 0, ALPHA = 1.
+By controlling the alpha and the rate at which this background is printed,
+you can control the speed at which the image decays.
+It should be noted that this type of control should constitute an infinite-impulse response filter.
+Although, it may work out that because of the discrete values for color, the result may end up being a finite-impulse response.
+Or, if after a color is printed,
+this successive low-alpha overwriting can never return the color of a pixel back to its original background color,
+it may be classified as an infinite impulse response filter just by the virtue that the color might never return to normal,
+although the transient would probably have to settle eventually...
+But I digress.
+
+Using the better persistence feature, it would avoid having to keep a backlog of the frames that were just printed.
+
+Alternative better persistence feature:
+If we want to keep everything in terms of being on a per-frame basis, we could adopt the following parameters:
+- uint32_t screenBlankColor	= 0xAARRGGBB;
+- uint32_t screenBlankPeriod = 1;
+screenBlankColor is the color that is used to blank the screen.
+From the user's perspective, they want to have control of the:
+- color (which will be called the "background color")
+- alpha (which will be called the "transparency").
+alternatively, the user could control (255 - alpha) by controlling a parameter called opacity.
+
+These parameters should probably fit in the fractal structure.
+
+
+//-----------------------------------------------------
+// Automatic rotation 
+//-----------------------------------------------------
+
+The children must have an automatic rotation parameter in units of degrees per frame.
+It would also be fitting to give them a phase control which would be measured in terms of the phase the children start with at the first frame of the program.
+
+//-----------------------------------------------------
+// Automatic scaling
+//-----------------------------------------------------
+
+similar to automatic rotation, automatic scaling would be some kind of automated control of the scale of a child.
+It could vary sinusoidally I suppose.
+One could specify two values which the scaling must fall between
+
+
+
+//-----------------------------------------------------
+// Flip about one axis
+//-----------------------------------------------------
+
+It would be neat to be able to have (on a per-child basis) the option to flip the fractal about an arbitrary axis.
+flipping about both axes would do the same thing as rotating by 180 degrees, I think.
+But just a single axis could add another level of complexity to the program (and slowness too :P).

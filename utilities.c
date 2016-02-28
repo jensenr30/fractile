@@ -42,6 +42,19 @@ void error_f(char *errstr, float data){
 	}
 }
 
+// this will log an error message and a floating point number to the error file
+void error_s(char *errstr, char *data){
+	// open error log file 
+	FILE *fp = fopen(ERROR_FILE,ERROR_FILE_MODE);
+	// if the error file is valid,
+	if(fp != NULL){
+		// write error log to error file
+		fprintf( fp, ERROR_FORMAT_S, ERROR_TIMESTAMP, errstr, data );
+		// close error fille
+		fclose(fp);
+	}
+}
+
 
 void gamelog(char *gamestr){
 	FILE *fp = fopen(GAMELOG_FILE, GAMELOG_FILE_MODE);
