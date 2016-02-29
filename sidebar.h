@@ -97,7 +97,27 @@ struct sidebar
 	SDL_Surface *font1Numbers[10];
 	// This will point to a surface that will always have the letter F rendered on it.
 	SDL_Surface *font1LetterF;
-
+	// this is the offset to apply when printing font1
+	int16_t font1OffsetX;
+	int16_t font1OffsetY;
+	
+	//--------------------------------------------------------------------------
+	// font2 is used for general text / messages / whatever in the sidebar
+	//--------------------------------------------------------------------------
+	
+	// the font that is used for general text
+	TTF_Font *font2;
+	// this points to a string which contains the path of the font you want to use.
+	// this points to a .ttf file.
+	char *font2Path;
+	// this is the font size
+	uint16_t font2Size;
+	// this is the color of the font
+	uint32_t font2Color;
+	// this is the offset to apply when printing font2
+	int16_t font2OffsetX;
+	int16_t font2OffsetY;
+	
 	
 };
 
@@ -105,6 +125,6 @@ struct sidebar
 
 
 int sidebar_init(struct sidebar *sb);
-int sidebar_load_font_and_pre_render(struct sidebar *sb);
+int sidebar_load_fonts(struct sidebar *sb);
 int sidebar_render(struct sidebar *sb, SDL_Surface *dest);
 int sidebar_evaluate(struct sidebar *sb, SDL_Event *event, uint16_t x, uint16_t y);

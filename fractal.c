@@ -66,7 +66,7 @@ void fractal_render_iteration(struct fractal *frac, SDL_Surface *dest, int itera
 	float ty[FRACTAL_MAX_SHAPE_POINTS];
 	
 	// if this is the iteration the user wants to print
-	if(iteration == 3)
+	if(1)//iteration == 0 || iteration == 3)
 	{
 		// render all the shapes. this is where the magic happens
 		for(i=0; i<frac->numberOfShapes; i++)

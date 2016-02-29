@@ -25,3 +25,8 @@ Uint32 color_mix_weighted(unsigned int color1, unsigned int color2, unsigned int
 Uint32 color_mix_weighted_f(unsigned int color1, unsigned int color2, float weight1, float weight2);
 
 //short print_camera_view(SDL_Surface *dest, struct cameraData *cam);
+
+#define getColorRed(x)		( (x & 0x00FF0000) >> 16 )
+#define getColorGreen(x)	( (x & 0x0000FF00) >>  8 )
+#define getColorBlue(x)		( (x & 0x000000FF) >>  0 )
+#define getColorAlpha(x)	( (x & 0xFF000000) >> 24 )

@@ -171,16 +171,16 @@ int main(int argc, char *argv[]){
 	fractal_set_default(&myFractal);
 	//float decayFact = 0.7;
 	
-	myFractal.numberOfChildren = 1;
-	myFractal.numberOfShapes = 1;
-	myFractal.iterations = 20000;
-	myFractal.shapes[0].type = fst_line;
+	myFractal.numberOfChildren = 2;
+	myFractal.numberOfShapes = 4;
+	myFractal.iterations = 2;
+	myFractal.shapes[0].type = fst_pixel;
 	myFractal.shapes[0].radius = 15;
 	myFractal.shapes[0].x[0] = 0;
-	myFractal.shapes[0].y[0] = 200;
-	myFractal.shapes[0].color = 0xFF6F20FF;
+	myFractal.shapes[0].y[0] = 0;
+	myFractal.shapes[0].color = 0xFFFF0000;
 	
-	myFractal.shapes[1].type = fst_circle;
+	myFractal.shapes[1].type = fst_pixel;
 	myFractal.shapes[1].radius = 5;
 	myFractal.shapes[1].color = 0xFF00FF00;
 	
@@ -200,22 +200,30 @@ int main(int argc, char *argv[]){
 	
 	myFractal.children[0].x = -100;
 	myFractal.children[0].y = 0;
+	myFractal.shapes[0].x[0] = -100;
+	myFractal.shapes[0].y[0] = 0;
 	
 	myFractal.children[1].x = 100;
 	myFractal.children[1].y = 0;
+	myFractal.shapes[1].x[0] = 100;
+	myFractal.shapes[1].y[0] = 0;
 	
-	myFractal.children[2].x = 20;
-	myFractal.children[2].y = 0;
+	myFractal.children[2].x = 0;
+	myFractal.children[2].y = -100;
+	myFractal.shapes[2].x[0] = 0;
+	myFractal.shapes[2].y[0] = -100;
 	
-	myFractal.children[3].x = 30;
-	myFractal.children[3].y = 0;
+	myFractal.children[3].x = 0;
+	myFractal.children[3].y = 100;
+	myFractal.shapes[3].x[0] = 0;
+	myFractal.shapes[3].y[0] = 100;
 	
 	myFractal.children[0].twist = 0;
 	myFractal.children[1].twist = 0;
 	myFractal.children[2].twist = 0;
 	myFractal.children[3].twist = 0;
 	
-	myFractal.children[0].scale = 0.98;//sqrt(0.5);
+	myFractal.children[0].scale = sqrt(0.5);
 	myFractal.children[1].scale = sqrt(0.5);
 	myFractal.children[2].scale = sqrt(0.5);
 	myFractal.children[3].scale = sqrt(0.5);
@@ -257,7 +265,8 @@ int main(int argc, char *argv[]){
 	SDL_Surface *mySideBarSurface = create_surface(mySideBar.rect.w, mySideBar.rect.h);
 	// point the sidebar at the fractal you are playing with
 	mySideBar.frac = &myFractal;
-	
+	// load the fonts that the sidebar will use
+	sidebar_load_fonts(&mySideBar);
 	
 	//--------------------------------------------------
 	// these variables are for panning / fractal part modification
@@ -546,10 +555,10 @@ int main(int argc, char *argv[]){
 		//myFractal.children[0].twist += 0.3643885;
 		//myFractal.children[1].twist -= 0.525564;
 		//myFractal.children[2].twist -= 0.7992432;
-		myFractal.children[0].twist -= 0.2;
-		myFractal.children[1].twist += 0.2;
-		myFractal.children[2].twist += 0.3;
-		myFractal.children[3].twist += 0.3;
+		myFractal.children[0].twist += 0.2;
+		myFractal.children[1].twist -= 0.4;
+		myFractal.children[2].twist -= 0.2;
+		myFractal.children[3].twist += 0.2;
 		
 		// render the child points
 		fractal_render_children(&myFractal, mySurface, 3);

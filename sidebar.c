@@ -7,8 +7,8 @@
 
 
 
-/// This will modify a sidebar struct and set the default values.
-// returns 
+/// This will set a sidebar struct to the default values.
+// returns:
 //	0	operation success
 //	-1	NULL sb pointer
 int sidebar_init(struct sidebar *sb)
@@ -44,6 +44,19 @@ int sidebar_init(struct sidebar *sb)
 	// set the default button border color
 	sb->colorTopButtonsBorder = 0xFFa0a0a0;
 	
+	// the font used for topButtons
+	sb->font1Path = "Inconsolata-Bold.ttf";			// path to the font
+	sb->font1Size = sb->topButtonsHeight;			// size of the font
+	sb->font1Color = 0xFF000000;					// color (0xAARRGGBB)
+	sb->font1OffsetX = 5;							// x offset (pixels)
+	sb->font1OffsetY = -2;							// y offset (pixels)
+	
+	// the font used for general text
+	sb->font2Path = "Inconsolata-Regular.ttf";		// path to the font
+	sb->font2Size = 10;								// size of the font
+	sb->font1Color = 0xFF000000;					// color (0xAARRGGBB)
+	sb->font2OffsetX = 5;							// x offset (pixels)
+	sb->font2OffsetY = -2;							// y offset (pixels)
 	
 	// successfully initialized the sidebar
 	return 0;
@@ -57,7 +70,10 @@ int sidebar_init(struct sidebar *sb)
 // returns:
 // 0	operation success
 // -1	bad sb pointer
-// -2	couldn't render letter 'F'
+// -2	could not open font1
+// -3	could not open font2
+
+// -9	couldn't render letter 'F'
 // -10	couldn't render number 0
 // -11	couldn't render number 1
 // -12	couldn't render number 2
@@ -69,37 +85,60 @@ int sidebar_init(struct sidebar *sb)
 // -18	couldn't render number 8
 // -19	couldn't render number 9
 
-int sidebar_load_font_and_pre_render(struct sidebar *sb)
+int sidebar_load_fonts(struct sidebar *sb)
 {
-//    //Open the font
-//    char *fontName = "absender1.ttf";
-//    font = TTF_OpenFont( sb->, 24 );
-//    
-//	//If there was an error in loading the font
-//    if( font == NULL )
-//    {
-//    	error_s("could not open font, ",fontName);
-//        return -14;
-//    }
-//    // render a test surface
-//    SDL_Surface* message = NULL;
-//    SDL_Color textColor = {230,230,230};
-//    message = TTF_RenderText_Blended(font, "1 2 3 4 5 6 7 8 9 0 The quick brown fox jumps over the lazy dog", textColor);
-//	
-//	// render all 10 digits (0 through 9) so that they are ready to go when they are needed.
-//	uint8_t n;
-//	char myStr[2] = "0";
-//	for(n = 0; n < 10; n++)
-//	{
-//		myStr[0] = '0' + n;
-//		numbers[n] = TTF_RenderText_Blended(font, myStr, textColor);
-//	}
-//	
-//	// render the letter 'F' so it is ready to go
-//	letterF = TTF_RenderText_Blended(font, "F", textColor);
-//	
-//	// success
-//	return 0;
+	// make sure the sb is valid
+    if(sb == NULL)
+	{
+		error("sidebar_load_fonts() was sent a NULL sb pointer!");
+		return -1;
+	}
+	
+	// attempt to open font1
+    sb->font1 = TTF_OpenFont( sb->font1Path, sb->font1Size );
+	//If there was an error in loading the font
+    if( sb->font1 == NULL )
+    {
+    	error_s("could not open font1, ",sb->font1Path);
+        return -2;
+    }
+    
+    // get the color and put in into an SDL_Color format
+    SDL_Color textColor;
+    textColor.r = getColorRed(sb->font1Color);
+    textColor.g = getColorGreen(sb->font1Color);
+    textColor.b = getColorBlue(sb->font1Color);
+    textColor.a = getColorAlpha(sb->font1Color);
+	// render all 10 digits (0 through 9) so that they are ready to go when they are needed.
+	uint8_t n;
+	char myStr[2] = "0";
+	for(n = 0; n < 10; n++)
+	{
+		myStr[0] = '0' + n;
+		sb->font1Numbers[n] = TTF_RenderText_Blended(sb->font1, myStr, textColor);
+		// make sure the error is reported
+		if(sb->font1Numbers[n] == NULL)
+		{
+			error_d("sidebar_load_fonts() using font1 could not render number ",n);
+			return -10-n;
+		}
+	}
+	
+	// render the letter 'F' so it is ready to go
+	sb->font1LetterF = TTF_RenderText_Blended(sb->font1, "F", textColor);
+	
+	
+    // attempt to open font2
+    sb->font2 = TTF_OpenFont( sb->font2Path, sb->font2Size );
+	//If there was an error in loading the font
+    if( sb->font2 == NULL )
+    {
+    	error_s("could not open font2, ",sb->font2Path);
+        return -3;
+    }
+	
+	// success
+	return 0;
 }
 
 
@@ -173,21 +212,33 @@ int sidebar_render(struct sidebar *sb, SDL_Surface *dest)
 		b++;
 	}
 	
-	// print buttons for the shapes
+	// print shapes for the buttons
+	genrect.y = 0 + sb->buttonsBorder;
+	genrect.w = sb->topButtonsWidth - 2*sb->buttonsBorder;
+	genrect.h = sb->topButtonsHeight - 2*sb->buttonsBorder;
 	while(b < topButtonsFit && b < sb->frac->numberOfChildren + sb->frac->numberOfShapes)
 	{
 		genrect.x = sb->topButtonsLeftRightWidth + b*sb->topButtonsWidth + sb->buttonsBorder;
-		genrect.y = 0 + sb->buttonsBorder;
-		genrect.w = sb->topButtonsWidth - 2*sb->buttonsBorder;
-		genrect.h = sb->topButtonsHeight - 2*sb->buttonsBorder;
 		SDL_FillRect(dest, &genrect, sb->colorTopButtonsBG);
 		b++;
 	}
 	
+	// test print the 'F'
+	genrect.y = 0 + sb->buttonsBorder + sb->font1OffsetY;
+	genrect.w = sb->topButtonsWidth - 2*sb->buttonsBorder;
+	genrect.h = sb->topButtonsHeight - 2*sb->buttonsBorder;
+	genrect.x = sb->topButtonsLeftRightWidth + 0*sb->topButtonsWidth + sb->buttonsBorder + sb->font1OffsetX;
+	SDL_BlitSurface(sb->font1LetterF, NULL, dest, &genrect);
 	
-	
-	// print the text over the buttons
-	
+	// test printing numbers over topButtons
+	for(b = 1; b < 7; b++)
+	{
+		genrect.y = 0 + sb->buttonsBorder + sb->font1OffsetY;
+		genrect.w = sb->topButtonsWidth - 2*sb->buttonsBorder;
+		genrect.h = sb->topButtonsHeight - 2*sb->buttonsBorder;
+		genrect.x = sb->topButtonsLeftRightWidth + b*sb->topButtonsWidth + sb->buttonsBorder + sb->font1OffsetX;
+		SDL_BlitSurface(sb->font1Numbers[b], NULL, dest, &genrect);
+	}
 	
 	
 	// success

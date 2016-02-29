@@ -1,0 +1,3 @@
+This is the source of the Inconsolata font:
+https://github.com/google/fonts/tree/master/ofl/inconsolata
+2016-02-28
