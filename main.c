@@ -41,8 +41,8 @@ int main(int argc, char *argv[]){
 	SDL_Surface *mySurface = create_surface(windW, windH);
 	SDL_Texture *fadeTexture = NULL;
 	SDL_Surface *fadeSurface = create_surface(windW, windH);	// this is a surface used to fade out old mySurface data. It is used to allow persistence of image.
-	uint8_t fadeAlpha = 0x10;
-	uint32_t fadeEverySoManyFrames = 5;							// this specifies how often a fade is performed. This allows the decay rate to be dragged out even longer than minimum non-zero alpha value. This says, every this many frames, the fade is done once.
+	uint8_t fadeAlpha = 0x20;
+	uint32_t fadeEverySoManyFrames = 2;							// this specifies how often a fade is performed. This allows the decay rate to be dragged out even longer than minimum non-zero alpha value. This says, every this many frames, the fade is done once.
 	uint32_t fadeFrames = 0;									// this is the frame fade counter. It keeps track of when fades need to be performed.
 	SDL_FillRect(fadeSurface, NULL, (fadeAlpha<<24) );			// this specifies the color data of the surface. the first 8 bits are the alpha value. the rest should all be zeros so that it is black.
 	
@@ -184,26 +184,27 @@ int main(int argc, char *argv[]){
 	fractal_set_default(&myFractal);
 	//float decayFact = 0.7;
 	
-	myFractal.numberOfChildren = 3;
+	myFractal.numberOfChildren = 1;
 	myFractal.numberOfShapes = 1;
-	myFractal.iterations = 3;
-	myFractal.shapes[0].type = fst_line;
+	myFractal.iterations = 10000;
+	myFractal.shapes[0].type = fst_circle;
 	myFractal.shapes[0].x[0] = -200;
 	myFractal.shapes[0].y[0] =  200;
 	myFractal.shapes[0].x[1] = -203;
 	myFractal.shapes[0].y[1] =  217;
-	myFractal.shapes[0].radius = 15;
-	myFractal.shapes[0].color = 0xFFFF0000;
+	myFractal.shapes[0].radius = 18;
+	myFractal.shapes[0].color = 0xFF6Fc030;
 	
-	myFractal.shapes[1].type = fst_pixel;
-	myFractal.shapes[1].radius = 5;
-	myFractal.shapes[1].color = 0xFF9f9f00;
+	myFractal.shapes[1].type = fst_circle;
+	myFractal.shapes[1].radius = 15;
+	myFractal.shapes[1].color = 0xFF7f7f00;
 	
-	myFractal.shapes[2].type = fst_pixel;
-	myFractal.shapes[2].color = 0xFF780045;
+	myFractal.shapes[2].type = fst_circle;
+	myFractal.shapes[2].radius = 10;
+	myFractal.shapes[2].color = 0xFFfca000;
 	
 	myFractal.shapes[3].type = fst_pixel;
-	myFractal.shapes[3].radius = 14;
+	myFractal.shapes[3].radius = 5;
 	myFractal.shapes[3].color = 0xFFab3411;
 	
 	myFractal.shapes[4].color = 0xFFff8840;
@@ -232,12 +233,12 @@ int main(int argc, char *argv[]){
 	myFractal.shapes[3].y[0] = 100;
 	*/
 	
-	myFractal.children[0].twist = 0;
+	myFractal.children[0].twist = -3;
 	myFractal.children[1].twist = 0;
 	myFractal.children[2].twist = 0;
 	myFractal.children[3].twist = 0;
 	
-	myFractal.children[0].scale = sqrt(0.5);
+	myFractal.children[0].scale = 0.998;//sqrt(0.5);
 	myFractal.children[1].scale = sqrt(0.5);
 	myFractal.children[2].scale = sqrt(0.5);
 	myFractal.children[3].scale = sqrt(0.5);
@@ -575,9 +576,9 @@ int main(int argc, char *argv[]){
 		//myFractal.children[0].twist += 0.3643885;
 		//myFractal.children[1].twist -= 0.525564;
 		//myFractal.children[2].twist -= 0.7992432;
-		myFractal.children[0].twist += 0.5678;//rand_range_f(-5,5);
-		myFractal.children[1].twist -= 0.135;
-		myFractal.children[2].twist -= 0.3468;
+		myFractal.children[0].twist += 0.01;0.6;//rand_range_f(-5,5);
+		myFractal.children[1].twist -= 0.3;
+		myFractal.children[2].twist -= 0.15;
 		myFractal.children[3].twist += 0.2;
 		
 		// render the child points
