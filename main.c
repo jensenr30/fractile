@@ -39,7 +39,20 @@ int main(int argc, char *argv[]){
 	SDL_Renderer *myRenderer = NULL;
 	SDL_Texture *myTexture = NULL;
 	SDL_Surface *mySurface = create_surface(windW, windH);
+	SDL_Texture *fadeTexture = NULL;
+	SDL_Surface *fadeSurface = create_surface(windW, windH);	// this is a surface used to fade out old mySurface data. It is used to allow persistence of image.
+	uint8_t fadeAlpha = 0x10;
+	uint32_t fadeEverySoManyFrames = 5;							// this specifies how often a fade is performed. This allows the decay rate to be dragged out even longer than minimum non-zero alpha value. This says, every this many frames, the fade is done once.
+	uint32_t fadeFrames = 0;									// this is the frame fade counter. It keeps track of when fades need to be performed.
+	SDL_FillRect(fadeSurface, NULL, (fadeAlpha<<24) );			// this specifies the color data of the surface. the first 8 bits are the alpha value. the rest should all be zeros so that it is black.
 	
+	// these things are not currently useful.
+	// I am doing things the (probably) wrong way by doing ablitsurface where the whole surface is black with some level of alpha.
+	fadeTexture = SDL_CreateTextureFromSurface(myRenderer, fadeSurface);
+	SDL_SetTextureAlphaMod(myTexture, fadeAlpha);
+	SDL_SetTextureBlendMode(myTexture, SDL_BLENDMODE_BLEND);
+	
+	// get a random seed based on the current time. This prevents the random numbers that are generated from being the same "random" numbers each time the program is started.
 	sgenrand(time(NULL));
 	
 	// initialize all SDL stuff
@@ -171,38 +184,38 @@ int main(int argc, char *argv[]){
 	fractal_set_default(&myFractal);
 	//float decayFact = 0.7;
 	
-	myFractal.numberOfChildren = 2;
-	myFractal.numberOfShapes = 4;
-	myFractal.iterations = 2;
-	myFractal.shapes[0].type = fst_pixel;
+	myFractal.numberOfChildren = 3;
+	myFractal.numberOfShapes = 1;
+	myFractal.iterations = 3;
+	myFractal.shapes[0].type = fst_line;
+	myFractal.shapes[0].x[0] = -200;
+	myFractal.shapes[0].y[0] =  200;
+	myFractal.shapes[0].x[1] = -203;
+	myFractal.shapes[0].y[1] =  217;
 	myFractal.shapes[0].radius = 15;
-	myFractal.shapes[0].x[0] = 0;
-	myFractal.shapes[0].y[0] = 0;
 	myFractal.shapes[0].color = 0xFFFF0000;
 	
 	myFractal.shapes[1].type = fst_pixel;
 	myFractal.shapes[1].radius = 5;
-	myFractal.shapes[1].color = 0xFF00FF00;
+	myFractal.shapes[1].color = 0xFF9f9f00;
 	
 	myFractal.shapes[2].type = fst_pixel;
-	myFractal.shapes[2].color = 0xFF290be9;
+	myFractal.shapes[2].color = 0xFF780045;
 	
 	myFractal.shapes[3].type = fst_pixel;
 	myFractal.shapes[3].radius = 14;
-	myFractal.shapes[3].color = 0xFFFFFFFF;
+	myFractal.shapes[3].color = 0xFFab3411;
 	
-	myFractal.shapes[4].color = 0xFF3388e0;
-	myFractal.shapes[4].type = fst_line;
+	myFractal.shapes[4].color = 0xFFff8840;
+	myFractal.shapes[4].type = fst_pixel;//fst_line;
 	myFractal.shapes[4].radius = 25;
 	
-	myFractal.shapes[5].type = fst_circle;
-	myFractal.shapes[5].color = 0xFF1144FF;
+	myFractal.shapes[5].type = fst_pixel;//fst_circle;
+	myFractal.shapes[5].color = 0xFFaa5588;
 	
 	myFractal.children[0].x = -100;
 	myFractal.children[0].y = 0;
-	myFractal.shapes[0].x[0] = -100;
-	myFractal.shapes[0].y[0] = 0;
-	
+	/*
 	myFractal.children[1].x = 100;
 	myFractal.children[1].y = 0;
 	myFractal.shapes[1].x[0] = 100;
@@ -217,6 +230,7 @@ int main(int argc, char *argv[]){
 	myFractal.children[3].y = 100;
 	myFractal.shapes[3].x[0] = 0;
 	myFractal.shapes[3].y[0] = 100;
+	*/
 	
 	myFractal.children[0].twist = 0;
 	myFractal.children[1].twist = 0;
@@ -287,7 +301,7 @@ int main(int argc, char *argv[]){
 	// (this will be set to myFractal or myFractalOrig depending on if the user is editing things or not)
 	struct fractal *fracOp;
 	// this keeps track of wheter or not the user wants the image to persist
-	uint8_t persist = 0;
+	uint8_t persist = 1;
 	
 	//--------------------------------------------------
 	// this is the fabled "main while() loop"
@@ -434,9 +448,15 @@ int main(int argc, char *argv[]){
 						// the new window width and height need to be recorded
 						windW = event.window.data1;
 						windH = event.window.data2;
-						// also the surface needs to be changed right away
+						// also the surface needs to be resized right away
 						if(mySurface != NULL)SDL_FreeSurface(mySurface);
 						mySurface = create_surface(windW, windH);
+						
+						// also the fade surface needs to be resized right away
+						if(fadeSurface != NULL)SDL_FreeSurface(fadeSurface);
+						fadeSurface = create_surface(windW, windH);
+						SDL_FillRect(fadeSurface, NULL, (fadeAlpha<<24) );			// this specifies the color data of the surface. the first 8 bits are the alpha value. the rest should all be zeros so that it is black.
+	
 						
 						// we need to resize the height of the sidebar
 						mySideBar.rect.h = windH;
@@ -555,9 +575,9 @@ int main(int argc, char *argv[]){
 		//myFractal.children[0].twist += 0.3643885;
 		//myFractal.children[1].twist -= 0.525564;
 		//myFractal.children[2].twist -= 0.7992432;
-		myFractal.children[0].twist += 0.2;
-		myFractal.children[1].twist -= 0.4;
-		myFractal.children[2].twist -= 0.2;
+		myFractal.children[0].twist += 0.5678;//rand_range_f(-5,5);
+		myFractal.children[1].twist -= 0.135;
+		myFractal.children[2].twist -= 0.3468;
 		myFractal.children[3].twist += 0.2;
 		
 		// render the child points
@@ -623,8 +643,38 @@ int main(int argc, char *argv[]){
 			if(mySurface != NULL)SDL_FreeSurface(mySurface);
 			mySurface = create_surface(windW, windH);
 		}
+		
+		//--------------------------------------------------
+		// Perform fading routine
+		//--------------------------------------------------
+		
+		// if you are supposed to fade on this frame,
+		if(fadeFrames == 0)
+		{
+			// apply the fading surface
+			SDL_BlitSurface(fadeSurface, NULL,mySurface,NULL);
+		}
+		
+		// record that another frame has gone by for the fade counter
+		fadeFrames++;
+		// if you have waited the desired amount,
+		if(fadeFrames >= fadeEverySoManyFrames)
+		{
+			// reset the fade counter and be sure to fade the next time
+			fadeFrames = 0;
+		}
+		
+		
+		//--------------------------------------------------
+		// Render Texture -> Screen
+		//--------------------------------------------------
+		
 		// render the mySurface to the myWindow
 		SDL_RenderCopy(myRenderer, myTexture, NULL, NULL);
+		
+		// fade it a little bit
+		//SDL_RenderCopy(myRenderer, fadeTexture, NULL, NULL);
+		
 		if(myTexture != NULL)SDL_DestroyTexture(myTexture);
 		// display the renderer's result on the screen and clear it when done
 		SDL_RenderPresent(myRenderer);
