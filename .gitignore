@@ -3,7 +3,8 @@
 Fractile.layout
 Fractile.depend
 
-*.exe
+bin/DebugWin/Fractile.exe
+bin/ReleaseWin/Fractile.exe
 *.o
 
 *stderr.txt
