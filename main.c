@@ -184,9 +184,9 @@ int main(int argc, char *argv[]){
 	fractal_set_default(&myFractal);
 	//float decayFact = 0.7;
 	
-	myFractal.numberOfChildren = 1;
-	myFractal.numberOfShapes = 1;
-	myFractal.iterations = 10000;
+	myFractal.numberOfChildren = 2;
+	myFractal.numberOfShapes = 2;
+	myFractal.iterations = 3;
 	myFractal.shapes[0].type = fst_circle;
 	myFractal.shapes[0].x[0] = -200;
 	myFractal.shapes[0].y[0] =  200;
@@ -233,7 +233,7 @@ int main(int argc, char *argv[]){
 	myFractal.shapes[3].y[0] = 100;
 	*/
 	
-	myFractal.children[0].twist = -3;
+	myFractal.children[0].twist = 180;
 	myFractal.children[1].twist = 0;
 	myFractal.children[2].twist = 0;
 	myFractal.children[3].twist = 0;
@@ -576,10 +576,10 @@ int main(int argc, char *argv[]){
 		//myFractal.children[0].twist += 0.3643885;
 		//myFractal.children[1].twist -= 0.525564;
 		//myFractal.children[2].twist -= 0.7992432;
-		myFractal.children[0].twist += 0.01;0.6;//rand_range_f(-5,5);
-		myFractal.children[1].twist -= 0.3;
-		myFractal.children[2].twist -= 0.15;
-		myFractal.children[3].twist += 0.2;
+		myFractal.children[0].twist += 0.2;//rand_range_f(-5,5);
+		myFractal.children[1].twist -= 0.2;
+		myFractal.children[2].twist -= 1;
+		myFractal.children[3].twist += 1;
 		
 		// render the child points
 		fractal_render_children(&myFractal, mySurface, 3);
