@@ -1,4 +1,22 @@
-Fractile
-===========
+# Fractile
 
-This program uses SDL to generate custom fractals in a simple and (hopefully) lightweight manor. 
+Design and render fractals in real time using SDL 2.
+
+## 2023 Refactor
+
+- [ ] fractal.c
+- [ ] fractal.h
+- [ ] globals.h
+- [ ] graphics.c
+- [ ] graphics.h
+- [ ] main.c
+- [ ] mt19937int.c
+- [ ] mt19937int.h
+- [ ] my_math.c
+- [ ] my_math.h
+- [ ] rand.c
+- [ ] rand.h
+- [ ] sidebar.c
+- [ ] sidebar.h
+- [ ] utilities.c
+- [ ] utilities.h
