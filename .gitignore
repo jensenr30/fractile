@@ -16,3 +16,6 @@ bin/DebugWin/gamelog.txt
 bin/ReleaseWin/error.txt
 bin/ReleaseWin/gamelog.txt
 screenshots/Fractile 1.0 screenshots.zip
+
+build/
+
