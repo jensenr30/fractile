@@ -16,7 +16,7 @@
 // scale allows the user to zoom in/out
 void fractal_render(struct fractal *frac, SDL_Surface *dest)
 {
-	
+
 	// check for NULL pointers for frac
 	if(frac == NULL)
 	{
@@ -41,14 +41,21 @@ void fractal_render(struct fractal *frac, SDL_Surface *dest)
 		error_d("fractal_render() was sent a frac with numberOfChildren > FRACTAL_MAX_CHILDREN. This will be automatically corrected. numberOfChildren was equal to ",frac->numberOfChildren);
 		frac->numberOfChildren = FRACTAL_MAX_CHILDREN;
 	}
-	
-	
-	
+
+
+
 	// call the first iteration. from here, all of the other iterations will be recursively called.
 	fractal_render_iteration(frac, dest, 0, frac->x, frac->y, frac->zoom, frac->twist);
-	
+
 }
 
+
+// TODO: fractal_render_iteration() is a top-down approach.  What is needed is a bottom-up approach
+// which renders individual pieces of the fractal, then uses those renderings to create a composite
+// rendering of the next-higher node in the hierarchy, all the way to the origin.
+// RE: TODO: Or, perhaps it would be best to calculate all the nodes in the fractal first, then walk
+// through the nodes to determine the most efficient way of rendering the fractal using hardware
+// acceleration.
 
 /// this will draw a single iteration of the fractal.
 // this function is recursive. It will call itself again to render its children.
@@ -64,7 +71,7 @@ void fractal_render_iteration(struct fractal *frac, SDL_Surface *dest, int itera
 	int i;
 	float tx[FRACTAL_MAX_SHAPE_POINTS];
 	float ty[FRACTAL_MAX_SHAPE_POINTS];
-	
+
 	// if this is the iteration the user wants to print
 	if(1)//iteration == 0 || iteration == 3)
 	{
@@ -78,20 +85,20 @@ void fractal_render_iteration(struct fractal *frac, SDL_Surface *dest, int itera
 					twist_xy(frac->shapes[i].x[0], frac->shapes[i].y[0], twist, &tx[0], &ty[0]);
 					draw_circle(dest, x + tx[0]*scale, y + ty[0]*scale, frac->shapes[i].radius*scale, frac->shapes[i].color);
 					break;
-				
+
 				case fst_line:
 					twist_xy(frac->shapes[i].x[0], frac->shapes[i].y[0], twist, &tx[0], &ty[0]);
 					twist_xy(frac->shapes[i].x[1], frac->shapes[i].y[1], twist, &tx[1], &ty[1]);
 					draw_line(dest, x + tx[0]*scale, y + ty[0]*scale, x + tx[1]*scale, y + ty[1]*scale, frac->shapes[i].radius*scale, frac->shapes[i].color);
 					break;
-				
+
 				default:
 				case fst_pixel:
 					twist_xy(frac->shapes[i].x[0], frac->shapes[i].y[0], twist, &tx[0], &ty[0]);
 					draw_pixel(dest, (x + tx[0]*scale)+0.5, (y + ty[0]*scale)+0.5, frac->shapes[i].color);
 					break;
 			}
-			
+
 		}
 	}
 	// if this iteration is not supposed to be the last iteration,
@@ -106,7 +113,7 @@ void fractal_render_iteration(struct fractal *frac, SDL_Surface *dest, int itera
 			fractal_render_iteration(frac, dest, iteration + 1, x + tx[0]*scale, y + ty[0]*scale, frac->children[i].scale*scale, twist + frac->children[i].twist);
 		}
 	}
-	
+
 }
 
 /// this will take a point <x,y> and rotate it around 0 by twist degrees
@@ -116,11 +123,11 @@ void fractal_render_iteration(struct fractal *frac, SDL_Surface *dest, int itera
 // NOTE: this function does NOT check for NULL x_ret, y_ret pointers. SO DON'T SEND IT ANY!
 void twist_xy(float x, float y, float twist, float *x_ret, float *y_ret)
 {
-	
+
 	float mag = sqrt(x*x + y*y);
-	
+
 	float ang;
-	
+
 	if(x != 0)
 	{
 		ang = atan(y/x);
@@ -139,29 +146,29 @@ void twist_xy(float x, float y, float twist, float *x_ret, float *y_ret)
 			ang = -1.570796;
 		}
 	}
-	
-	
-	
+
+
+
 	// convert twist to radians and add it to the angle
 	ang += twist*0.01745329252;
-	
+
 	// return the twisted x and y coordinates
 	*x_ret = mag*cos(ang);
 	*y_ret = mag*sin(ang);
-	
+
 }
 
 /// this function renders the children's placement as simple circles.
 // this allows the user to visually see where the fractal's "exit" points are. Where it will copy itself
 void fractal_render_children(struct fractal *frac, SDL_Surface *dest, int iterations)
 {
-	
+
 	int c;
 	for(c=0; c<frac->numberOfChildren; c++)
 	{
 		draw_circle(dest, frac->x + frac->children[c].x*frac->zoom, frac->y + frac->children[c].y*frac->zoom, FRACTAL_CHILDREN_DISPLAY_RADIUS*frac->zoom, 0xffffffff);
 	}
-	
+
 }
 
 
@@ -174,10 +181,10 @@ void fractal_set_default(struct fractal *frac)
 		error("fractal_set_default() was sent a NULL [frac] pointer! Aborting function call.");
 		return;
 	}
-	
+
 	// shape, child, pair.
 	int s,c,p;
-	
+
 	// for every shape in a fractal
 	for(s=0; s<FRACTAL_MAX_SHAPES; s++)
 	{
@@ -203,7 +210,7 @@ void fractal_set_default(struct fractal *frac)
 		frac->children[c].y = 200*sin(3.1415*2*c/((float)FRACTAL_MAX_CHILDREN));	// "
 		frac->children[c].scale = FRACTAL_DEFAULT_SCALE;							// default scale
 		frac->children[c].twist = FRACTAL_DEFAULT_CHILDREN_TWIST;					// default twist for children
-	
+
 	}
 	// set defaults for other things
 	frac->iterations = FRACTAL_DEFAULT_ITERATIONS;					// default iterations
@@ -237,7 +244,7 @@ int fractal_select_copy(struct fractalSelect *source, struct fractalSelect *dest
 		error("fractal_select_copy() was sent a NULL [dest] pointer. Aborting function call.");
 		return -2;
 	}
-	
+
 	int s,sp;
 	// for every shape,
 	for(s=0; s<FRACTAL_MAX_SHAPES; s++)
@@ -251,7 +258,7 @@ int fractal_select_copy(struct fractalSelect *source, struct fractalSelect *dest
 		// copy the radius of each shape
 		dest->shapeRadius[s] = source->shapeRadius[s];
 	}
-	
+
 	int c;
 	// for each child,
 	for(c=0; c<FRACTAL_MAX_CHILDREN; c++)
@@ -283,31 +290,31 @@ int fractal_copy(struct fractal *source, struct fractal *dest)
 		error("fractal_copy() was sent a NULL [dest] pointer. Aborting function call.");
 		return -2;
 	}
-	
+
 	int s,sp;
 	// copy all shape parameters
 	for(s=0; s<FRACTAL_MAX_SHAPES; s++)
 	{
 		// copy parameters
-		
+
 		dest->shapes[s].type =			source->shapes[s].type;
 		dest->shapes[s].color =			source->shapes[s].color;
 		dest->shapes[s].radius = 		source->shapes[s].radius;
 		dest->shapes[s].fillType = 		source->shapes[s].fillType;
 		dest->shapes[s].fillPercent=	source->shapes[s].fillPercent;
-		
+
 		// copy all of the xy points for each shape
 		for(sp=0; sp<FRACTAL_MAX_SHAPE_POINTS; sp++)
 		{
 			dest->shapes[s].x[sp] = source->shapes[s].x[sp];
 			dest->shapes[s].y[sp] = source->shapes[s].y[sp];
 		}
-		
+
 	}
 	dest->numberOfShapes =		source->numberOfShapes;
-	
+
 	int c;
-	// copy all child parameters 
+	// copy all child parameters
 	for(c=0; c<FRACTAL_MAX_CHILDREN; c++)
 	{
 		dest->children[c].scale =	source->children[c].scale;
@@ -316,15 +323,15 @@ int fractal_copy(struct fractal *source, struct fractal *dest)
 		dest->children[c].y =		source->children[c].y;
 	}
 	dest->numberOfChildren = 	source->numberOfChildren;
-	
+
 	dest->iterations =			source->iterations;
 	dest->iterationsChildren =	source->iterationsChildren;
 	dest->zoom =				source->zoom;
 	dest->twist =				source->twist;
 	dest->x =					source->x;
 	dest->y =					source->y;
-	
-	
+
+
 	// copy the fractalSelect structure from the source in to the dest
 	// also, return the value returned from fractal_select_copy.
 	// That will indicate the overall success of the copying process.
@@ -341,7 +348,7 @@ void fractal_select_deselect_all(struct fractalSelect *select)
 		error("fractal_select_clear() was sent a NULL [select] pointer. Aborting function call.");
 		return;
 	}
-	
+
 	int s,sp;
 	// for every fractal shape,
 	for(s=0; s<FRACTAL_MAX_SHAPES; s++)
@@ -361,7 +368,7 @@ void fractal_select_deselect_all(struct fractalSelect *select)
 		// deselect that child
 		select->child[c] = 0;
 	}
-	
+
 }
 
 
@@ -380,17 +387,17 @@ int fractal_select_point(SDL_Surface *dest, struct fractal *frac, float x, float
 		error("fractal_select_clear() was sent a NULL [frac] pointer! Aborting function call.");
 		return -1;
 	}
-	
+
 	// this keeps track of whether or not a part of the fractal was clicked.
 	char clickedPart = 0;
-	
+
 	// calculate the <x,y> position in fractal space
 	float xf = (x - frac->x) / frac->zoom;
 	float yf = (y - frac->y) / frac->zoom;
-	
+
 	// debugging
 	//draw_circle(dest, xf, yf, 10, 0xFFFF3311);
-	
+
 	// this keeps track of how close the input <x,y> pair is to the closest part of the fractal.
 	// however, for sake of speed of execution, this is stored as a square value.
 	// this number is always delta_x^2 + delta_y^2
@@ -401,16 +408,16 @@ int fractal_select_point(SDL_Surface *dest, struct fractal *frac, float x, float
 	// this is used to store the calculation of distance between <x,y> and the current point being checked
 	// dist2, like closest2, is pronounced "distance squared"
 	float dist2;
-	
+
 	int s;
 	int sp;
 	int shapePointsUsed;
-	
-	
+
+
 	//---------------------------------------------
 	// check if the user selected parts of a shape
 	//---------------------------------------------
-	
+
 	// for each fractal shape
 	for(s=0; s<FRACTAL_MAX_SHAPES; s++)
 	{
@@ -424,12 +431,12 @@ int fractal_select_point(SDL_Surface *dest, struct fractal *frac, float x, float
 			case fst_tri:		shapePointsUsed = 3; break;
 			default:			shapePointsUsed = 1; break;
 		}
-		
-		
+
+
 		//---------------------------------------------
 		// check if the user clicked near any xy points
 		//---------------------------------------------
-		
+
 		// for each xy point, check if the user clicked near that point. In this case, "near" mean
 		for(sp=0; sp<shapePointsUsed; sp++)
 		{
@@ -446,13 +453,13 @@ int fractal_select_point(SDL_Surface *dest, struct fractal *frac, float x, float
 				frac->select.shapePoints[s][sp] = 1;
 			}
 		}
-		
-		
+
+
 		//---------------------------------------------
 		// check if the user clicked a radius distance
 		// away from the first xy point
 		//---------------------------------------------
-		
+
 		// only check for the user selecting the radius if the shape is a circle
 		if(frac->shapes[s].type == fst_circle)
 		{
@@ -471,14 +478,14 @@ int fractal_select_point(SDL_Surface *dest, struct fractal *frac, float x, float
 				frac->select.shapeRadius[s] = 1;
 			}
 		}// if(type == circle)
-		
+
 	}// for(shapes)
-	
-	
+
+
 	//---------------------------------------------
 	// check if the user clicked near child points
 	//---------------------------------------------
-	
+
 	int c;
 	// check all children
 	for(c=0; c<FRACTAL_MAX_CHILDREN; c++)
@@ -496,7 +503,7 @@ int fractal_select_point(SDL_Surface *dest, struct fractal *frac, float x, float
 			frac->select.child[c] = 1;
 		}
 	}// for(children)
-	
+
 	//---------------------------------------------
 	// check if the closest click was close ENOUGH
 	// to select a part of the fractal
@@ -512,7 +519,7 @@ int fractal_select_point(SDL_Surface *dest, struct fractal *frac, float x, float
 	{
 		clickedPart = 1;
 	}
-	
+
 	return clickedPart;
 }
 
@@ -535,11 +542,11 @@ int fractal_select_modify(struct fractal *frac, float x, float y)
 		error("fractal_select_modify() was sent a NULL [frac] pointer! Aborting function call.");
 		return -1;
 	}
-	
+
 	//---------------------------------------------
 	// check if shapes need to be modified
 	//---------------------------------------------
-	
+
 	int s, sp;
 	// for all shapes, modify the selected ones
 	for(s=0; s<FRACTAL_MAX_SHAPES; s++)
@@ -547,7 +554,7 @@ int fractal_select_modify(struct fractal *frac, float x, float y)
 		//---------------------------------------------
 		// check if the user wants to modify any xy points
 		//---------------------------------------------
-		
+
 		// for each xy point, check if the user clicked near that point. In this case, "near" mean
 		for(sp=0; sp<FRACTAL_MAX_SHAPE_POINTS; sp++)
 		{
@@ -558,24 +565,24 @@ int fractal_select_modify(struct fractal *frac, float x, float y)
 				frac->shapes[s].y[sp] += y;
 			}
 		}
-		
+
 		//---------------------------------------------
 		// check if the user wants to modify the radius
 		//---------------------------------------------
-		
+
 		// if the radius is selected for modification,
 		if(frac->select.shapeRadius[s])
 		{
 			// modify the radius
 			frac->shapes[s].radius += x; /// TODO: fix this stupid hack. The radius needs to be configurable is a user-friendly way.
 		}
-		
+
 	}// for(shape)
-	
+
 	//---------------------------------------------
 	// check if children need to be modifies
 	//---------------------------------------------
-	
+
 	int c;
 	// check all children
 	for(c=0; c<FRACTAL_MAX_CHILDREN; c++)
@@ -587,7 +594,7 @@ int fractal_select_modify(struct fractal *frac, float x, float y)
 			frac->children[c].y += y;
 		}
 	}// for(children)
-	
+
 	return 0; // success
 }
 
@@ -601,10 +608,10 @@ void fractal_zoom(struct fractal *frac, float zoomFactor, float x, float y)
 		error("fractal_zoom() was sent a NULL frac poitner! Aborting function call.");
 		return;
 	}
-	
+
 	// adjust the zoom of the fractal
 	frac->zoom *= zoomFactor;
-	
+
 	// calculate the deltas between the <x,y> point of the fractal on the screen and the mouse click on the screen
 	float dx = frac->x - x;
 	float dy = frac->y - y;
@@ -614,5 +621,5 @@ void fractal_zoom(struct fractal *frac, float zoomFactor, float x, float y)
 	// modify the position of the fractal on the screen such that the user will feel as though the zoom occurred centered on their mouse location
 	frac->x = x + dx;
 	frac->y = y + dy;
-	
+
 }
