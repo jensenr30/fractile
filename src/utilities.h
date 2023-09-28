@@ -1,3 +1,6 @@
+#ifndef UTILITIES_H
+#define UTILITIES_H
+
 //--------------------------------------------------
 // error stuff
 //--------------------------------------------------
@@ -47,3 +50,5 @@ int init_SDL();
 SDL_Surface *create_surface(int witdth, int height);
 
 void clean_up();
+
+#endif /* UTILITIES_H */

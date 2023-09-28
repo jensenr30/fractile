@@ -1,3 +1,6 @@
+#ifndef MY_MATH_H
+#define MY_MATH_H
+
 /**
 	this file has some definitions and functions that will perform some common mathematical operations.
 	this is essentially for convenience in other functions.
@@ -20,3 +23,5 @@
 
 /// performs a squaring operation on the operand
 #define sqr(A) ((A)*(A))
+
+#endif /* MY_MATH_H */

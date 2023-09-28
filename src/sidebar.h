@@ -1,3 +1,6 @@
+#ifndef SIDEBAR_H
+#define SIDEBAR_H
+
 #include <inttypes.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -128,3 +131,5 @@ int sidebar_init(struct sidebar *sb);
 int sidebar_load_fonts(struct sidebar *sb);
 int sidebar_render(struct sidebar *sb, SDL_Surface *dest);
 int sidebar_evaluate(struct sidebar *sb, SDL_Event *event, uint16_t x, uint16_t y);
+
+#endif /* SIDEBAR_H */

@@ -1,3 +1,6 @@
+#ifndef GLOBALS_H
+#define GLOBALS_H
+
 //#include <SDL2/SDL_ttf.h>
 #define DEBUG 1
 // global display stuff
@@ -12,3 +15,5 @@ typedef unsigned char byte;
 
 unsigned int windW;
 unsigned int windH;
+
+#endif /* GLOBALS_H */

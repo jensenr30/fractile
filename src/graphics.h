@@ -1,3 +1,6 @@
+#ifndef GRAPHICS_H
+#define GRAPHICS_H
+
 #include <SDL2/SDL.h>
 #include "globals.h"
 
@@ -30,3 +33,5 @@ Uint32 color_mix_weighted_f(unsigned int color1, unsigned int color2, float weig
 #define getColorGreen(x)	( (x & 0x0000FF00) >>  8 )
 #define getColorBlue(x)		( (x & 0x000000FF) >>  0 )
 #define getColorAlpha(x)	( (x & 0xFF000000) >> 24 )
+
+#endif /* GRAPHICS_H */

@@ -1,3 +1,6 @@
+#ifndef RAND_H
+#define RAND_H
+
 #include "mt19937int.h"
 
 
@@ -60,3 +63,5 @@ void test_random_functions(unsigned long);
 
 
 
+
+#endif /* RAND_H */

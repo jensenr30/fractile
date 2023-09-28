@@ -1,3 +1,6 @@
+#ifndef FRACTAL_H
+#define FRACTAL_H
+
 /*
 
 fractal.h
@@ -211,3 +214,5 @@ int fractal_select_point(SDL_Surface *dest, struct fractal *frac, float x, float
 int fractal_select_modify(struct fractal *frac, float x, float y);
 void fractal_zoom(struct fractal *frac, float zoomFactor, float x, float y);
 
+
+#endif /* FRACTAL_H */
