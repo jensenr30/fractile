@@ -13,27 +13,27 @@ Uint32 get_pixel(SDL_Surface *surface, int x, int y){
 	int bpp = surface->format->BytesPerPixel;
 	/* Here p is the address to the pixel we want to retrieve */
 	Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
-	
+
 	switch(bpp) {
 	case 1:
 		return *p;
 		break;
-	
+
 	case 2:
 		return *(Uint16 *)p;
 		break;
-	
+
 	case 3:
 		if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
 			return p[0] << 16 | p[1] << 8 | p[2];
 		else
 			return p[0] | p[1] << 8 | p[2] << 16;
 		break;
-	
+
 	case 4:
 		return *(Uint32 *)p;
 		break;
-	
+
 	default:
 		return 0;	   /* shouldn't happen, but avoids warnings */
 	}
@@ -55,34 +55,34 @@ void draw_pixel(SDL_Surface *dest, int x, int y, Uint32 color)
 /// this function will mix two colors (according to their respective weight) and return the resulting color.
 // everything is Uint32, 32 bits unsigned integer
 Uint32 color_mix_weighted(Uint32 color1, Uint32 color2, Uint32 weight1, Uint32 weight2){
-	
+
 	// calculate total weight
 	Uint32 weight = weight1 + weight2;
-	
+
 	// calculate individual values for all three color bytes (and the alpha byte)
 	Uint32 alpha =		( ((color1>>24)&0xff)*weight1 + ((color2>>24)&0xff)*weight2 ) / (weight);
 	Uint32 red =		( ((color1>>16)&0xff)*weight1 + ((color2>>16)&0xff)*weight2 ) / (weight);
 	Uint32 green =		( ((color1>>8 )&0xff)*weight1 + ((color2>>8 )&0xff)*weight2 ) / (weight);
 	Uint32 blue =		( ((color1	)&0xff)*weight1 + ((color2	)&0xff)*weight2 ) / (weight);
-	
+
 	// return the weighted, mixed color.
 	return (alpha<<24) | (red<<16) | (green<<8) | blue;
 }
 
 Uint32 color_mix_weighted_f(unsigned int color1, unsigned int color2, float weight1, float weight2){
-	
+
 	// calculate total weight
 	float weight = weight1 + weight2;
-	
+
 	// calculate individual values for all three color bytes (and the alpha byte)
 	Uint32 alpha =		( ((color1>>24)&0xff)*weight1 + ((color2>>24)&0xff)*weight2 ) / (weight);
 	Uint32 red =		( ((color1>>16)&0xff)*weight1 + ((color2>>16)&0xff)*weight2 ) / (weight);
 	Uint32 green =		( ((color1>>8 )&0xff)*weight1 + ((color2>>8 )&0xff)*weight2 ) / (weight);
 	Uint32 blue =		( ((color1	)&0xff)*weight1 + ((color2	)&0xff)*weight2 ) / (weight);
-	
+
 	// return the weighted, mixed color.
 	return (alpha<<24) | (red<<16) | (green<<8) | blue;
-	
+
 }
 
 
@@ -97,13 +97,13 @@ Uint32 color_mix_weighted_f(unsigned int color1, unsigned int color2, float weig
 // returns 0 success.
 // returns 1 on invalid dest
 short draw_rect(SDL_Surface *dest, int x, int y, int w, int h, int borderThickness, Uint32 colorBorder, Uint32 colorFill, char doFill){
-	
+
 	// check for a NULL destination surface pointer.
 	if(dest == NULL){
 		error("draw_rect() was passed an invalid dest pointer. dest = NULL");
 		return 1;
 	}
-	
+
 	// calculate starting/stopping positions
 	int i, j, istart = x, jstart = y, istop = x+w, jstop = y+h, temp;
 	// swap istart and istop if istop is less than istart
@@ -118,12 +118,12 @@ short draw_rect(SDL_Surface *dest, int x, int y, int w, int h, int borderThickne
 		jstop = jstart;
 		jstart = temp;
 	}
-	// bound the 
+	// bound the
 	if(istart < 0) istart = 0;
 	if(istop > dest->w) istop = dest->w;
 	if(jstart < 0) jstart = 0;
 	if(jstop > dest->h) jstop = dest->h;
-	
+
 	// draw the rectangle
 	for(i=istart; i<istop; i++){
 		for(j=jstart; j<jstop; j++){
@@ -145,10 +145,10 @@ short draw_rect(SDL_Surface *dest, int x, int y, int w, int h, int borderThickne
 /*
 /// returns a pointer to the loaded texture.
 SDL_Texture *load_image_to_texture(char *filename){
-	
+
 	//attempt to load the image
 	SDL_Surface *tempSurface = IMG_Load(filename);
-	
+
 	// if the image was not loaded to a surface correctly,
 	if(tempSurface == NULL){
 		// create an error message to write to file.
@@ -160,10 +160,10 @@ SDL_Texture *load_image_to_texture(char *filename){
 		// and return NULL.
 		return NULL;
 	}
-	
+
 	// try to convert the surface into a texture
 	SDL_Texture *tempTexture = SDL_CreateTextureFromSurface(myRenderer, tempSurface);
-	
+
 	// if the texture was not created from surface correctly,
 	if(tempTexture == NULL){
 		// write and error message to the error log
@@ -171,7 +171,7 @@ SDL_Texture *load_image_to_texture(char *filename){
 		// and return NULL.
 		return NULL;
 	}
-	
+
 	//  if the image loaded correctly, return a pointer to the texture that contains it.
 	return tempTexture;
 }
@@ -190,7 +190,7 @@ SDL_Texture *load_image_to_texture(char *filename){
 // xr and yr are pointers to variables outside of this function.
 
 int intersect_p(float x1, float y1, float slope1, float x2, float y2, float slope2, float *xr, float *yr){
-	
+
 	//------------------------------------------------------------
 	// check to see if the lines are parallel and handle special cases
 	//------------------------------------------------------------
@@ -212,36 +212,36 @@ int intersect_p(float x1, float y1, float slope1, float x2, float y2, float slop
 	//------------------------------------------------------------
 	// calculate where the intersect point is
 	//------------------------------------------------------------
-	
+
 	//calculate y intercepts
 	float b1 = y1 - x1*slope1;
 	float b2 = y2 - x2*slope2;
-	
+
 	// calculate the intersection coordinates <xr,yr>
 	*xr = (b2-b1)/(slope1-slope2);
 	*yr = slope1*(*xr) + b1;
-	
+
 	// a single intersection point is found.
-	return 1; 
+	return 1;
 }
 
 /// RYAN PLEASE TODO:
 void draw_line(SDL_Surface *dest, float x1, float y1, float x2, float y2, float thickness, unsigned int lineColor){
-	
+
 	//-------------------------------------------------------------------------------
 	// setting up variables
 	//-------------------------------------------------------------------------------
 	// these are the differences in x and y.
 	float xdiff = x2-x1;
 	float ydiff = y2-y1;
-	
+
 	// these are the slopes of x and y. This describes how fast they change with respect to a unit step in the line parameter, t.
 	float xslope;
 	float yslope;
-	
+
 	// this is the maximum difference (either the difference in y or the difference in y, depending on which is bigger.)
 	float bigdiff;
-	
+
 	if(fabs(ydiff) > fabs(xdiff)){			// the difference in y is greater than the difference in x
 		bigdiff = ydiff;
 		xslope = xdiff/bigdiff;
@@ -259,14 +259,14 @@ void draw_line(SDL_Surface *dest, float x1, float y1, float x2, float y2, float 
 	// check to see if BOTH points are out of bounds
 	//-------------------------------------------------------------------------------
 	if(!within_screen(x1,y1) && !within_screen(x2,y2)){
-		
+
 		// a temporary solution (this doesn't allow lines that have points outside the screen to be drawn THROUGH the screen)
-		return;															
-			
+		return;
+
 		// used to collect the resulting intersection points with the screen.
 		float xr, yr, xr1=-1, yr1=-1, xr2=-1, yr2=-1;
 		char foundOne = 0;
-		
+
 		// check top screen bound intersection
 		if( intersect_p(x1,y1,yslope/xslope, 0,0,HORIZONTAL, &xr,&yr)==1){
 			if(within_screen(xr,yr)){
@@ -282,7 +282,7 @@ void draw_line(SDL_Surface *dest, float x1, float y1, float x2, float y2, float 
 			}
 		}
 		// check bottom screen bound intersection
-		if( intersect_p(x1,y1,yslope/xslope, 0,windH-1,HORIZONTAL, &xr,&yr)==1){
+		if( intersect_p(x1,y1,yslope/xslope, 0,get_window_height()-1,HORIZONTAL, &xr,&yr)==1){
 			if(within_screen(xr,yr)){
 				if(foundOne==0){
 					xr1=xr;
@@ -310,7 +310,7 @@ void draw_line(SDL_Surface *dest, float x1, float y1, float x2, float y2, float 
 			}
 		}
 		// check right bound intersection
-		if( intersect_p(x1,y1,yslope/xslope, windW-1,0,VERTICAL, &xr,&yr)==1){
+		if( intersect_p(x1,y1,yslope/xslope, get_window_width()-1,0,VERTICAL, &xr,&yr)==1){
 			if(within_screen(xr,yr)){
 				if(foundOne==0){
 					xr1=xr;
@@ -334,12 +334,12 @@ void draw_line(SDL_Surface *dest, float x1, float y1, float x2, float y2, float 
 	// check to see if ONE of the points is out of bounds
 	//-------------------------------------------------------------------------------
 	else if(!within_screen(x1,y1) || !within_screen(x2,y2)){
-		
+
 		// used to collect the resulting intersection points with the screen.
 		float xr, yr, xr1=-1, yr1=-1;
-		
+
 		char foundOne = 0;
-		
+
 		float xin, yin; // these are the coordinates of the inside point
 		float xout, yout; // these are the coordinates of the outside point
 		// store the inside points in xin and yin floating point variables.
@@ -355,12 +355,12 @@ void draw_line(SDL_Surface *dest, float x1, float y1, float x2, float y2, float 
 			xout = x1;
 			yout = y1;
 		}
-		
+
 		// this records the direction that x travels when going from inside the screen to outside it. (1 or -1)
 		//float xSignChange = (xin-xout);
-		
-		
-		
+
+
+
 		// check top screen bound intersection
 		if( !foundOne && intersect_p(x1,y1,yslope/xslope, 0,0,HORIZONTAL, &xr,&yr)==1){
 			if(within_screen(xr,yr)){
@@ -372,7 +372,7 @@ void draw_line(SDL_Surface *dest, float x1, float y1, float x2, float y2, float 
 			}
 		}
 		// check bottom screen bound intersection
-		if( !foundOne && intersect_p(x1,y1,yslope/xslope, 0,windH-1,HORIZONTAL, &xr,&yr)==1){
+		if( !foundOne && intersect_p(x1,y1,yslope/xslope, 0,get_window_height()-1,HORIZONTAL, &xr,&yr)==1){
 			if(within_screen(xr,yr)){
 				if((yin-yr)*(yin-yout) >=0){
 					xr1=xr;
@@ -392,7 +392,7 @@ void draw_line(SDL_Surface *dest, float x1, float y1, float x2, float y2, float 
 			}
 		}
 		// check right bound intersection
-		if( !foundOne && intersect_p(x1,y1,yslope/xslope, windW-1,0,VERTICAL, &xr,&yr)==1){
+		if( !foundOne && intersect_p(x1,y1,yslope/xslope, get_window_width()-1,0,VERTICAL, &xr,&yr)==1){
 			if(within_screen(xr,yr)){
 				if((xin-xr)*(xin-xout) >=0){
 					xr1=xr;
@@ -415,7 +415,7 @@ void draw_line(SDL_Surface *dest, float x1, float y1, float x2, float y2, float 
 	// drawing valid in-bounds line
 	//-------------------------------------------------------------------------------
 	// this is the arbitrary parameter than will step through the line's pixels
-	
+
 	//swap the x's if necessary to correct the sign of bigdiff.
 	if(bigdiff<0){
 		bigdiff*=-1.0;
@@ -426,7 +426,7 @@ void draw_line(SDL_Surface *dest, float x1, float y1, float x2, float y2, float 
 	for(t=0; t<=bigdiff; t=t+1.0){
 		set_pixel(dest, (int)(x1 + xslope*t), (int)(y1 + yslope*t), lineColor);
 	}
-	
+
 }
 
 /// RYAN TODO:
@@ -436,12 +436,12 @@ void draw_line(SDL_Surface *dest, float x1, float y1, float x2, float y2, float 
 // this draws a circle with radius and color at point (x,y)
 void draw_circle(SDL_Surface *dest, float x, float y, float radius, Uint32 color){
 	if(dest == NULL) return;
-	
+
 	float xLowBound = x - radius;
 	float xHighBound= x + radius;
 	float yLowBound = y - radius;
 	float yHighBound= y + radius;
-	
+
 	int i,j;
 	float dist;
 	for(i=(int)xLowBound; i<=(int)(xHighBound+1); i++){
@@ -451,7 +451,7 @@ void draw_circle(SDL_Surface *dest, float x, float y, float radius, Uint32 color
 				set_pixel(dest, i, j, color);
 		}
 	}
-	
+
 }
 
 
@@ -462,13 +462,13 @@ void draw_circle(SDL_Surface *dest, float x, float y, float radius, Uint32 color
 //	0	rect is NULL
 char within_rect(int x, int y,SDL_Rect *rect)
 {
-	
+
 	if(rect == NULL)
 	{
 		error("within_rect() was sent a NULL rect!");
 		return 0;
 	}
-	
+
 	if(x >= rect->x && y >= rect->y && x <= rect->x+rect->w && y <= rect->y+rect->h)
 	{
 		return 1;

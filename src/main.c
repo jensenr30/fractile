@@ -13,66 +13,66 @@
 
 #define MOUSE_BUTTONS 5
 
-
-
+// global event stuff
+SDL_Event event;
 
 int main(int argc, char *argv[]){
-	
-	
-	
+
+
+
 	error("\n\n\n\n== PROGRAM START ======================================================\n\n\n\n");
-	
+
 	//--------------------------------------------------
 	// initial gamelog write
 	//--------------------------------------------------
 	gamelog_startup(argc, argv);
-	
-	windW = 1300;
-	windH = 731;
-	
+
+	set_window_width(1300);
+	set_window_height(731);
+
 	int i;
 	//--------------------------------------------------
 	// set up surfaces, textures, renderers, windows,
 	//--------------------------------------------------
-	
+
 	SDL_Window *myWindow = NULL;
 	SDL_Renderer *myRenderer = NULL;
 	SDL_Texture *myTexture = NULL;
-	SDL_Surface *mySurface = create_surface(windW, windH);
+	SDL_Surface *mySurface = create_surface(get_window_width(), get_window_height());
 	SDL_Texture *fadeTexture = NULL;
-	SDL_Surface *fadeSurface = create_surface(windW, windH);	// this is a surface used to fade out old mySurface data. It is used to allow persistence of image.
+	SDL_Surface *fadeSurface = create_surface(get_window_width(), get_window_height());	// this is a surface used to fade out old mySurface data. It is used to allow persistence of image.
 	uint8_t fadeAlpha = 0x20;
 	uint32_t fadeEverySoManyFrames = 2;							// this specifies how often a fade is performed. This allows the decay rate to be dragged out even longer than minimum non-zero alpha value. This says, every this many frames, the fade is done once.
 	uint32_t fadeFrames = 0;									// this is the frame fade counter. It keeps track of when fades need to be performed.
 	SDL_FillRect(fadeSurface, NULL, (fadeAlpha<<24) );			// this specifies the color data of the surface. the first 8 bits are the alpha value. the rest should all be zeros so that it is black.
-	
+
 	// these things are not currently useful.
 	// I am doing things the (probably) wrong way by doing ablitsurface where the whole surface is black with some level of alpha.
 	fadeTexture = SDL_CreateTextureFromSurface(myRenderer, fadeSurface);
 	SDL_SetTextureAlphaMod(myTexture, fadeAlpha);
 	SDL_SetTextureBlendMode(myTexture, SDL_BLENDMODE_BLEND);
-	
+
 	// get a random seed based on the current time. This prevents the random numbers that are generated from being the same "random" numbers each time the program is started.
 	sgenrand(time(NULL));
-	
+
 	// initialize all SDL stuff
 	if(SDL_Init(SDL_INIT_EVERYTHING) == -1)
 	{
 		error("SDL_Init() failed!");
 		return -99;
 	}
-	
+
 	//Initialize SDL_ttf
     if( TTF_Init() == -1 )
     {
     	error("TTF_Init() failed!");
     	return -13;
     }
-    
+
 	// set network window
-	myWindow = SDL_CreateWindow("Fractile 1.0", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windW, windH, SDL_WINDOW_RESIZABLE);
+	myWindow = SDL_CreateWindow("Fractile 1.0", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, get_window_width(), get_window_height(), SDL_WINDOW_RESIZABLE);
 	myRenderer = SDL_CreateRenderer(myWindow, -1, 0);
-	
+
 	if(myWindow == NULL){
 		error("main() could not create myWindow using SDL_CreateWindow");
 		return -1;
@@ -81,30 +81,30 @@ int main(int argc, char *argv[]){
 		error("main() could not create myRenderer using SDL_CreateRenderer");
 		return -2;
 	}
-	
+
 	SDL_SetRenderDrawColor(myRenderer, 0, 0, 0, 255);
 	SDL_RenderClear(myRenderer);
 	SDL_RenderPresent(myRenderer);
-	
+
 	SDL_SetRenderDrawColor(myRenderer, 0, 0, 0, 255);
 	SDL_RenderClear(myRenderer);
 	SDL_RenderPresent(myRenderer);
-	
-	
-	
+
+
+
 //	//--------------------------------------------------
 //	// load the font
 //	//--------------------------------------------------
 //	//Initialize SDL_ttf
 //    if( TTF_Init() == -1 )
 //    {
-//        return -13;    
+//        return -13;
 //    }
-//    
+//
 //    //Open the font
 //    char *fontName = "absender1.ttf";
 //    font = TTF_OpenFont( fontName, 24 );
-//    
+//
 //	//If there was an error in loading the font
 //    if( font == NULL )
 //    {
@@ -115,7 +115,7 @@ int main(int argc, char *argv[]){
 //    SDL_Surface* message = NULL;
 //    SDL_Color textColor = {230,230,230};
 //    message = TTF_RenderText_Blended(font, "1 2 3 4 5 6 7 8 9 0 The quick brown fox jumps over the lazy dog", textColor);
-//	
+//
 //	// render all 10 digits (0 through 9) so that they are ready to go when they are needed.
 //	uint8_t n;
 //	char myStr[2] = "0";
@@ -124,15 +124,15 @@ int main(int argc, char *argv[]){
 //		myStr[0] = '0' + n;
 //		numbers[n] = TTF_RenderText_Blended(font, myStr, textColor);
 //	}
-//	
+//
 //	// render the letter 'F' so it is ready to go
 //	letterF = TTF_RenderText_Blended(font, "F", textColor);
-	
-	
+
+
 	//--------------------------------------------------
 	// event handling
 	//--------------------------------------------------
-	
+
 	// this records if the user wants to quit
 	byte quit = 0;
 	const int keysSize = 256;
@@ -146,7 +146,7 @@ int main(int argc, char *argv[]){
 	float x=0, y=0;
 	// these keep track of where the mouse was just moments ago.
 	float xlast=0, ylast=0;
-	
+
 	// these two 2-element arrays keep the data concerning the state of the right and left mouse buttons.
 	// EX:
 		// mouse[SDL_BUTTON_LEFT][0] is the CURRENT state of the LEFT mouse button
@@ -155,15 +155,15 @@ int main(int argc, char *argv[]){
 		// mouse[SDL_BUTTON_RIGHT][1] is the LAST	state of the RIGHT mouse button
 		// etc...
 	int mouse[MOUSE_BUTTONS][2] = { {0,0}, {0,0}, {0,0}, {0,0}, {0,0} };
-	
+
 	// this is similar to mouse. however, this is used to store where the user clicked when a particular mouse button was clicked.
 		// mouseClick[SDL_BUTTON_LEFT][0] is the x position where the user clicked the left  mouse button.
 		// mouseClick[SDL_BUTTON_LEFT][1] is the y position where the user clicked the left  mouse button.
 		// mouseClick[SDL_BUTTON_RIGHT][0] is the x position where the user clicked the RIGHT mouse button.
 		// etc...
 	int mouseClick[MOUSE_BUTTONS][2] = { {0,0}, {0,0}, {0,0}, {0,0}, {0,0} };
-	
-	
+
+
 	//--------------------------------------------------
 	// these variables keep track of time and FPS
 	//--------------------------------------------------
@@ -171,8 +171,8 @@ int main(int argc, char *argv[]){
 	Uint32 ticksNow = 0;
 	Uint32 frames = 0;
 	Uint32 FPS = 0;
-	
-	
+
+
 	//--------------------------------------------------
 	// these variables are for fractal stuff
 	//--------------------------------------------------
@@ -183,7 +183,7 @@ int main(int argc, char *argv[]){
 	// set the fractal to default.
 	fractal_set_default(&myFractal);
 	//float decayFact = 0.7;
-	
+
 	myFractal.numberOfChildren = 2;
 	myFractal.numberOfShapes = 2;
 	myFractal.iterations = 3;
@@ -194,26 +194,26 @@ int main(int argc, char *argv[]){
 	myFractal.shapes[0].y[1] =  217;
 	myFractal.shapes[0].radius = 18;
 	myFractal.shapes[0].color = 0xFF6Fc030;
-	
+
 	myFractal.shapes[1].type = fst_circle;
 	myFractal.shapes[1].radius = 15;
 	myFractal.shapes[1].color = 0xFF7f7f00;
-	
+
 	myFractal.shapes[2].type = fst_circle;
 	myFractal.shapes[2].radius = 10;
 	myFractal.shapes[2].color = 0xFFfca000;
-	
+
 	myFractal.shapes[3].type = fst_pixel;
 	myFractal.shapes[3].radius = 5;
 	myFractal.shapes[3].color = 0xFFab3411;
-	
+
 	myFractal.shapes[4].color = 0xFFff8840;
 	myFractal.shapes[4].type = fst_pixel;//fst_line;
 	myFractal.shapes[4].radius = 25;
-	
+
 	myFractal.shapes[5].type = fst_pixel;//fst_circle;
 	myFractal.shapes[5].color = 0xFFaa5588;
-	
+
 	myFractal.children[0].x = -100;
 	myFractal.children[0].y = 0;
 	/*
@@ -221,28 +221,28 @@ int main(int argc, char *argv[]){
 	myFractal.children[1].y = 0;
 	myFractal.shapes[1].x[0] = 100;
 	myFractal.shapes[1].y[0] = 0;
-	
+
 	myFractal.children[2].x = 0;
 	myFractal.children[2].y = -100;
 	myFractal.shapes[2].x[0] = 0;
 	myFractal.shapes[2].y[0] = -100;
-	
+
 	myFractal.children[3].x = 0;
 	myFractal.children[3].y = 100;
 	myFractal.shapes[3].x[0] = 0;
 	myFractal.shapes[3].y[0] = 100;
 	*/
-	
+
 	myFractal.children[0].twist = 180;
 	myFractal.children[1].twist = 0;
 	myFractal.children[2].twist = 0;
 	myFractal.children[3].twist = 0;
-	
+
 	myFractal.children[0].scale = 0.998;//sqrt(0.5);
 	myFractal.children[1].scale = sqrt(0.5);
 	myFractal.children[2].scale = sqrt(0.5);
 	myFractal.children[3].scale = sqrt(0.5);
-	
+
 	/*
 	myFractal.children[1].scale = decayFact*myFractal.children[0].scale;
 	myFractal.children[2].scale = decayFact*myFractal.children[1].scale;
@@ -264,11 +264,11 @@ int main(int argc, char *argv[]){
 	myFractal.children[18].scale = decayFact*myFractal.children[17].scale;
 	myFractal.children[19].scale = decayFact*myFractal.children[18].scale;
 	*/
-	
+
 	float zoomFactor = 1.05;
-	
-	
-	
+
+
+
 	//--------------------------------------------------
 	// sidebar stuff
 	//--------------------------------------------------
@@ -282,7 +282,7 @@ int main(int argc, char *argv[]){
 	mySideBar.frac = &myFractal;
 	// load the fonts that the sidebar will use
 	sidebar_load_fonts(&mySideBar);
-	
+
 	//--------------------------------------------------
 	// these variables are for panning / fractal part modification
 	//--------------------------------------------------
@@ -303,16 +303,16 @@ int main(int argc, char *argv[]){
 	struct fractal *fracOp;
 	// this keeps track of wheter or not the user wants the image to persist
 	uint8_t persist = 1;
-	
+
 	//--------------------------------------------------
 	// this is the fabled "main while() loop"
 	// This is where the user input is interpreted.
 	// The fractal rendering routines are called from here.
 	// mouse motion, mouse clicks, keystrokes, etc...
 	//--------------------------------------------------
-		
+
 	while(quit == 0){
-		
+
 		// check to see which fractal structure will be operated on.
 		// this depends on whether or not the user is modifying a part or panning.
 		if(panning || modPart)
@@ -323,13 +323,13 @@ int main(int argc, char *argv[]){
 		{
 			fracOp = &myFractal;
 		}
-		
+
 		// reset all keystroke values
 		for(i=0; i<keysSize; i++){
 			keys[i] = 0;
 		}
 		while(SDL_PollEvent(&event)){
-			
+
 			//--------------------------------------------------
 			// if the mouse has moved,
 			//--------------------------------------------------
@@ -337,8 +337,8 @@ int main(int argc, char *argv[]){
 				x = event.motion.x;
 				y = event.motion.y;
 			}
-			
-			
+
+
 			// if the event is NOT relevant to the sidebar,
 			if(!sidebar_evaluate(&mySideBar, &event, x, y))
 			{
@@ -346,10 +346,10 @@ int main(int argc, char *argv[]){
 				// if a mouse button is pressed,
 				//--------------------------------------------------
 				if(event.button.type == SDL_MOUSEBUTTONDOWN){
-					
+
 					x = event.button.x;
 					y = event.button.y;
-					
+
 					// set mouse button states
 					if(event.button.button == SDL_BUTTON_LEFT){
 						// record that the left mouse button is down
@@ -358,7 +358,7 @@ int main(int argc, char *argv[]){
 						mouseClick[SDL_BUTTON_LEFT][0] = x;
 						mouseClick[SDL_BUTTON_LEFT][1] = y;
 					}
-					
+
 					else if(event.button.button == SDL_BUTTON_RIGHT){
 						// record that the right mouse button is down
 						mouse[SDL_BUTTON_RIGHT][0] = 1;
@@ -366,7 +366,7 @@ int main(int argc, char *argv[]){
 						mouseClick[SDL_BUTTON_RIGHT][0] = x;
 						mouseClick[SDL_BUTTON_RIGHT][1] = y;
 					}
-					
+
 					else if(event.button.button == SDL_BUTTON_MIDDLE){
 						// record that the middle mouse button is down
 						mouse[SDL_BUTTON_MIDDLE][0] = 1;
@@ -375,8 +375,8 @@ int main(int argc, char *argv[]){
 						mouseClick[SDL_BUTTON_MIDDLE][1] = y;
 					}
 				}
-				
-				
+
+
 				//--------------------------------------------------
 				// if a mouse button has been released,
 				//--------------------------------------------------
@@ -386,8 +386,8 @@ int main(int argc, char *argv[]){
 					if(event.button.button == SDL_BUTTON_RIGHT) mouse[SDL_BUTTON_RIGHT][0] = 0;
 					if(event.button.button == SDL_BUTTON_MIDDLE) mouse[SDL_BUTTON_MIDDLE][0] = 0;
 				}
-				
-				
+
+
 				//--------------------------------------------------
 				// if the mouse wheel is turned,
 				//--------------------------------------------------
@@ -397,8 +397,8 @@ int main(int argc, char *argv[]){
 					else
 						fractal_zoom(fracOp, 1/zoomFactor, x, y);
 				}
-				
-				
+
+
 				//--------------------------------------------------
 				// if a key has been pressed,
 				//--------------------------------------------------
@@ -423,8 +423,8 @@ int main(int argc, char *argv[]){
 						break;
 					}
 				}
-				
-				
+
+
 				//--------------------------------------------------
 				// if a key has been released,
 				//--------------------------------------------------
@@ -434,8 +434,8 @@ int main(int argc, char *argv[]){
 						keysHeld[(event.key.keysym.sym)%keysSize] = 0;
 					}
 				}
-				
-				
+
+
 				//--------------------------------------------------
 				// if there has been a window event
 				//--------------------------------------------------
@@ -447,20 +447,20 @@ int main(int argc, char *argv[]){
 					// if the window was resized,
 					if( event.window.event == SDL_WINDOWEVENT_RESIZED){
 						// the new window width and height need to be recorded
-						windW = event.window.data1;
-						windH = event.window.data2;
+						set_window_width(event.window.data1);
+						set_window_height(event.window.data2);
 						// also the surface needs to be resized right away
 						if(mySurface != NULL)SDL_FreeSurface(mySurface);
-						mySurface = create_surface(windW, windH);
-						
+						mySurface = create_surface(get_window_width(), get_window_height());
+
 						// also the fade surface needs to be resized right away
 						if(fadeSurface != NULL)SDL_FreeSurface(fadeSurface);
-						fadeSurface = create_surface(windW, windH);
+						fadeSurface = create_surface(get_window_width(), get_window_height());
 						SDL_FillRect(fadeSurface, NULL, (fadeAlpha<<24) );			// this specifies the color data of the surface. the first 8 bits are the alpha value. the rest should all be zeros so that it is black.
-	
-						
+
+
 						// we need to resize the height of the sidebar
-						mySideBar.rect.h = windH;
+						mySideBar.rect.h = get_window_height();
 						// the old sidebar surface will no longer serve us.
 						if(mySideBarSurface != NULL)SDL_FreeSurface(mySideBarSurface);
 						// create a new one with the proper dimensions.
@@ -468,7 +468,7 @@ int main(int argc, char *argv[]){
 					}
 				}
 			}
-			
+
 			//--------------------------------------------------
 			// if there has been a quit event,
 			//--------------------------------------------------
@@ -476,7 +476,7 @@ int main(int argc, char *argv[]){
 				quit = 1;
 			}
 		}
-		
+
 		//--------------------------------------------------
 		// if the user just left-clicked
 		//--------------------------------------------------
@@ -485,10 +485,10 @@ int main(int argc, char *argv[]){
 			// store original x,y positions of mouse
 			orig_x = x;
 			orig_y = y;
-			
+
 			// see if the user intended to click a part of the fractal
 			int clickedPart = fractal_select_point(mySurface, &myFractal, x, y);
-			
+
 			// if a valid part was found
 			if(clickedPart >= 1)
 			{
@@ -508,7 +508,7 @@ int main(int argc, char *argv[]){
 				pan_orig_y = myFractal.y;
 			}
 		}
-		
+
 		// if the user is currently modifying a part,
 		if(modPart)
 		{
@@ -527,7 +527,7 @@ int main(int argc, char *argv[]){
 				modPart = 0;
 			}
 		}
-		
+
 		// if the user is currently panning,
 		if(panning)
 		{
@@ -543,15 +543,15 @@ int main(int argc, char *argv[]){
 				panning = 0;
 			}
 		}
-		
+
 		/*
 		// testing random movement in shapes
 		myFractal.children[0].x += rand_range_f(-5,5);
 		myFractal.children[0].y += rand_range_f(-5,5);
 		myFractal.children[1].x += rand_range_f(-5,5);
 		myFractal.children[1].y += rand_range_f(-5,5);
-		
-		
+
+
 		myFractal.shapes[0].x[0] += rand_range_f(-5,5);
 		myFractal.shapes[0].y[0] += rand_range_f(-5,5);
 		myFractal.shapes[1].x[0] += rand_range_f(-5,5);
@@ -563,7 +563,7 @@ int main(int argc, char *argv[]){
 		myFractal.shapes[4].x[0] += rand_range_f(-5,5);
 		myFractal.shapes[4].y[0] += rand_range_f(-5,5);
 		*/
-		
+
 		/*
 		// testing automatic twist
 		int c;
@@ -572,7 +572,7 @@ int main(int argc, char *argv[]){
 			myFractal.children[c].twist += 0.08;// c*0.2679842 + 0.129778;
 		}
 		*/
-		
+
 		//myFractal.children[0].twist += 0.3643885;
 		//myFractal.children[1].twist -= 0.525564;
 		//myFractal.children[2].twist -= 0.7992432;
@@ -580,19 +580,16 @@ int main(int argc, char *argv[]){
 		myFractal.children[1].twist -= 0.2;
 		myFractal.children[2].twist -= 1;
 		myFractal.children[3].twist += 1;
-		
-		// render the child points
+
 		fractal_render_children(&myFractal, mySurface, 3);
-		
-		// render the fractal itself
+
 		fractal_render(&myFractal, mySurface);
-		
-		// render the sidebar
-		
-		sidebar_render(&mySideBar,mySideBarSurface);
-		
+
+		// TODO uncomment this:
+		//sidebar_render(&mySideBar,mySideBarSurface);
+
 		SDL_BlitSurface(mySideBarSurface, NULL, mySurface, &mySideBar.rect );
-		
+
 		/*
 		// the following code tests the operation of the twist_xy function to ensure it works properly.
 		// the results should be a series of circles that twist around the center of the screen
@@ -601,17 +598,17 @@ int main(int argc, char *argv[]){
 		float yt;
 		for(i=45; i<360; i+=45)
 		{
-			twist_xy(x-windW/2,y-windH/2, i, &xt, &yt);
-			draw_circle(mySurface, xt+windW/2, yt+windH/2, 10, 0xff0000ff);
+			twist_xy(x-get_window_width()/2,y-get_window_height()/2, i, &xt, &yt);
+			draw_circle(mySurface, xt+get_window_width()/2, yt+get_window_height()/2, 10, 0xff0000ff);
 		}
 		*/
-		
+
 		// this was used to test the event.motion.x stuff
 		// it appears that event.motion.x and event.motion.y are cleared when different events occur.
 		//draw_circle(mySurface, event.motion.x, event.motion.y, 10, 0xff00ffff);
-		
-		
-		
+
+
+
 //		//--------------------------------------------------
 //		// testing font creation
 //		//--------------------------------------------------
@@ -621,7 +618,7 @@ int main(int argc, char *argv[]){
 //		testRect.w = message->w;
 //		testRect.h = message->h;
 //		SDL_BlitSurface(message, NULL, mySurface, &testRect);
-//		
+//
 //		for(n = 0; n < 10; n++)
 //		{
 //			testRect.x = 25*n;
@@ -630,32 +627,32 @@ int main(int argc, char *argv[]){
 //			testRect.h = numbers[n]->h;
 //			SDL_BlitSurface(numbers[n], NULL, mySurface, &testRect);
 //		}
-		
+
 		//--------------------------------------------------
 		// this area of the code puts whatever was rendered
 		// into mySurface onto the screen for the user to see
 		//--------------------------------------------------
-		
+
 		myTexture = SDL_CreateTextureFromSurface(myRenderer, mySurface);
 		// if the user does not want the image to persist,
 		if(!persist)
 		{
 			// clear the old texture if it exists
 			if(mySurface != NULL)SDL_FreeSurface(mySurface);
-			mySurface = create_surface(windW, windH);
+			mySurface = create_surface(get_window_width(), get_window_height());
 		}
-		
+
 		//--------------------------------------------------
 		// Perform fading routine
 		//--------------------------------------------------
-		
+
 		// if you are supposed to fade on this frame,
 		if(fadeFrames == 0)
 		{
 			// apply the fading surface
 			SDL_BlitSurface(fadeSurface, NULL,mySurface,NULL);
 		}
-		
+
 		// record that another frame has gone by for the fade counter
 		fadeFrames++;
 		// if you have waited the desired amount,
@@ -664,28 +661,28 @@ int main(int argc, char *argv[]){
 			// reset the fade counter and be sure to fade the next time
 			fadeFrames = 0;
 		}
-		
-		
+
+
 		//--------------------------------------------------
 		// Render Texture -> Screen
 		//--------------------------------------------------
-		
+
 		// render the mySurface to the myWindow
 		SDL_RenderCopy(myRenderer, myTexture, NULL, NULL);
-		
+
 		// fade it a little bit
 		//SDL_RenderCopy(myRenderer, fadeTexture, NULL, NULL);
-		
+
 		if(myTexture != NULL)SDL_DestroyTexture(myTexture);
 		// display the renderer's result on the screen and clear it when done
 		SDL_RenderPresent(myRenderer);
 		SDL_RenderClear(myRenderer);
-		
-		
+
+
 		//--------------------------------------------------
 		// records mouse position and button states
 		//--------------------------------------------------
-		
+
 		// store the current x and y values and use them as the "last" values in the next iteration of the loop
 		xlast = x;
 		ylast = y;
@@ -694,8 +691,8 @@ int main(int argc, char *argv[]){
 			// set the last state of this mouse button to the current state (for the next loop iteration)
 			mouse[i][1] = mouse[i][0];
 		}
-		
-		
+
+
 		//--------------------------------------------------
 		// tracks FPS of the game
 		//--------------------------------------------------
@@ -712,20 +709,20 @@ int main(int argc, char *argv[]){
 			ticksLast = ticksNow;
 			gamelog_d("FPS =", FPS);
 		}
-		
+
 	}
-	
-	
+
+
 	//--------------------------------------------------
 	// clean up
 	//--------------------------------------------------
 	if(myRenderer != NULL) SDL_DestroyRenderer(myRenderer);
 	if(myTexture  != NULL) SDL_DestroyTexture (myTexture);
 	if(myWindow   != NULL) SDL_DestroyWindow  (myWindow);
-	
+
 	// clean up all SDL subsystems and other non-SDL systems and global memory.
 	clean_up();
-	
+
 	gamelog("Program exiting normally.");
 	return 0;
 }

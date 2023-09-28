@@ -219,8 +219,8 @@ void fractal_set_default(struct fractal *frac)
 	frac->numberOfShapes = FRACTAL_DEFAULT_SHAPES;					// default number of shapes
 	frac->zoom = FRACTAL_DEFAULT_ZOOM;								// default zoom scale
 	frac->twist = FRACTAL_DEFAULT_TWIST;							// default twist
-	frac->x = windW/2;												// default placement of origin on SDL_Surface rendered to is the center of the screen
-	frac->y = windH/2;												// "
+	frac->x = get_window_width()/2;												// default placement of origin on SDL_Surface rendered to is the center of the screen
+	frac->y = get_window_height()/2;												// "
 }
 
 

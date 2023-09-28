@@ -19,45 +19,45 @@ int sidebar_init(struct sidebar *sb)
 		error("sidebar_init() was sent a NULL [sb] pointer! Aborting function call.");
 		return -1;
 	}
-	
+
 	// set default position and size
 	sb->rect.x = 0;
 	sb->rect.y = 0;
 	sb->rect.w = 200;
-	sb->rect.h = windH;
-	
-	
+	sb->rect.h = get_window_height();
+
+
 	// set the default button properties
 	sb->topButtonsPosition = 0;
 	sb->topButtonsHeight = 24;
 	sb->topButtonsWidth = 24;
 	sb->topButtonsLeftRightWidth = 16;
 	sb->buttonsBorder = 1;
-	
+
 	// set the fractal to NULL
 	sb->frac = NULL;
-	
+
 	// set the default background color
 	sb->colorBG = 0xFF404040;
 	// set the default button background color
 	sb->colorTopButtonsBG = 0xFF707070;
 	// set the default button border color
 	sb->colorTopButtonsBorder = 0xFFa0a0a0;
-	
+
 	// the font used for topButtons
 	sb->font1Path = "Inconsolata-Bold.ttf";			// path to the font
 	sb->font1Size = sb->topButtonsHeight;			// size of the font
 	sb->font1Color = 0xFF000000;					// color (0xAARRGGBB)
 	sb->font1OffsetX = 5;							// x offset (pixels)
 	sb->font1OffsetY = -2;							// y offset (pixels)
-	
+
 	// the font used for general text
 	sb->font2Path = "Inconsolata-Regular.ttf";		// path to the font
 	sb->font2Size = 10;								// size of the font
 	sb->font1Color = 0xFF000000;					// color (0xAARRGGBB)
 	sb->font2OffsetX = 5;							// x offset (pixels)
 	sb->font2OffsetY = -2;							// y offset (pixels)
-	
+
 	// successfully initialized the sidebar
 	return 0;
 }
@@ -66,7 +66,7 @@ int sidebar_init(struct sidebar *sb)
 /// This renders all the text.
 // this should be called once at the beginning of the program.
 // I supposed if you wanted to change font mid-way through the program you could call it a second time.
-// it 
+// it
 // returns:
 // 0	operation success
 // -1	bad sb pointer
@@ -93,7 +93,7 @@ int sidebar_load_fonts(struct sidebar *sb)
 		error("sidebar_load_fonts() was sent a NULL sb pointer!");
 		return -1;
 	}
-	
+
 	// attempt to open font1
     sb->font1 = TTF_OpenFont( sb->font1Path, sb->font1Size );
 	//If there was an error in loading the font
@@ -102,7 +102,7 @@ int sidebar_load_fonts(struct sidebar *sb)
     	error_s("could not open font1, ",sb->font1Path);
         return -2;
     }
-    
+
     // get the color and put in into an SDL_Color format
     SDL_Color textColor;
     textColor.r = getColorRed(sb->font1Color);
@@ -123,11 +123,11 @@ int sidebar_load_fonts(struct sidebar *sb)
 			return -10-n;
 		}
 	}
-	
+
 	// render the letter 'F' so it is ready to go
 	sb->font1LetterF = TTF_RenderText_Blended(sb->font1, "F", textColor);
-	
-	
+
+
     // attempt to open font2
     sb->font2 = TTF_OpenFont( sb->font2Path, sb->font2Size );
 	//If there was an error in loading the font
@@ -136,7 +136,7 @@ int sidebar_load_fonts(struct sidebar *sb)
     	error_s("could not open font2, ",sb->font2Path);
         return -3;
     }
-	
+
 	// success
 	return 0;
 }
@@ -149,7 +149,7 @@ int sidebar_load_fonts(struct sidebar *sb)
 // it always renders at x=0, y=0.
 // if you want to move the sidebar somewhere else, you will need to do that yourself.
 // Inputs:
-//  *event a pointer to an SDL_Event. 
+//  *event a pointer to an SDL_Event.
 // returns...
 // 0	operation success
 // -1	NULL sb pointer
@@ -161,8 +161,8 @@ int sidebar_render(struct sidebar *sb, SDL_Surface *dest)
 		error("sidebar_render() was sent a NULL sb pointer!");
 		return -1;
 	}
-	
-	
+
+
 	if(dest == NULL)
 	{
 		error("sidebar_render() was sent a NULL dest pointer!");
@@ -170,37 +170,37 @@ int sidebar_render(struct sidebar *sb, SDL_Surface *dest)
 	}
 	// this is a general purpose rectangle just used in this function
 	struct SDL_Rect genrect;
-	
+
 	// create a rectangle that is the same size as the sidebar, but is at <0,0>
-	// this is just for printing it inside the 
+	// this is just for printing it inside the
 	genrect.x = 0;
 	genrect.y = 0;
 	genrect.w = sb->rect.w;
 	genrect.h = sb->rect.h;
 	SDL_FillRect(dest, &genrect, sb->colorBG);
-	
-	// print the border color 
+
+	// print the border color
 	genrect.h = sb->topButtonsHeight;
 	SDL_FillRect(dest, &genrect, sb->colorTopButtonsBorder);
-	
+
 	// print the << left arrow button background
 	genrect.x = 0 + sb->buttonsBorder;
 	genrect.y = 0 + sb->buttonsBorder;
 	genrect.w = sb->topButtonsLeftRightWidth - 2*sb->buttonsBorder;
 	genrect.h = sb->topButtonsHeight - 2*sb->buttonsBorder;
 	SDL_FillRect(dest, &genrect, sb->colorTopButtonsBG);
-	
+
 	// print the >> right arrow button
 	genrect.x = sb->rect.w - sb->topButtonsLeftRightWidth + sb->buttonsBorder;
 	genrect.y = 0 + sb->buttonsBorder;
 	genrect.w = sb->topButtonsLeftRightWidth - 2*sb->buttonsBorder;
 	genrect.h = sb->topButtonsHeight - 2*sb->buttonsBorder;
 	SDL_FillRect(dest, &genrect, sb->colorTopButtonsBG);
-	
+
 	// calculate how many top buttons can fit between the left and right top buttons.
 	uint8_t topButtonsFit = (sb->rect.w - sb->topButtonsLeftRightWidth*2)/sb->topButtonsWidth;
 	uint8_t b = 0;
-	
+
 	// print buttons for children
 	while(b < topButtonsFit && b < sb->frac->numberOfChildren)
 	{
@@ -211,7 +211,7 @@ int sidebar_render(struct sidebar *sb, SDL_Surface *dest)
 		SDL_FillRect(dest, &genrect, sb->colorTopButtonsBG);
 		b++;
 	}
-	
+
 	// print shapes for the buttons
 	genrect.y = 0 + sb->buttonsBorder;
 	genrect.w = sb->topButtonsWidth - 2*sb->buttonsBorder;
@@ -222,14 +222,14 @@ int sidebar_render(struct sidebar *sb, SDL_Surface *dest)
 		SDL_FillRect(dest, &genrect, sb->colorTopButtonsBG);
 		b++;
 	}
-	
+
 	// test print the 'F'
 	genrect.y = 0 + sb->buttonsBorder + sb->font1OffsetY;
 	genrect.w = sb->topButtonsWidth - 2*sb->buttonsBorder;
 	genrect.h = sb->topButtonsHeight - 2*sb->buttonsBorder;
 	genrect.x = sb->topButtonsLeftRightWidth + 0*sb->topButtonsWidth + sb->buttonsBorder + sb->font1OffsetX;
 	SDL_BlitSurface(sb->font1LetterF, NULL, dest, &genrect);
-	
+
 	// test printing numbers over topButtons
 	for(b = 1; b < 7; b++)
 	{
@@ -239,8 +239,8 @@ int sidebar_render(struct sidebar *sb, SDL_Surface *dest)
 		genrect.x = sb->topButtonsLeftRightWidth + b*sb->topButtonsWidth + sb->buttonsBorder + sb->font1OffsetX;
 		SDL_BlitSurface(sb->font1Numbers[b], NULL, dest, &genrect);
 	}
-	
-	
+
+
 	// success
 	return 0;
 }
@@ -264,7 +264,7 @@ int sidebar_evaluate(struct sidebar *sb, SDL_Event *event, uint16_t x, uint16_t 
 	// If you later find something (like a click inside the sidebar area)
 	// that IS relevant, you will have to set this to 1.
 	char relevant = 0;
-	
+
 	if( within_rect(x, y, &sb->rect) )
 	{
 		// if the user clicks down in the side bar,
@@ -285,9 +285,9 @@ int sidebar_evaluate(struct sidebar *sb, SDL_Event *event, uint16_t x, uint16_t 
 	{
 		relevant = 0;
 	}
-	
-	
-	
+
+
+
 	// return if the user event was relevant to the sidebar or not
 	return relevant;
 }

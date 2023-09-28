@@ -6,8 +6,7 @@ Design and render fractals in real time using SDL 2.
 
 - sdl2
 - sdl2_image
-- sdl2_ttf
-
+- sdl_ttf
 
 ## 2023 Refactor
 

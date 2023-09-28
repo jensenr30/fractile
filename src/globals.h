@@ -8,12 +8,12 @@
 //SDL_Renderer *myRenderer;
 //SDL_Texture *myTexture;
 
-// global event stuff
-SDL_Event event;
-
 typedef unsigned char byte;
 
-unsigned int windW;
-unsigned int windH;
+unsigned int get_window_width(void);
+unsigned int get_window_height(void);
+
+int set_window_width(unsigned int width);
+int set_window_height(unsigned int height);
 
 #endif /* GLOBALS_H */

@@ -4,7 +4,7 @@
 #include <SDL2/SDL.h>
 #include "globals.h"
 
-#define within_screen(x,y) (x>=0 && x<windW && y>=0 && y<windH)
+#define within_screen(x,y) (x>=0 && x<get_window_width() && y>=0 && y<get_window_height())
 #define VERTICAL 10000.0f
 #define HORIZONTAL 0.0001f
 
