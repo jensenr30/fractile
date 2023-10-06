@@ -162,7 +162,6 @@ int main(int argc, char *argv[]) {
 
     myFractal.numberOfChildren = 2;
     myFractal.numberOfShapes = 2;
-    myFractal.iterations = 3;
     myFractal.shapes[0].type = fst_circle;
     myFractal.shapes[0].x[0] = -200;
     myFractal.shapes[0].y[0] = 200;
@@ -240,6 +239,9 @@ int main(int argc, char *argv[]) {
     struct fractal *fracOp;
     // this keeps track of wheter or not the user wants the image to persist
     uint8_t persist = 1;
+
+    // number of times to recursively render the fractal
+    int iterations = 3;
 
     //--------------------------------------------------
     // This is where the user input is interpreted.
@@ -337,11 +339,11 @@ int main(int argc, char *argv[]) {
                     }
                     switch (event.key.keysym.sym) {
                         case SDLK_DOWN:
-                            fracOp->iterations--;
-                            if (fracOp->iterations < 0) fracOp->iterations = 0;
+                            iterations--;
+                            if (iterations < 0) iterations = 0;
                             break;
                         case SDLK_UP:
-                            fracOp->iterations++;
+                            iterations++;
                             break;
                         case SDLK_h: // toggle image persistance (works really well with twist)
                             persist = !persist;
@@ -471,7 +473,7 @@ int main(int argc, char *argv[]) {
 
         fractal_render_children(&myFractal, mySurface, 3);
 
-        fractal_render(&myFractal, mySurface);
+        fractal_render(&myFractal, mySurface, 4);
 
         // TODO uncomment this:
         // sidebar_render(&mySideBar,mySideBarSurface);

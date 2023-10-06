@@ -14,7 +14,7 @@
 // 0.1: 	the image should be shrunk ten times (zoomed out) scale = 10:		the fractal
 // rendered should look very large (zoomed in)
 // scale allows the user to zoom in/out
-void fractal_render(struct fractal *frac, SDL_Surface *dest) {
+void fractal_render(struct fractal *frac, SDL_Surface *dest, uint32_t iterations) {
 
     // check for NULL pointers for frac
     if (frac == NULL) {
@@ -46,7 +46,7 @@ void fractal_render(struct fractal *frac, SDL_Surface *dest) {
     }
 
     // call the first iteration. from here, all of the other iterations will be recursively called.
-    fractal_render_iteration(frac, dest, 0, frac->x, frac->y, frac->zoom, frac->twist);
+    fractal_render_iteration(frac, dest, iterations, frac->x, frac->y, frac->zoom, frac->twist);
 }
 
 // TODO: fractal_render_iteration() is a top-down approach.  What is needed is a bottom-up approach
@@ -74,6 +74,9 @@ void fractal_render_iteration(
     float scale,
     float twist
 ) {
+    if (iteration == 0) {
+        return;
+    }
     int i;
     float tx[FRACTAL_MAX_SHAPE_POINTS];
     float ty[FRACTAL_MAX_SHAPE_POINTS];
@@ -123,23 +126,21 @@ void fractal_render_iteration(
             }
         }
     }
-    // if this iteration is not supposed to be the last iteration,
-    if (iteration < frac->iterations) {
-        // render each child.
-        for (i = 0; i < frac->numberOfChildren; i++) {
-            // calculate the twist for each child (using the tx and ty variables)
-            twist_xy(frac->children[i].x, frac->children[i].y, twist, &tx[0], &ty[0]);
-            // render a child recursively
-            fractal_render_iteration(
-                frac,
-                dest,
-                iteration + 1,
-                x + tx[0] * scale,
-                y + ty[0] * scale,
-                frac->children[i].scale * scale,
-                twist + frac->children[i].twist
-            );
-        }
+
+    // render each child.
+    for (i = 0; i < frac->numberOfChildren; i++) {
+        // calculate the twist for each child (using the tx and ty variables)
+        twist_xy(frac->children[i].x, frac->children[i].y, twist, &tx[0], &ty[0]);
+        // render a child recursively
+        fractal_render_iteration(
+            frac,
+            dest,
+            iteration - 1,
+            x + tx[0] * scale,
+            y + ty[0] * scale,
+            frac->children[i].scale * scale,
+            twist + frac->children[i].twist
+        );
     }
 }
 
@@ -233,7 +234,6 @@ void fractal_set_default(struct fractal *frac) {
         frac->children[c].twist = FRACTAL_DEFAULT_CHILDREN_TWIST; // default twist for children
     }
     // set defaults for other things
-    frac->iterations = FRACTAL_DEFAULT_ITERATIONS; // default iterations
     frac->iterationsChildren =
         FRACTAL_DEFAULT_ITERATIONS_CHILDREN; // default iterations of rendered children points
     frac->numberOfChildren = FRACTAL_DEFAULT_CHILDREN; // default number of children
@@ -283,62 +283,17 @@ int fractal_select_copy(struct fractalSelect *source, struct fractalSelect *dest
     return 0; // success
 }
 
-/// this will copy the data from one fractal structure into another fractal structure
-// returns 0  on successful copy
-// returns -1 on NULL source pointer
-// returns -2 on NULL dest   pointer
 int fractal_copy(struct fractal *source, struct fractal *dest) {
-    // check for a NULL select pointer
     if (source == NULL) {
         error("fractal_copy() was sent a NULL [source] pointer. Aborting function call.");
         return -1;
     }
-    // check for a NULL select pointer
     if (dest == NULL) {
         error("fractal_copy() was sent a NULL [dest] pointer. Aborting function call.");
         return -2;
     }
 
-    int s, sp;
-    // copy all shape parameters
-    for (s = 0; s < FRACTAL_MAX_SHAPES; s++) {
-        // copy parameters
-
-        dest->shapes[s].type = source->shapes[s].type;
-        dest->shapes[s].color = source->shapes[s].color;
-        dest->shapes[s].radius = source->shapes[s].radius;
-        dest->shapes[s].fillType = source->shapes[s].fillType;
-        dest->shapes[s].fillPercent = source->shapes[s].fillPercent;
-
-        // copy all of the xy points for each shape
-        for (sp = 0; sp < FRACTAL_MAX_SHAPE_POINTS; sp++) {
-            dest->shapes[s].x[sp] = source->shapes[s].x[sp];
-            dest->shapes[s].y[sp] = source->shapes[s].y[sp];
-        }
-    }
-    dest->numberOfShapes = source->numberOfShapes;
-
-    int c;
-    // copy all child parameters
-    for (c = 0; c < FRACTAL_MAX_CHILDREN; c++) {
-        dest->children[c].scale = source->children[c].scale;
-        dest->children[c].twist = source->children[c].twist;
-        dest->children[c].x = source->children[c].x;
-        dest->children[c].y = source->children[c].y;
-    }
-    dest->numberOfChildren = source->numberOfChildren;
-
-    dest->iterations = source->iterations;
-    dest->iterationsChildren = source->iterationsChildren;
-    dest->zoom = source->zoom;
-    dest->twist = source->twist;
-    dest->x = source->x;
-    dest->y = source->y;
-
-    // copy the fractalSelect structure from the source in to the dest
-    // also, return the value returned from fractal_select_copy.
-    // That will indicate the overall success of the copying process.
-    return fractal_select_copy(&source->select, &dest->select);
+    *dest = *source;
 }
 
 void fractal_select_deselect_all(struct fractalSelect *select) {

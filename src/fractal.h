@@ -158,14 +158,9 @@ struct fractal {
     // this tells us how many shapes the fractal has.
     unsigned int numberOfShapes;
 
-    // these are the exits of the fractal (the points that will be used as the origin for the next
-    // iteration of this fractal. this is just an <x,y> pair
     struct fractalChild children[FRACTAL_MAX_CHILDREN];
-    // this tells us how many children the fractal has.
     unsigned int numberOfChildren;
 
-    // this is the number of iterations the fractal is to be evaluated.
-    float iterations;
     // this is how many children iterations are rendered
     float iterationsChildren;
 
@@ -187,7 +182,7 @@ struct fractal {
 //-------------------------------------------------------
 
 // these functions are centered around rendering a fractal
-void fractal_render(struct fractal *frac, SDL_Surface *dest);
+void fractal_render(struct fractal *frac, SDL_Surface *dest, uint32_t iterations);
 void fractal_render_iteration(
     struct fractal *frac,
     SDL_Surface *dest,
@@ -202,6 +197,10 @@ void twist_xy(float x, float y, float twist, float *x_ret, float *y_ret);
 
 // these functions are centered around batch manipulation of data in a fractal structure.
 int fractal_select_copy(struct fractalSelect *source, struct fractalSelect *dest);
+/**
+ * @brief copy a fractal
+ * @return 0  on successful copy, otherwise negative
+ */
 int fractal_copy(struct fractal *source, struct fractal *dest);
 void fractal_set_default(struct fractal *frac);
 
