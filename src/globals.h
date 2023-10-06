@@ -3,10 +3,6 @@
 
 //#include <SDL2/SDL_ttf.h>
 #define DEBUG 1
-// global display stuff
-//SDL_Window *myWindow;
-//SDL_Renderer *myRenderer;
-//SDL_Texture *myTexture;
 
 typedef unsigned char byte;
 

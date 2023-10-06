@@ -69,7 +69,7 @@ int main(int argc, char *argv[]){
     	return -13;
     }
 
-	// set network window
+	// create window
 	myWindow = SDL_CreateWindow("Fractile 1.0", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, get_window_width(), get_window_height(), SDL_WINDOW_RESIZABLE);
 	myRenderer = SDL_CreateRenderer(myWindow, -1, 0);
 
@@ -92,42 +92,6 @@ int main(int argc, char *argv[]){
 
 
 
-//	//--------------------------------------------------
-//	// load the font
-//	//--------------------------------------------------
-//	//Initialize SDL_ttf
-//    if( TTF_Init() == -1 )
-//    {
-//        return -13;
-//    }
-//
-//    //Open the font
-//    char *fontName = "absender1.ttf";
-//    font = TTF_OpenFont( fontName, 24 );
-//
-//	//If there was an error in loading the font
-//    if( font == NULL )
-//    {
-//    	error_s("could not open font, ",fontName);
-//        return -14;
-//    }
-//    // render a test surface
-//    SDL_Surface* message = NULL;
-//    SDL_Color textColor = {230,230,230};
-//    message = TTF_RenderText_Blended(font, "1 2 3 4 5 6 7 8 9 0 The quick brown fox jumps over the lazy dog", textColor);
-//
-//	// render all 10 digits (0 through 9) so that they are ready to go when they are needed.
-//	uint8_t n;
-//	char myStr[2] = "0";
-//	for(n = 0; n < 10; n++)
-//	{
-//		myStr[0] = '0' + n;
-//		numbers[n] = TTF_RenderText_Blended(font, myStr, textColor);
-//	}
-//
-//	// render the letter 'F' so it is ready to go
-//	letterF = TTF_RenderText_Blended(font, "F", textColor);
-
 
 	//--------------------------------------------------
 	// event handling
@@ -147,6 +111,7 @@ int main(int argc, char *argv[]){
 	// these keep track of where the mouse was just moments ago.
 	float xlast=0, ylast=0;
 
+	// todo: refactor: struct
 	// these two 2-element arrays keep the data concerning the state of the right and left mouse buttons.
 	// EX:
 		// mouse[SDL_BUTTON_LEFT][0] is the CURRENT state of the LEFT mouse button
@@ -156,6 +121,7 @@ int main(int argc, char *argv[]){
 		// etc...
 	int mouse[MOUSE_BUTTONS][2] = { {0,0}, {0,0}, {0,0}, {0,0}, {0,0} };
 
+	// todo: refactor: struct
 	// this is similar to mouse. however, this is used to store where the user clicked when a particular mouse button was clicked.
 		// mouseClick[SDL_BUTTON_LEFT][0] is the x position where the user clicked the left  mouse button.
 		// mouseClick[SDL_BUTTON_LEFT][1] is the y position where the user clicked the left  mouse button.
@@ -216,22 +182,6 @@ int main(int argc, char *argv[]){
 
 	myFractal.children[0].x = -100;
 	myFractal.children[0].y = 0;
-	/*
-	myFractal.children[1].x = 100;
-	myFractal.children[1].y = 0;
-	myFractal.shapes[1].x[0] = 100;
-	myFractal.shapes[1].y[0] = 0;
-
-	myFractal.children[2].x = 0;
-	myFractal.children[2].y = -100;
-	myFractal.shapes[2].x[0] = 0;
-	myFractal.shapes[2].y[0] = -100;
-
-	myFractal.children[3].x = 0;
-	myFractal.children[3].y = 100;
-	myFractal.shapes[3].x[0] = 0;
-	myFractal.shapes[3].y[0] = 100;
-	*/
 
 	myFractal.children[0].twist = 180;
 	myFractal.children[1].twist = 0;
@@ -242,28 +192,6 @@ int main(int argc, char *argv[]){
 	myFractal.children[1].scale = sqrt(0.5);
 	myFractal.children[2].scale = sqrt(0.5);
 	myFractal.children[3].scale = sqrt(0.5);
-
-	/*
-	myFractal.children[1].scale = decayFact*myFractal.children[0].scale;
-	myFractal.children[2].scale = decayFact*myFractal.children[1].scale;
-	myFractal.children[3].scale = decayFact*myFractal.children[2].scale;
-	myFractal.children[4].scale = decayFact*myFractal.children[3].scale;
-	myFractal.children[5].scale = decayFact*myFractal.children[4].scale;
-	myFractal.children[6].scale = decayFact*myFractal.children[5].scale;
-	myFractal.children[7].scale = decayFact*myFractal.children[6].scale;
-	myFractal.children[8].scale = decayFact*myFractal.children[7].scale;
-	myFractal.children[9].scale = decayFact*myFractal.children[8].scale;
-	myFractal.children[10].scale = decayFact*myFractal.children[9].scale;
-	myFractal.children[11].scale = decayFact*myFractal.children[10].scale;
-	myFractal.children[12].scale = decayFact*myFractal.children[11].scale;
-	myFractal.children[13].scale = decayFact*myFractal.children[12].scale;
-	myFractal.children[14].scale = decayFact*myFractal.children[13].scale;
-	myFractal.children[15].scale = decayFact*myFractal.children[14].scale;
-	myFractal.children[16].scale = decayFact*myFractal.children[15].scale;
-	myFractal.children[17].scale = decayFact*myFractal.children[16].scale;
-	myFractal.children[18].scale = decayFact*myFractal.children[17].scale;
-	myFractal.children[19].scale = decayFact*myFractal.children[18].scale;
-	*/
 
 	float zoomFactor = 1.05;
 
@@ -305,12 +233,10 @@ int main(int argc, char *argv[]){
 	uint8_t persist = 1;
 
 	//--------------------------------------------------
-	// this is the fabled "main while() loop"
 	// This is where the user input is interpreted.
 	// The fractal rendering routines are called from here.
 	// mouse motion, mouse clicks, keystrokes, etc...
 	//--------------------------------------------------
-
 	while(quit == 0){
 
 		// check to see which fractal structure will be operated on.
@@ -544,38 +470,6 @@ int main(int argc, char *argv[]){
 			}
 		}
 
-		/*
-		// testing random movement in shapes
-		myFractal.children[0].x += rand_range_f(-5,5);
-		myFractal.children[0].y += rand_range_f(-5,5);
-		myFractal.children[1].x += rand_range_f(-5,5);
-		myFractal.children[1].y += rand_range_f(-5,5);
-
-
-		myFractal.shapes[0].x[0] += rand_range_f(-5,5);
-		myFractal.shapes[0].y[0] += rand_range_f(-5,5);
-		myFractal.shapes[1].x[0] += rand_range_f(-5,5);
-		myFractal.shapes[1].y[0] += rand_range_f(-5,5);
-		myFractal.shapes[2].x[0] += rand_range_f(-5,5);
-		myFractal.shapes[2].y[0] += rand_range_f(-5,5);
-		myFractal.shapes[3].x[0] += rand_range_f(-5,5);
-		myFractal.shapes[3].y[0] += rand_range_f(-5,5);
-		myFractal.shapes[4].x[0] += rand_range_f(-5,5);
-		myFractal.shapes[4].y[0] += rand_range_f(-5,5);
-		*/
-
-		/*
-		// testing automatic twist
-		int c;
-		for(c=0; c<myFractal.numberOfChildren; c++)
-		{
-			myFractal.children[c].twist += 0.08;// c*0.2679842 + 0.129778;
-		}
-		*/
-
-		//myFractal.children[0].twist += 0.3643885;
-		//myFractal.children[1].twist -= 0.525564;
-		//myFractal.children[2].twist -= 0.7992432;
 		myFractal.children[0].twist += 0.2;//rand_range_f(-5,5);
 		myFractal.children[1].twist -= 0.2;
 		myFractal.children[2].twist -= 1;
@@ -589,44 +483,6 @@ int main(int argc, char *argv[]){
 		//sidebar_render(&mySideBar,mySideBarSurface);
 
 		SDL_BlitSurface(mySideBarSurface, NULL, mySurface, &mySideBar.rect );
-
-		/*
-		// the following code tests the operation of the twist_xy function to ensure it works properly.
-		// the results should be a series of circles that twist around the center of the screen
-		draw_circle(mySurface, x, y, 10, 0xff0000ff);
-		float xt;
-		float yt;
-		for(i=45; i<360; i+=45)
-		{
-			twist_xy(x-get_window_width()/2,y-get_window_height()/2, i, &xt, &yt);
-			draw_circle(mySurface, xt+get_window_width()/2, yt+get_window_height()/2, 10, 0xff0000ff);
-		}
-		*/
-
-		// this was used to test the event.motion.x stuff
-		// it appears that event.motion.x and event.motion.y are cleared when different events occur.
-		//draw_circle(mySurface, event.motion.x, event.motion.y, 10, 0xff00ffff);
-
-
-
-//		//--------------------------------------------------
-//		// testing font creation
-//		//--------------------------------------------------
-//		SDL_Rect testRect;
-//		testRect.x = 23;
-//		testRect.y = 4;
-//		testRect.w = message->w;
-//		testRect.h = message->h;
-//		SDL_BlitSurface(message, NULL, mySurface, &testRect);
-//
-//		for(n = 0; n < 10; n++)
-//		{
-//			testRect.x = 25*n;
-//			testRect.y = 50*n;
-//			testRect.w = numbers[n]->w;
-//			testRect.h = numbers[n]->h;
-//			SDL_BlitSurface(numbers[n], NULL, mySurface, &testRect);
-//		}
 
 		//--------------------------------------------------
 		// this area of the code puts whatever was rendered
