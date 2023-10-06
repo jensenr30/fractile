@@ -240,47 +240,9 @@ void fractal_set_default(struct fractal *frac) {
     frac->numberOfShapes = FRACTAL_DEFAULT_SHAPES;     // default number of shapes
     frac->zoom = FRACTAL_DEFAULT_ZOOM;                 // default zoom scale
     frac->twist = FRACTAL_DEFAULT_TWIST;               // default twist
-    frac->x =
-        get_window_width() /
-        2; // default placement of origin on SDL_Surface rendered to is the center of the screen
-    frac->y = get_window_height() / 2; // "
-}
-
-/// this will copy the data from one fractalSelect structure into another fractalSelect structure
-// returns 0  on successful copy
-// returns -1 on NULL source pointer
-// returns -2 on NULL dest   pointer
-int fractal_select_copy(struct fractalSelect *source, struct fractalSelect *dest) {
-    // check for a NULL select pointer
-    if (source == NULL) {
-        error("fractal_select_copy() was sent a NULL [source] pointer. Aborting function call.");
-        return -1;
-    }
-    // check for a NULL select pointer
-    if (dest == NULL) {
-        error("fractal_select_copy() was sent a NULL [dest] pointer. Aborting function call.");
-        return -2;
-    }
-
-    int s, sp;
-    // for every shape,
-    for (s = 0; s < FRACTAL_MAX_SHAPES; s++) {
-        // for every shape point,
-        for (sp = 0; sp < FRACTAL_MAX_SHAPE_POINTS; sp++) {
-            // copy each shape point
-            dest->shapePoints[s][sp] = source->shapePoints[s][sp];
-        }
-        // copy the radius of each shape
-        dest->shapeRadius[s] = source->shapeRadius[s];
-    }
-
-    int c;
-    // for each child,
-    for (c = 0; c < FRACTAL_MAX_CHILDREN; c++) {
-        // copy each child
-        dest->child[s] = source->child[s];
-    }
-    return 0; // success
+    // default placement of origin on SDL_Surface rendered to is the center of the screen
+    frac->x = get_window_width() / 2.0f;
+    frac->y = get_window_height() / 2.0f;
 }
 
 int fractal_copy(struct fractal *source, struct fractal *dest) {
@@ -297,7 +259,6 @@ int fractal_copy(struct fractal *source, struct fractal *dest) {
 }
 
 void fractal_select_deselect_all(struct fractalSelect *select) {
-    // check for a NULL select pointer
     if (select == NULL) {
         error("fractal_select_clear() was sent a NULL [select] pointer. Aborting function call.");
         return;

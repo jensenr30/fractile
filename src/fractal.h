@@ -195,8 +195,6 @@ void fractal_render_iteration(
 void fractal_render_children(struct fractal *frac, SDL_Surface *dest, int iterations);
 void twist_xy(float x, float y, float twist, float *x_ret, float *y_ret);
 
-// these functions are centered around batch manipulation of data in a fractal structure.
-int fractal_select_copy(struct fractalSelect *source, struct fractalSelect *dest);
 /**
  * @brief copy a fractal
  * @return 0  on successful copy, otherwise negative

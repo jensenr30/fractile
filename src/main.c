@@ -473,7 +473,7 @@ int main(int argc, char *argv[]) {
 
         fractal_render_children(&myFractal, mySurface, 3);
 
-        fractal_render(&myFractal, mySurface, 4);
+        fractal_render(&myFractal, mySurface, iterations);
 
         // TODO uncomment this:
         // sidebar_render(&mySideBar,mySideBarSurface);
