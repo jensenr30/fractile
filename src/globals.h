@@ -1,7 +1,7 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-//#include <SDL2/SDL_ttf.h>
+// #include <SDL2/SDL_ttf.h>
 #define DEBUG 1
 
 typedef unsigned char byte;
