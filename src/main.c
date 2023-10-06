@@ -142,7 +142,7 @@ int main(int argc, char *argv[]) {
     int mouseClick[MOUSE_BUTTONS][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
 
     //--------------------------------------------------
-    // these variables keep track of time and FPS
+    // time, FPS
     //--------------------------------------------------
     Uint32 ticksLast = 0;
     Uint32 ticksNow = 0;
@@ -150,15 +150,11 @@ int main(int argc, char *argv[]) {
     Uint32 FPS = 0;
 
     //--------------------------------------------------
-    // these variables are for fractal stuff
+    // configure fractal
     //--------------------------------------------------
-    // declare a fractal.
     struct fractal myFractal;
-    // print the size of the fractal structure to file
     gamelog_d("sizeof(struct fractal) (in bytes) = ", sizeof(struct fractal));
-    // set the fractal to default.
     fractal_set_default(&myFractal);
-    // float decayFact = 0.7;
 
     myFractal.numberOfChildren = 2;
     myFractal.numberOfShapes = 2;
@@ -205,17 +201,12 @@ int main(int argc, char *argv[]) {
     float zoomFactor = 1.05;
 
     //--------------------------------------------------
-    // sidebar stuff
+    // sidebar
     //--------------------------------------------------
-    // create sidebar
     struct sidebar mySideBar;
-    // init sidebar
     sidebar_init(&mySideBar);
-    // create a surface to print the sidebar onto.
     SDL_Surface *mySideBarSurface = create_surface(mySideBar.rect.w, mySideBar.rect.h);
-    // point the sidebar at the fractal you are playing with
     mySideBar.frac = &myFractal;
-    // load the fonts that the sidebar will use
     sidebar_load_fonts(&mySideBar);
 
     //--------------------------------------------------
@@ -262,21 +253,17 @@ int main(int argc, char *argv[]) {
         for (i = 0; i < keysSize; i++) {
             keys[i] = 0;
         }
-        while (SDL_PollEvent(&event)) {
 
-            //--------------------------------------------------
-            // if the mouse has moved,
-            //--------------------------------------------------
+        while (SDL_PollEvent(&event)) {
             if (event.type == SDL_MOUSEMOTION) {
+                // record mouse position
                 x = event.motion.x;
                 y = event.motion.y;
             }
 
             // if the event is NOT relevant to the sidebar,
             if (!sidebar_evaluate(&mySideBar, &event, x, y)) {
-                //--------------------------------------------------
                 // if a mouse button is pressed,
-                //--------------------------------------------------
                 if (event.button.type == SDL_MOUSEBUTTONDOWN) {
 
                     x = event.button.x;
@@ -308,9 +295,6 @@ int main(int argc, char *argv[]) {
                     }
                 }
 
-                //--------------------------------------------------
-                // if a mouse button has been released,
-                //--------------------------------------------------
                 else if (event.type == SDL_MOUSEBUTTONUP) {
                     // set mouse button states
                     if (event.button.button == SDL_BUTTON_LEFT) mouse[SDL_BUTTON_LEFT][0] = 0;
@@ -318,19 +302,13 @@ int main(int argc, char *argv[]) {
                     if (event.button.button == SDL_BUTTON_MIDDLE) mouse[SDL_BUTTON_MIDDLE][0] = 0;
                 }
 
-                //--------------------------------------------------
-                // if the mouse wheel is turned,
-                //--------------------------------------------------
-                else if (event.type == SDL_MOUSEWHEEL) {
+                else if (event.type == SDL_MOUSEWHEEL) { // if the mouse wheel is turned,
                     if (event.wheel.y > 0)
                         fractal_zoom(fracOp, zoomFactor, x, y);
                     else
                         fractal_zoom(fracOp, 1 / zoomFactor, x, y);
                 }
 
-                //--------------------------------------------------
-                // if a key has been pressed,
-                //--------------------------------------------------
                 else if (event.type == SDL_KEYDOWN) {
                     if (event.key.keysym.sym >= 0) {
                         // set that character, number, or letter to 1.
@@ -353,9 +331,6 @@ int main(int argc, char *argv[]) {
                     }
                 }
 
-                //--------------------------------------------------
-                // if a key has been released,
-                //--------------------------------------------------
                 else if (event.type == SDL_KEYUP) {
                     if (event.key.keysym.sym >= 0) {
                         // set that character, number, or letter to 0.
@@ -363,9 +338,6 @@ int main(int argc, char *argv[]) {
                     }
                 }
 
-                //--------------------------------------------------
-                // if there has been a window event
-                //--------------------------------------------------
                 else if (event.type == SDL_WINDOWEVENT) {
                     // if the window has been closed,
                     if (event.window.event == SDL_WINDOWEVENT_CLOSE) {
@@ -398,9 +370,6 @@ int main(int argc, char *argv[]) {
                 }
             }
 
-            //--------------------------------------------------
-            // if there has been a quit event,
-            //--------------------------------------------------
             if (event.type == SDL_QUIT) {
                 quit = 1;
             }
@@ -466,11 +435,13 @@ int main(int argc, char *argv[]) {
             }
         }
 
+        // todo: make these parameters user-configurable
         myFractal.children[0].twist += 0.2; // rand_range_f(-5,5);
         myFractal.children[1].twist -= 0.2;
         myFractal.children[2].twist -= 1;
         myFractal.children[3].twist += 1;
 
+        // todo: get rid of this:
         fractal_render_children(&myFractal, mySurface, 3);
 
         fractal_render(&myFractal, mySurface, iterations);
