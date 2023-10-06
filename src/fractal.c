@@ -4,16 +4,8 @@
 #include "utilities.h"
 #include <math.h>
 
-/// this function will render a fractal to a destination SDL_Surface
-// frac is the fractal to render
-// dest is the destination SDL_Surface to render the fractal to
-// x and y are the coordinates on the SDL surface (in units of pixels) where the origin of the
-// fractal will be printed. x and y can be outside the bounds of the screen. That is absolutely fine
-// and even encouraged. As long as some part of the fractal is still seen. scale specifies the scale
-// to render everything at. scale = 1:		one-to-one ratio fractal space to pixels scale =
-// 0.1: 	the image should be shrunk ten times (zoomed out) scale = 10:		the fractal
-// rendered should look very large (zoomed in)
-// scale allows the user to zoom in/out
+#define DEGREES_TO_RADIANS (M_PI / 180)
+
 void fractal_render(struct fractal *frac, SDL_Surface *dest, uint32_t iterations) {
 
     // check for NULL pointers for frac
@@ -56,15 +48,7 @@ void fractal_render(struct fractal *frac, SDL_Surface *dest, uint32_t iterations
 // through the nodes to determine the most efficient way of rendering the fractal using hardware
 // acceleration.
 
-/// this will draw a single iteration of the fractal.
-// this function is recursive. It will call itself again to render its children.
-// this means that the function will take exponentially longer as the number of iterations
-// increases. frac is a pointer to the fractal to be rendered. dest is a pointer to the SDL_Surface
-// to be rendered to. iteration is the current iteration of the fractal (i.e. how deep in the
-// fractal you are) <x,y> is the position of the fractal's origin on the screen (units of pixels,
-// but still floating point numbers to retain accuracy) scale tells us what scale this iteration is
-// at. NOTE: this function does not check for a bad fractal pointer or a bad SDL_Surface pointer. So
-// don't send this function any NULL or 0xbaadf00d pointers.
+// draw a fractal recursively
 void fractal_render_iteration(
     struct fractal *frac,
     SDL_Surface *dest,
@@ -74,6 +58,9 @@ void fractal_render_iteration(
     float scale,
     float twist
 ) {
+    if (frac == NULL || dest == NULL) {
+        return;
+    }
     if (iteration == 0) {
         return;
     }
@@ -81,57 +68,49 @@ void fractal_render_iteration(
     float tx[FRACTAL_MAX_SHAPE_POINTS];
     float ty[FRACTAL_MAX_SHAPE_POINTS];
 
-    // if this is the iteration the user wants to print
-    if (1) // iteration == 0 || iteration == 3)
-    {
-        // render all the shapes. this is where the magic happens
-        for (i = 0; i < frac->numberOfShapes; i++) {
-            // draw a line between <x[0],y[0]> and <x[1],y[1]>
-            switch (frac->shapes[i].type) {
-                case fst_circle:
-                    twist_xy(frac->shapes[i].x[0], frac->shapes[i].y[0], twist, &tx[0], &ty[0]);
-                    draw_circle(
-                        dest,
-                        x + tx[0] * scale,
-                        y + ty[0] * scale,
-                        frac->shapes[i].radius * scale,
-                        frac->shapes[i].color
-                    );
-                    break;
+    for (i = 0; i < frac->numberOfShapes; i++) {
+        // todo: extract methods for drawing shapes
+        switch (frac->shapes[i].type) {
+            case fst_circle:
+                twist_xy(frac->shapes[i].x[0], frac->shapes[i].y[0], twist, &tx[0], &ty[0]);
+                draw_circle(
+                    dest,
+                    x + tx[0] * scale,
+                    y + ty[0] * scale,
+                    frac->shapes[i].radius * scale,
+                    frac->shapes[i].color
+                );
+                break;
 
-                case fst_line:
-                    twist_xy(frac->shapes[i].x[0], frac->shapes[i].y[0], twist, &tx[0], &ty[0]);
-                    twist_xy(frac->shapes[i].x[1], frac->shapes[i].y[1], twist, &tx[1], &ty[1]);
-                    draw_line(
-                        dest,
-                        x + tx[0] * scale,
-                        y + ty[0] * scale,
-                        x + tx[1] * scale,
-                        y + ty[1] * scale,
-                        frac->shapes[i].radius * scale,
-                        frac->shapes[i].color
-                    );
-                    break;
+            case fst_line:
+                twist_xy(frac->shapes[i].x[0], frac->shapes[i].y[0], twist, &tx[0], &ty[0]);
+                twist_xy(frac->shapes[i].x[1], frac->shapes[i].y[1], twist, &tx[1], &ty[1]);
+                draw_line(
+                    dest,
+                    x + tx[0] * scale,
+                    y + ty[0] * scale,
+                    x + tx[1] * scale,
+                    y + ty[1] * scale,
+                    frac->shapes[i].radius * scale,
+                    frac->shapes[i].color
+                );
+                break;
 
-                default:
-                case fst_pixel:
-                    twist_xy(frac->shapes[i].x[0], frac->shapes[i].y[0], twist, &tx[0], &ty[0]);
-                    draw_pixel(
-                        dest,
-                        (x + tx[0] * scale) + 0.5,
-                        (y + ty[0] * scale) + 0.5,
-                        frac->shapes[i].color
-                    );
-                    break;
-            }
+            default:
+            case fst_pixel:
+                twist_xy(frac->shapes[i].x[0], frac->shapes[i].y[0], twist, &tx[0], &ty[0]);
+                draw_pixel(
+                    dest,
+                    (x + tx[0] * scale) + 0.5,
+                    (y + ty[0] * scale) + 0.5,
+                    frac->shapes[i].color
+                );
+                break;
         }
     }
 
-    // render each child.
     for (i = 0; i < frac->numberOfChildren; i++) {
-        // calculate the twist for each child (using the tx and ty variables)
         twist_xy(frac->children[i].x, frac->children[i].y, twist, &tx[0], &ty[0]);
-        // render a child recursively
         fractal_render_iteration(
             frac,
             dest,
@@ -148,36 +127,38 @@ void fractal_render_iteration(
 // <x,y> is a point relative to <0,0>
 // twist is the amount (in degrees) that <x,y> should be twisted
 // <x_ret,y_ret> is <x,y> rotated by the angle twist
-// NOTE: this function does NOT check for NULL x_ret, y_ret pointers. SO DON'T SEND IT ANY!
-void twist_xy(float x, float y, float twist, float *x_ret, float *y_ret) {
+// todo: refactor using a Point struct (see if SDL has any native Point types)
+// todo: see if SDL or other library has accellerated rotation about the origin
+void twist_xy(float x, float y, float twist_degrees, float *x_ret, float *y_ret) {
+    if (x_ret == NULL || y_ret == NULL) {
+        return;
+    }
 
     float mag = sqrt(x * x + y * y);
 
-    float ang;
+    float angle_radians;
 
     if (x != 0) {
-        ang = atan(y / x);
+        angle_radians = atan(y / x);
         // if x is less that 0, then we need to add this correction factor because of the 180 degree
         // cyclic nature of the atan() function
-        if (x < 0) ang -= 3.141592654;
+        if (x < 0) angle_radians -= 3.141592654;
     }
-    // if x IS equal to zero, then we cannot use atan(y/x) because we would be dividing by zero.
-    // fortunately for us, we know the angle must either be positive or negative 90 degrees based on
-    // the sign on y
+    // If x IS equal to zero, then we cannot use atan(y/x) because we would be dividing by zero.
     else {
-        if (y > 0) {
-            ang = 1.570796;
+        // The angle must either be positive or negative 90 degrees based on the sign on y.
+        if (y >= 0) {
+            angle_radians = 1.570796;
         } else {
-            ang = -1.570796;
+            angle_radians = -1.570796;
         }
     }
 
-    // convert twist to radians and add it to the angle
-    ang += twist * 0.01745329252;
+    angle_radians += twist_degrees * DEGREES_TO_RADIANS;
 
     // return the twisted x and y coordinates
-    *x_ret = mag * cos(ang);
-    *y_ret = mag * sin(ang);
+    *x_ret = mag * cos(angle_radians);
+    *y_ret = mag * sin(angle_radians);
 }
 
 /// this function renders the children's placement as simple circles.
@@ -197,6 +178,7 @@ void fractal_render_children(struct fractal *frac, SDL_Surface *dest, int iterat
     }
 }
 
+// todo: refactor into more functions
 void fractal_set_default(struct fractal *frac) {
     // check for a NULL frac pointer
     if (frac == NULL) {
@@ -243,19 +225,6 @@ void fractal_set_default(struct fractal *frac) {
     // default placement of origin on SDL_Surface rendered to is the center of the screen
     frac->x = get_window_width() / 2.0f;
     frac->y = get_window_height() / 2.0f;
-}
-
-int fractal_copy(struct fractal *source, struct fractal *dest) {
-    if (source == NULL) {
-        error("fractal_copy() was sent a NULL [source] pointer. Aborting function call.");
-        return -1;
-    }
-    if (dest == NULL) {
-        error("fractal_copy() was sent a NULL [dest] pointer. Aborting function call.");
-        return -2;
-    }
-
-    *dest = *source;
 }
 
 void fractal_select_deselect_all(struct fractalSelect *select) {

@@ -391,8 +391,8 @@ int main(int argc, char *argv[]) {
                 // enter the part modification mode
                 modPart = 1;
                 // make a copy of the fractal's original state when modification happened.
+                myFractalOrig = myFractal;
                 // now myFractal will be set to some modified version of myFractalOrig
-                fractal_copy(&myFractal, &myFractalOrig);
             }
             // otherwise, no valid part was found
             else {
@@ -410,7 +410,7 @@ int main(int argc, char *argv[]) {
             if (mouse[SDL_BUTTON_LEFT][0]) {
                 // draw_circle(mySurface, 200, 200, 66.67, 0xFF0000FF);
                 //  copy the original state of myFractal into the myFractal
-                fractal_copy(&myFractalOrig, &myFractal);
+                myFractal = myFractalOrig;
                 // modify myFractal
                 fractal_select_modify(
                     &myFractal, (x - orig_x) / myFractalOrig.zoom, (y - orig_y) / myFractalOrig.zoom
