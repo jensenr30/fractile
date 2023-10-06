@@ -195,11 +195,6 @@ void fractal_render_iteration(
 void fractal_render_children(struct fractal *frac, SDL_Surface *dest, int iterations);
 void twist_xy(float x, float y, float twist, float *x_ret, float *y_ret);
 
-/**
- * @brief copy a fractal
- * @return 0  on successful copy, otherwise negative
- */
-int fractal_copy(struct fractal *source, struct fractal *dest);
 void fractal_set_default(struct fractal *frac);
 
 // these functions are centered around user interface

@@ -233,21 +233,16 @@ void fractal_select_deselect_all(struct fractalSelect *select) {
         return;
     }
 
-    int s, sp;
-    // for every fractal shape,
-    for (s = 0; s < FRACTAL_MAX_SHAPES; s++) {
-        // deselect each points set of xy points
-        for (sp = 0; sp < FRACTAL_MAX_SHAPE_POINTS; sp++) {
-            select->shapePoints[s][sp] = 0;
+    for (int shape = 0; shape < FRACTAL_MAX_SHAPES; shape++) {
+        for (int sp = 0; sp < FRACTAL_MAX_SHAPE_POINTS; sp++) {
+            select->shapePoints[shape][sp] = 0; // deselect each points set of xy points
         }
-        // deselect each point's radius
-        select->shapeRadius[s] = 0;
+        select->shapeRadius[shape] = 0; // deselect each point's radius
     }
-    int c;
-    // for each child,
-    for (c = 0; c < FRACTAL_MAX_CHILDREN; c++) {
+
+    for (int child = 0; child < FRACTAL_MAX_CHILDREN; child++) {
         // deselect that child
-        select->child[c] = 0;
+        select->child[child] = 0;
     }
 }
 
@@ -291,10 +286,9 @@ int fractal_select_point(SDL_Surface *dest, struct fractal *frac, float x, float
     //---------------------------------------------
     // check if the user selected parts of a shape
     //---------------------------------------------
-
-    // for each fractal shape
     for (s = 0; s < FRACTAL_MAX_SHAPES; s++) {
         // figure out how many shape points are relevant to the specific shape
+        // todo: there must be a better way - use a struct? and enum?
         switch (frac->shapes[s].type) {
             case fst_circle:
                 shapePointsUsed = 1;
@@ -316,10 +310,10 @@ int fractal_select_point(SDL_Surface *dest, struct fractal *frac, float x, float
                 break;
         }
 
+        // todo: this belongs in a different file
         //---------------------------------------------
         // check if the user clicked near any xy points
         //---------------------------------------------
-
         // for each xy point, check if the user clicked near that point. In this case, "near" mean
         for (sp = 0; sp < shapePointsUsed; sp++) {
             // calculate the distance between where the user clicked and the xy point of this shape
@@ -336,11 +330,11 @@ int fractal_select_point(SDL_Surface *dest, struct fractal *frac, float x, float
             }
         }
 
+        // todo: this belongs in a different file
         //---------------------------------------------
         // check if the user clicked a radius distance
         // away from the first xy point
         //---------------------------------------------
-
         // only check for the user selecting the radius if the shape is a circle
         if (frac->shapes[s].type == fst_circle) {
             // calculate the dist2 between <xf,yf> and the first point <x[0],y[0]>
