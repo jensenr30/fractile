@@ -1,6 +1,8 @@
+![fractile banner](screenshots/banner.png?raw=true "fractile banner")
+
 # Fractile
 
-Design and render fractals in real time using SDL 2.
+Design and render 2D fractals in real time using SDL2.
 
 ## Dependencies
 
@@ -19,7 +21,7 @@ TODO: `make install`
 
 `./build/fractile`
 
-## 2023 Refactor
+## TODO: Refactor
 
 - [ ] fractal.c
 - [ ] fractal.h
