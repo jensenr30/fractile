@@ -1,23 +1,23 @@
-*.layout
-*.depend
-Fractile.layout
-Fractile.depend
+/bin/DebugWin/Fractile.exe
+/bin/ReleaseWin/Fractile.exe
+/bin/DebugWin/error.txt
+/bin/DebugWin/gamelog.txt
+/bin/ReleaseWin/error.txt
+/bin/ReleaseWin/gamelog.txt
+/screenshots/Fractile 1.0 screenshots.zip
 
-bin/DebugWin/Fractile.exe
-bin/ReleaseWin/Fractile.exe
-*.o
+/error.txt
+/gamelog.txt
 
 *stderr.txt
 *stdout.txt
+
+/*.layout
+/*.depend
+
+/build/
+
 *.orig
 *Thumbs.db
-bin/DebugWin/error.txt
-bin/DebugWin/gamelog.txt
-bin/ReleaseWin/error.txt
-bin/ReleaseWin/gamelog.txt
-screenshots/Fractile 1.0 screenshots.zip
 
-build/
-error.txt
-gamelog.txt
-
+*.o
