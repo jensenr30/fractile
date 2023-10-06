@@ -1,3 +1,5 @@
+# Fractile Makefile
+
 # Thanks to Chase Lambert https://makefiletutorial.com/#makefile-cookbook
 # Thanks to Job Vranish (https://spin.atomicobject.com/2016/08/26/makefile-c-projects/)
 

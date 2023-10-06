@@ -4,9 +4,20 @@ Design and render fractals in real time using SDL 2.
 
 ## Dependencies
 
+- make
 - sdl2
 - sdl2_image
 - sdl_ttf
+
+## Compile
+
+`make`
+
+TODO: `make install`
+
+## Run
+
+`./build/fractile`
 
 ## 2023 Refactor
 
