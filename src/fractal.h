@@ -86,10 +86,6 @@ Contents:
 
 #define fsf_TOP 4 // this is the highest valid number for fractal shape fill
 
-//-------------------------------------------------------
-// structure declarations
-//-------------------------------------------------------
-
 /// this is an <x,y> pair
 struct fractalChild {
     // this is the x position of the child with respect to its parent (units of pixels)
@@ -176,10 +172,6 @@ struct fractal {
     // this keeps track of what part of the fractal is being selected
     struct fractalSelect select;
 };
-
-//-------------------------------------------------------
-// function prototypes
-//-------------------------------------------------------
 
 // these functions are centered around rendering a fractal
 void fractal_render(struct fractal *frac, SDL_Surface *dest, uint32_t iterations);
