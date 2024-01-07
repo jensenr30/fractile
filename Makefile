@@ -9,7 +9,8 @@ SRC_DIRS := ./src
 TARGET_EXEC := ./fractile
 
 # Find all the C and C++ files we want to compile
-# Note the single quotes around the * expressions. The shell will incorrectly expand these otherwise, but we want to send the * directly to the find command.
+# Note the single quotes around the * expressions. The shell will incorrectly expand these
+# otherwise, but we want to send the * directly to the find command.
 SRCS := $(shell find $(SRC_DIRS) -name '*.cpp' -or -name '*.c' -or -name '*.s')
 
 # Prepends BUILD_DIR and appends .o to every src file
@@ -44,6 +45,10 @@ $(BUILD_DIR)/%.c.o: %.c
 .PHONY: clean
 clean:
 	rm -r $(BUILD_DIR)
+
+.PHONY: run
+run:
+	./$(BUILD_DIR)/fractile
 
 # Include the .d makefiles. The - at the front suppresses the errors of missing
 # Makefiles. Initially, all the .d files will be missing, and we don't want those

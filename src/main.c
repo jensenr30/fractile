@@ -17,13 +17,6 @@
 SDL_Event event;
 
 int main(int argc, char *argv[]) {
-
-    error("\n\n\n\n== PROGRAM START ======================================================\n\n\n\n"
-    );
-
-    //--------------------------------------------------
-    // initial gamelog write
-    //--------------------------------------------------
     gamelog_startup(argc, argv);
 
     set_window_width(1300);
@@ -436,10 +429,10 @@ int main(int argc, char *argv[]) {
         }
 
         // todo: make these parameters user-configurable
-        myFractal.children[0].twist += 0.2; // rand_range_f(-5,5);
-        myFractal.children[1].twist -= 0.2;
-        myFractal.children[2].twist -= 1;
-        myFractal.children[3].twist += 1;
+        myFractal.children[0].twist += 0.0021357845553; // rand_range_f(-5,5);
+        myFractal.children[1].twist -= 0.0031281;
+        myFractal.children[2].twist -= 0.0012645;
+        myFractal.children[3].twist += 0.003241531;
 
         // todo: get rid of this:
         fractal_render_children(&myFractal, mySurface, 3);

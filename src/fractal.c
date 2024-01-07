@@ -212,8 +212,8 @@ void fractal_set_default(struct fractal *frac) {
             cos(3.1415 * 2 * c / ((float)FRACTAL_MAX_CHILDREN)
             ); // distribute the children points initially radially outward from the fractal origin.
         frac->children[c].y = 200 * sin(3.1415 * 2 * c / ((float)FRACTAL_MAX_CHILDREN)); // "
-        frac->children[c].scale = FRACTAL_DEFAULT_SCALE;          // default scale
-        frac->children[c].twist = FRACTAL_DEFAULT_CHILDREN_TWIST; // default twist for children
+        frac->children[c].scale = FRACTAL_DEFAULT_SCALE;              // default scale
+        frac->children[c].twist = FRACTAL_DEFAULT_CHILDREN_TWIST * 4; // default twist for children
     }
     // set defaults for other things
     frac->iterationsChildren =
@@ -351,16 +351,14 @@ int fractal_select_point(SDL_Surface *dest, struct fractal *frac, float x, float
                 // set the selected part to the appropriate child number
                 frac->select.shapeRadius[s] = 1;
             }
-        } // if(type == circle)
-
-    } // for(shapes)
+        }
+    }
 
     //---------------------------------------------
     // check if the user clicked near child points
     //---------------------------------------------
 
     int c;
-    // check all children
     for (c = 0; c < FRACTAL_MAX_CHILDREN; c++) {
         // calculate the distance between where the user clicked and the child point
         dist2 = sqr(xf - frac->children[c].x) + sqr(yf - frac->children[c].y);
@@ -374,7 +372,7 @@ int fractal_select_point(SDL_Surface *dest, struct fractal *frac, float x, float
             // set the selected part to the appropriate child number
             frac->select.child[c] = 1;
         }
-    } // for(children)
+    }
 
     //---------------------------------------------
     // check if the closest click was close ENOUGH
@@ -427,18 +425,13 @@ int fractal_select_modify(struct fractal *frac, float x, float y) {
             }
         }
 
-        //---------------------------------------------
-        // check if the user wants to modify the radius
-        //---------------------------------------------
-
         // if the radius is selected for modification,
         if (frac->select.shapeRadius[s]) {
             // modify the radius
             frac->shapes[s].radius += x; /// TODO: fix this stupid hack. The radius needs to be
                                          /// configurable is a user-friendly way.
         }
-
-    } // for(shape)
+    }
 
     //---------------------------------------------
     // check if children need to be modifies
@@ -452,9 +445,9 @@ int fractal_select_modify(struct fractal *frac, float x, float y) {
             frac->children[c].x += x;
             frac->children[c].y += y;
         }
-    } // for(children)
+    }
 
-    return 0; // success
+    return 0;
 }
 
 void fractal_zoom(struct fractal *frac, float zoomFactor, float x, float y) {
